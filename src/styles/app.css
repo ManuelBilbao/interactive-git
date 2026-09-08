@@ -308,9 +308,13 @@ code {
 
 /* ---------- lesson panel ---------- */
 
+/* Panels leave their top padding to the title row, which spans the full width
+   and carries a bottom border. The lesson panel has no title row, so it puts
+   that padding back itself. */
 .lesson-panel {
   display: flex;
   flex-direction: column;
+  padding-top: 14px;
 }
 
 .lesson-list {
@@ -541,32 +545,66 @@ code {
   border-top: 1px solid var(--line);
 }
 
+.lesson-nav.solved {
+  border-top-color: var(--ok-line);
+}
+
+/* Reaching the goal is the one moment worth a filled surface: a band across
+   the whole footer, flush under its border, so it cannot be missed. */
 .lesson-solved {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding-bottom: 4px;
+  gap: 5px;
+  margin: -12px -14px 12px;
+  padding: 12px 14px;
+  background: var(--ok-soft);
+  border-bottom: 1px solid var(--ok-line);
+  animation: solved-in 0.24s ease-out;
+}
+
+@keyframes solved-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-solved {
+    animation: none;
+  }
 }
 
 .lesson-solved h3 {
   display: flex;
-  gap: 7px;
+  gap: 9px;
   align-items: center;
   color: var(--ok);
   font-family: var(--mono);
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .lesson-solved h3::before {
   content: "✓";
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--ok);
+  color: #fff;
+  font-size: 10.5px;
 }
 
 .lesson-solved p {
   margin: 0;
   font-size: 12.5px;
-  color: var(--ink-3);
+  line-height: 1.5;
+  color: var(--ink-2);
 }
 
 .lesson-steps {

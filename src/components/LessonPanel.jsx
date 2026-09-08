@@ -99,7 +99,7 @@ export default function LessonPanel({
 
       {/* The footer is pinned, so when the goal is reached the banner and the
           way onwards are both in view without scrolling back down. */}
-      <div className="lesson-nav">
+      <div className={solved ? 'lesson-nav solved' : 'lesson-nav'}>
         {solved && (
           <div className="lesson-solved">
             <h3>{isLast ? t('lesson.finished') : t('lesson.solved')}</h3>
