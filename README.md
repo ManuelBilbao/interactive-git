@@ -103,6 +103,7 @@ src/
     locales/es-AR.json
   components/        la interfaz
   styles/app.css
+public/favicon.svg   el logo del header, redibujado para 16px
 docs/                arquitectura y catálogo de lecciones
 scripts/             chequeos de render y de navegador, y el extractor de mensajes
 test/                tests del simulador, de las lecciones y del grafo

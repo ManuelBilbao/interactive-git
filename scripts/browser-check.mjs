@@ -241,6 +241,19 @@ try {
 
   await check('the four panels rendered', (await evaluate("return document.querySelectorAll('.panel').length")) === 4)
 
+  // The tab icon is a file in public/, so nothing in the app would notice if
+  // it went missing: the browser just falls back to a blank page icon.
+  await check(
+    'the favicon is linked and loads',
+    await evaluate(`
+      const link = document.querySelector('link[rel="icon"]')
+      if (!link) return false
+      const image = new Image()
+      image.src = link.href
+      return image.decode().then(() => image.naturalWidth > 0, () => false)
+    `),
+  )
+
   // git speaks the language of the site, the way it follows LANG for real.
   await type('git status')
   await check(
