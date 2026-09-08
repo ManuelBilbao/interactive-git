@@ -125,9 +125,17 @@ h3 {
   font-size: 13px;
 }
 
+.toggle {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  cursor: pointer;
+  color: var(--muted);
+}
+
 .workspace {
   display: grid;
-  grid-template-columns: 360px minmax(0, 1fr) 320px;
+  grid-template-columns: 320px minmax(0, 1fr) 288px;
   gap: 12px;
   padding: 12px;
   overflow: hidden;
@@ -333,15 +341,20 @@ h3 {
 
 /* ---------- graph ---------- */
 
+/* The two repositories stay side by side: seeing yours next to the server's is
+   the whole point. Each takes the width it needs and the row scrolls. */
 .graph-columns {
   display: flex;
-  gap: 18px;
+  gap: 28px;
   align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
 
+/* Each graph takes the width it needs; the panel scrolls when both together
+   do not fit, so a branch label is never cut in half. */
 .graph-column {
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 0 0 auto;
 }
 
 .graph-label {
@@ -351,7 +364,7 @@ h3 {
 }
 
 .graph-scroll {
-  overflow: auto;
+  overflow: visible;
 }
 
 .edge {
