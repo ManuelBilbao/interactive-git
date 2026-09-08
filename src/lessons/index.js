@@ -141,10 +141,12 @@ const DEFINITIONS = [
     check: (_world, history) => {
       const added = history.findIndex((line) => /^git\s+add\b/.test(line))
       if (added === -1) return false
-      const lookedAgain = history.some(
-        (line, position) => position > added && /^git\s+diff\s*$/.test(line),
-      )
-      return lookedAgain && ran(history, /^git\s+diff\s+--(staged|cached)\s*$/)
+      const bare = /^git\s+diff\s*$/
+      const looked = (first) =>
+        history.some(
+          (line, position) => (first ? position < added : position > added) && bare.test(line),
+        )
+      return looked(true) && looked(false) && ran(history, /^git\s+diff\s+--(staged|cached)\s*$/)
     },
   },
   {

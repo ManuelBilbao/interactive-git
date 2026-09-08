@@ -400,10 +400,10 @@
       "title": "Ver qué cambió",
       "intro": [
         "`git status` te dice **qué archivos** cambiaron. `git diff` te dice **qué cambió adentro**: línea por línea, lo que se agregó en verde con un `+` y lo que se borró en rojo con un `-`.",
-        "Acá `recetas.md` tiene un cambio sin guardar. Miralo con `git diff`, ponelo en el stage, y volvé a correr `git diff`.",
-        "Lo que pasa entonces confunde a todo el mundo la primera vez, así que vale la pena verlo ahora y no en un parcial."
+        "Acá `recetas.md` tiene un cambio recién hecho, que todavía no está en ningún commit.",
+        "Lo que pasa con ese cambio cuando entra al stage confunde a todo el mundo la primera vez, así que vale la pena verlo ahora y no en un parcial."
       ],
-      "goal": "Mirá el cambio, ponelo en el stage, volvé a mirar, y después mirá lo que quedó guardado ahí.",
+      "goal": "Mirá qué cambió adentro de `recetas.md`, ponelo en el stage y volvé a mirar. La segunda vez no vas a ver nada: encontrá dónde quedó el cambio.",
       "hints": [
         "El comando es uno solo, sin argumentos, y compara tu carpeta contra el stage. Por eso, una vez que hacés `git add`, no encuentra nada que mostrar: el cambio ya está del otro lado.",
         "Para ver lo que está en el stage hace falta una opción, la misma que le falta a `git status`.",

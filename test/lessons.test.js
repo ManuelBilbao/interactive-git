@@ -89,6 +89,24 @@ for (const lesson of LESSONS) {
   })
 }
 
+test('the diff lesson needs the look before the `git add`, not only after', () => {
+  // The whole lesson is the contrast between the two, so seeing only the
+  // second half of it is not the goal, however many commands were typed.
+  const lesson = LESSONS.find((item) => item.id === 'diff')
+  const solve = (lines) => {
+    let world = lesson.setup()
+    const history = []
+    for (const line of lines) {
+      world = run(world, line).world
+      history.push(line)
+    }
+    return lesson.check(world, history)
+  }
+
+  assert.equal(solve(['git add recetas.md', 'git diff', 'git diff --staged']), false)
+  assert.equal(solve(SOLUTIONS.diff), true)
+})
+
 test('the push lesson rejects a push that skipped the pull', () => {
   const lesson = LESSONS.find((item) => item.id === 'pushRejected')
   const step = run(lesson.setup(), 'git push')

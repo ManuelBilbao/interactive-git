@@ -32,7 +32,8 @@ donde confunden: después de `git add`, `git diff` no imprime nada, porque compa
 la carpeta contra el stage y el cambio ya se fue al otro lado. Verlo una vez, con
 la explicación al lado, ahorra media clase después. La otra mitad de la lección
 es que "sin salida" es una respuesta y no una falla, y para eso el simulador pone
-una tarjeta cuando pasa.
+una tarjeta cuando pasa. Como todo el sentido está en el contraste, la condición
+de victoria pide el `git diff` **antes** del `git add` y no solo el de después.
 
 **Comparar antes de mergear (15).** `git diff main postres` contesta "qué me
 traería este merge" antes de hacerlo. Y enseña una cosa que se paga cara: con dos
