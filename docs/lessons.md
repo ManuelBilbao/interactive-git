@@ -133,6 +133,10 @@ Aparte de eso, cada lección tiene pistas propias, que se piden de a una con el
 botón **Pedir una pista** y van de lo general a lo concreto. Nadie se queda
 trabado, pero hay que decidir pedir ayuda.
 
+Cuando la solución son varios comandos, van en un bloque, uno por línea, listos
+para tipear; cuando es uno solo, va en la oración. La URL del repositorio también
+va en un bloque: es larga y partida en dos renglones se copia mal.
+
 **El panel no lista los comandos de la lección.** Los tuvo un tiempo, arriba de
 las pistas, y era un machete: con el comando a la vista no queda nada que
 resolver. Ahora el comando exacto vive en la última pista, que se ofrece como

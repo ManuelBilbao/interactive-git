@@ -132,7 +132,10 @@ una lección imposible de completar, el test te lo dice.
    comando exacto para la última: es la que se ofrece como *Mostrar solución*.
 3. Agregá una solución en `test/lessons.test.js`. El test falla si falta.
 
-En los textos podés usar `` `código` `` y `**negrita**`.
+En los textos podés usar `` `código` ``, `**negrita**` y bloques con triple
+backtick, uno por línea, para las soluciones de varios comandos. `{repoUrl}` se
+reemplaza por la URL del repositorio del curso, que vive en una sola constante
+(`COURSE_REPO_URL`) para que la prosa no se desincronice del servidor simulado.
 
 ## Agregar un idioma
 

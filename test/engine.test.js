@@ -280,3 +280,22 @@ test('a failed command leaves the world untouched', () => {
   assert.equal(step.output.error, true)
   assert.equal(step.world, world)
 })
+
+test('clone names the directory after the repository, as git does', () => {
+  const world = play(worldWithRemote(), 'git clone https://github.com/curso/proyecto.git')
+  assert.equal(world.folder, 'proyecto')
+
+  // A URL whose repository is named differently renames the folder with it.
+  const other = createWorld({ remoteUrl: 'https://github.com/quien/mi-repo.git' })
+  const remote = createRepo({ head: { type: 'branch', name: 'main' } })
+  remote.branches.main = writeCommit(other, remote, {
+    parents: [],
+    message: 'inicial',
+    tree: { 'README.md': 'x' },
+  })
+  other.remote = remote
+
+  const cloned = play(other, 'git clone https://github.com/quien/mi-repo.git')
+  assert.equal(cloned.folder, 'mi-repo')
+  assert.match(run(other, 'git clone https://github.com/quien/mi-repo.git').output.lines[0], /mi-repo/)
+})

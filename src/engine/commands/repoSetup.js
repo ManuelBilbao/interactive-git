@@ -22,6 +22,12 @@ export function gitInit(world) {
   ]
 }
 
+/** The directory `git clone` creates: the last path segment, minus `.git`. */
+function folderFromUrl(url) {
+  const last = url.replace(/\/+$/, '').split('/').pop() ?? ''
+  return last.replace(/\.git$/, '') || 'proyecto'
+}
+
 export function gitClone(world, args) {
   const url = args[0]
   if (!url) {
@@ -73,6 +79,7 @@ export function gitClone(world, args) {
   world.files = { ...tree }
   world.repo = repo
   world.remoteUrl = url
+  world.folder = folderFromUrl(url)
 
   const count = Object.keys(repo.commits).length
   return [

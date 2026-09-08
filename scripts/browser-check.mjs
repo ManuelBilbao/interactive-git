@@ -312,6 +312,24 @@ try {
   const spanish = await terminal()
   await check('status is translated', spanish.includes('En la rama main'), terminal)
   await check('so are its sections', spanish.includes('Cambios listos para el commit:'), terminal)
+
+  // Layout, last so it does not disturb the lesson above: a code block has to
+  // show every line it holds. The lesson panel is a flex column, and a flex
+  // child that shrinks below its content clips whatever it cannot fit.
+  await openLesson(10)
+  await check(
+    'the repository URL block shows all of its lines',
+    await evaluate(
+      `const pre = document.querySelector('.commands')
+       if (!pre) throw new Error('lesson 10 shows no command block')
+       return pre.scrollHeight <= pre.clientHeight + 1`,
+    ),
+    () =>
+      evaluate(
+        `const pre = document.querySelector('.commands')
+         return \`clientHeight ${pre.clientHeight}, scrollHeight ${pre.scrollHeight}\``,
+      ),
+  )
 } finally {
   socket.close()
   await cleanUp()

@@ -22,7 +22,15 @@ import {
 } from '../engine/model.js'
 import { computeStatus, isClean } from '../engine/status.js'
 
-const REMOTE_URL = 'https://github.com/curso/recetas.git'
+/**
+ * The real repository this site is built from, so the URL they type is one
+ * they can actually open rather than a placeholder.
+ *
+ * Exported because the lesson texts quote it: they interpolate `{repoUrl}`
+ * instead of writing it out, so the URL in the prose cannot drift from the one
+ * the simulated server will answer to.
+ */
+export const COURSE_REPO_URL = 'https://github.com/ManuelBilbao/interactive-git.git'
 
 /** Adds a commit to a repository and moves the branch that points at it. */
 function seed(world, repo, branch, message, tree) {
@@ -47,7 +55,7 @@ function localRepo(world, commits) {
 function remoteRepo(world, commits) {
   const repo = createRepo({ head: { type: 'branch', name: 'main' } })
   world.remote = repo
-  world.remoteUrl = REMOTE_URL
+  world.remoteUrl = COURSE_REPO_URL
   for (const [message, tree] of commits) seed(world, repo, 'main', message, tree)
   return repo
 }

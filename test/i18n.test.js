@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 
-import { LESSONS } from '../src/lessons/index.js'
+import { COURSE_REPO_URL, LESSONS } from '../src/lessons/index.js'
 
 const messages = JSON.parse(readFileSync(new URL('../src/i18n/locales/es-AR.json', import.meta.url)))
 
@@ -76,6 +76,32 @@ test('the lesson text never lists the commands as an answer key', () => {
   // The intro teaches a command by name, which is the point; what must not
   // come back is a bare list of them sitting above the hints.
   assert.equal(messages.lesson.commands, undefined)
+})
+
+test('lesson prose never writes the repository URL out by hand', () => {
+  // It interpolates `{repoUrl}` instead, so the URL in the prose cannot drift
+  // from the one the simulated server answers to.
+  const prose = JSON.stringify(messages.lessons)
+  assert.equal(
+    prose.includes('github.com'),
+    false,
+    'a lesson text has a URL written out; use `{repoUrl}`',
+  )
+  assert.ok(prose.includes('{repoUrl}'), 'no lesson quotes the repository URL at all')
+})
+
+test('the URL the lessons quote is the one the server answers to', () => {
+  const clone = LESSONS.find((lesson) => lesson.id === 'clone').setup()
+  assert.equal(clone.remoteUrl, COURSE_REPO_URL)
+})
+
+test('the last lesson reminds you of the URL', () => {
+  // Cloning happened many lessons earlier, so the final challenge repeats it.
+  const final = messages.lessons.final
+  assert.ok(
+    [...final.intro, final.goal].some((text) => text.includes('{repoUrl}')),
+    'the final lesson asks for a clone without saying what to clone',
+  )
 })
 
 test('no lesson translation is left over', () => {

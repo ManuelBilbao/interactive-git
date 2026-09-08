@@ -317,6 +317,20 @@ code {
   padding-top: 14px;
 }
 
+/* The panel is a flex column, so its children would shrink below their content
+   when the lesson is long enough to scroll. Anything that clips — a code block
+   is a scroll container — loses a line that way. */
+.lesson-panel > * {
+  flex-shrink: 0;
+}
+
+/* Inline code wraps here, unlike everywhere else: the lesson text quotes whole
+   lines of git output, and this column is too narrow to hold them unbroken. */
+.lesson-panel code {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
 .lesson-list {
   margin-bottom: 18px;
   font-size: 13px;
@@ -487,6 +501,41 @@ code {
 
 .hint p {
   margin: 0;
+}
+
+.hint p + p {
+  margin-top: 7px;
+}
+
+/* Commands ready to be typed, one per line. A line too long for this column
+   wraps at a space, with what wraps hanging under the command it belongs to.
+   Something with no spaces to break at — a URL — is left whole and the block
+   scrolls instead, because a URL split across two lines is a URL mistyped. */
+.commands {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  overflow-x: auto;
+}
+
+.commands code {
+  display: block;
+  background: none;
+  border: none;
+  border-radius: 0;
+  /* Hanging indent: what wraps sits under the command it belongs to. */
+  padding: 0 0 0 1.4em;
+  text-indent: -1.4em;
+  white-space: pre-wrap;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.commands + p {
+  margin-top: 8px;
 }
 
 .hint-title {

@@ -2,9 +2,9 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
 import { run } from '../src/engine/commands/index.js'
-import { LESSONS } from '../src/lessons/index.js'
+import { COURSE_REPO_URL, LESSONS } from '../src/lessons/index.js'
 
-const URL = 'https://github.com/curso/recetas.git'
+const URL = COURSE_REPO_URL
 
 /** One known-good solution per lesson, in the same order as the course. */
 const SOLUTIONS = {

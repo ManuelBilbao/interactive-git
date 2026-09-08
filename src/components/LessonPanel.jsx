@@ -1,6 +1,6 @@
 import { useI18n } from '../i18n/index.jsx'
-import { LESSONS } from '../lessons/index.js'
-import RichText from './RichText.jsx'
+import { COURSE_REPO_URL, LESSONS } from '../lessons/index.js'
+import RichText, { RichBlocks } from './RichText.jsx'
 
 function LessonList({ current, completed, onSelect }) {
   const { t } = useI18n()
@@ -39,7 +39,9 @@ export default function LessonPanel({
 }) {
   const { t, tList, has } = useI18n()
   const key = `lessons.${lesson.id}`
-  const hints = tList(`${key}.hints`)
+  // Lesson prose quotes the repository URL; it comes from one place.
+  const params = { repoUrl: COURSE_REPO_URL }
+  const hints = tList(`${key}.hints`, params)
   const isLast = index === LESSONS.length - 1
   // The last hint spells out the command, so it is offered as what it is.
   const solutionAt = hints.length - 1
@@ -54,19 +56,19 @@ export default function LessonPanel({
       </p>
       <h2 className="lesson-title">{t(`${key}.title`)}</h2>
 
-      {tList(`${key}.intro`).map((paragraph) => (
-        <RichText key={paragraph} text={paragraph} className="lesson-intro" />
+      {tList(`${key}.intro`, params).map((paragraph) => (
+        <RichBlocks key={paragraph} text={paragraph} className="lesson-intro" />
       ))}
 
       <div className="lesson-goal">
         <h3>{t('lesson.goal')}</h3>
-        <RichText text={t(`${key}.goal`)} />
+        <RichText text={t(`${key}.goal`, params)} />
       </div>
 
       {has(`${key}.note`) && (
         <div className="lesson-note">
           <h3>{t('lesson.note')}</h3>
-          <RichText text={t(`${key}.note`)} />
+          <RichText text={t(`${key}.note`, params)} />
         </div>
       )}
 
@@ -78,7 +80,7 @@ export default function LessonPanel({
                 ? t('lesson.solutionTitle')
                 : t('lesson.hintTitle', { number: position + 1 })}
             </span>
-            <RichText text={hint} />
+            <RichBlocks text={hint} />
           </div>
         ))}
         {hintsShown < hints.length ? (

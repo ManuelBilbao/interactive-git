@@ -156,7 +156,7 @@
       "hints": [
         "Tenés que pasar los dos archivos al stage. El comando lleva el nombre del archivo.",
         "Podés hacerlo de a uno, o todos juntos poniendo un punto en lugar del nombre.",
-        "`git add recetas.md` y `git add compras.md`, o `git add .` de una. Comprobalo con `git status`: los dos tienen que aparecer bajo `{gitToBeCommitted}`."
+        "De a uno:\n```\ngit add recetas.md\ngit add compras.md\n```\nO los dos juntos con `git add .`. Comprobalo con `git status`: tienen que aparecer bajo `{gitToBeCommitted}`."
       ]
     },
     "commit": {
@@ -185,7 +185,7 @@
         "Primero cambiá `recetas.md`: usá el botón Editar del panel Archivos.",
         "Mirá `git status`: el archivo aparece en rojo, bajo `{gitNotStaged}`. Para que pase a verde tenés que ponerlo en el stage.",
         "Con el archivo en verde ya se puede guardar.",
-        "`git add recetas.md`, mirá `git status` otra vez, y cerrá con `git commit -m \"agrego milanesas\"`."
+        "El ciclo completo:\n```\ngit add recetas.md\ngit status\ngit commit -m \"agrego milanesas\"\n```"
       ]
     },
     "restore": {
@@ -199,7 +199,7 @@
       "hints": [
         "Son dos pasos: sacar del stage lo que está ahí, y descartar lo que quedó escrito en la carpeta.",
         "Los dos usan el mismo comando; el que toca el stage lleva `--staged`.",
-        "`git restore --staged recetas.md` y después `git restore recetas.md`. `git status` tiene que terminar diciendo `{gitClean}`."
+        "Primero sacalo del stage, después descartá lo que quedó escrito:\n```\ngit restore --staged recetas.md\ngit restore recetas.md\n```\n`git status` tiene que terminar diciendo `{gitClean}`."
       ]
     },
     "branch": {
@@ -239,7 +239,7 @@
       "hints": [
         "Hay un comando que crea la rama y te para en ella de una sola vez: es el de la lección anterior con una opción de más.",
         "Una vez ahí, el ciclo de siempre: creá el archivo, ponelo en el stage y guardalo.",
-        "`git checkout -b bebidas`, creá `bebidas.md` con el botón Nuevo archivo, y cerrá con `git add bebidas.md` y `git commit -m \"agrego bebidas\"`."
+        "Creá el archivo con el botón Nuevo archivo cuando ya estés en la rama:\n```\ngit checkout -b bebidas\ngit add bebidas.md\ngit commit -m \"agrego bebidas\"\n```"
       ]
     },
     "merge": {
@@ -273,12 +273,12 @@
       "intro": [
         "Hasta acá todo pasó en tu computadora. Ahora aparece un segundo repositorio: el que vive en el servidor. Git lo llama **origin**.",
         "`git clone <url>` se baja todo: los commits, las ramas y la historia completa. Y te deja la copia lista para trabajar.",
-        "El repositorio del curso está en `https://github.com/curso/recetas.git`."
+        "Vamos a clonar el repositorio de este mismo sitio, que es de verdad y podés abrir en otra pestaña:\n```\n{repoUrl}\n```"
       ],
       "goal": "Cloná el repositorio del curso.",
       "hints": [
         "El comando lleva la URL del repositorio, que está en la explicación de arriba.",
-        "`git clone https://github.com/curso/recetas.git`. Cuando termine, mirá los dos paneles de Historia: tenés la misma cadena de commits de los dos lados."
+        "```\ngit clone {repoUrl}\n```\nCuando termine, mirá los dos paneles de Historia: tenés la misma cadena de commits de los dos lados."
       ]
     },
     "push": {
@@ -292,7 +292,7 @@
       "hints": [
         "Primero necesitás un commit propio: editá `recetas.md`, ponelo en el stage y guardalo.",
         "Con el commit hecho, falta un solo comando para que llegue al servidor.",
-        "`git add recetas.md`, `git commit -m \"agrego milanesas\"` y después `git push`. Mirá cómo `origin/main` se mueve junto con `main`."
+        "```\ngit add recetas.md\ngit commit -m \"agrego milanesas\"\ngit push\n```\nMirá cómo `origin/main` se mueve junto con `main`."
       ]
     },
     "pull": {
@@ -319,7 +319,7 @@
       "hints": [
         "Probá `git push` y leé el error entero: dice que el servidor rechazó el push y que primero traigas lo que hay allá.",
         "Traer lo de afuera y juntarlo con lo tuyo es un solo comando. Recién después vas a poder subir.",
-        "`git pull` y después `git push`."
+        "```\ngit pull\ngit push\n```"
       ]
     },
     "branchAll": {
@@ -333,7 +333,7 @@
       "hints": [
         "La rama `postres` existe solo en tu computadora. Subirla es el mismo push de antes, pero nombrando la rama; con una opción más queda además asociada.",
         "Para listar todas las ramas, las tuyas y las del servidor, hay una opción de `git branch`.",
-        "`git push -u origin postres` y después `git branch -a`. Ahora `postres` aparece dos veces: la tuya y `remotes/origin/postres`."
+        "```\ngit push -u origin postres\ngit branch -a\n```\nAhora `postres` aparece dos veces: la tuya y `remotes/origin/postres`."
       ]
     },
     "final": {
@@ -341,6 +341,7 @@
       "intro": [
         "Último nivel: el flujo completo, igual que en un proyecto de verdad.",
         "Cloná el repositorio, hacé el trabajo en una rama aparte, traelo a `main` con un merge y subilo.",
+        "El repositorio es el mismo que clonaste hace unas lecciones:\n```\n{repoUrl}\n```",
         "Sin pistas paso a paso esta vez. Si te trabás, `git status` te va a decir dónde estás."
       ],
       "goal": "Cloná el repositorio, creá la rama `bebidas` con un commit que agregue `bebidas.md`, mergeala a `main` y hacé push.",
@@ -348,7 +349,7 @@
         "Arrancá trayendo el repositorio del servidor a tu computadora.",
         "Hacé el trabajo en una rama aparte: creala y pasate a ella en un paso, y commiteá `bebidas.md` ahí.",
         "Volvé a `main` y traé lo que hiciste con un merge. Al final, subilo.",
-        "`git clone https://github.com/curso/recetas.git`, `git checkout -b bebidas`, `git add .`, `git commit -m \"agrego bebidas\"`, `git checkout main`, `git merge bebidas` y `git push`."
+        "Creá `bebidas.md` desde el panel Archivos cuando estés en la rama. Los comandos son:\n```\ngit clone {repoUrl}\ngit checkout -b bebidas\ngit add .\ngit commit -m \"agrego bebidas\"\ngit checkout main\ngit merge bebidas\ngit push\n```"
       ]
     }
   },
