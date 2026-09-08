@@ -139,6 +139,9 @@ try {
 try {
   const html = wrap(h(App, null))
   if (!html.includes('lesson-title')) throw new Error('the lesson panel is missing')
+  if (html.includes('lesson-commands')) {
+    throw new Error('the lesson panel is listing the commands again')
+  }
   console.log(`ok   full page (${html.length} chars)`)
 } catch (error) {
   failures += 1

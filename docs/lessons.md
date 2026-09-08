@@ -130,8 +130,20 @@ Los errores están escritos para que valga la pena leerlos. Un `git comit` sugie
 checkout que pisaría trabajo sin guardar lista los archivos en peligro.
 
 Aparte de eso, cada lección tiene pistas propias, que se piden de a una con el
-botón **Pedir una pista** y van de lo general a lo concreto: la última siempre
-dice el comando exacto. Nadie se queda trabado, pero hay que decidir pedir ayuda.
+botón **Pedir una pista** y van de lo general a lo concreto. Nadie se queda
+trabado, pero hay que decidir pedir ayuda.
+
+**El panel no lista los comandos de la lección.** Los tuvo un tiempo, arriba de
+las pistas, y era un machete: con el comando a la vista no queda nada que
+resolver. Ahora el comando exacto vive en la última pista, que se ofrece como
+**Mostrar solución** —con el contador incluido, así se ve que es una pista más y
+no algo aparte— y queda marcada en naranja cuando se muestra. La explicación de
+arriba sigue nombrando el comando que enseña: eso es dar clase, no dar la
+respuesta.
+
+Los tests lo sostienen: toda lección tiene al menos dos pistas, la última nombra
+alguno de los comandos que la lección introduce, y el render del panel falla si
+la lista de comandos vuelve a aparecer.
 
 ## Por qué no está `git status --staged`
 
@@ -145,7 +157,7 @@ de archivos.
 
 ## Ideas para el aula
 
-- La primera vez que abren el sitio les corre solo un recorrido guiado de seis
+- La primera vez que abren el sitio les corre solo un recorrido guiado de siete
   pasos que muestra para qué es cada panel. Si lo saltearon, vuelve con
   **¿Cómo funciona?**, arriba a la derecha: sirve para arrancar la clase todos
   mirando lo mismo.

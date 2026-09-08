@@ -3,7 +3,12 @@
 // A lesson is three things:
 //   - `setup`, which builds the world the student starts from,
 //   - `check`, which decides whether the goal was reached,
-//   - `commands`, the commands it introduces (shown as chips in the sidebar).
+//   - `commands`, the commands it introduces.
+//
+// `commands` is metadata, not something the student sees: listing the answer
+// above the hints defeated them. It records what each lesson teaches, which is
+// what lets the tests prove no lesson needs a command taught later, and what
+// the last hint of each lesson has to name.
 //
 // All of its text lives in the locale files under `lessons.<id>.*`, so a new
 // language never requires touching this file.

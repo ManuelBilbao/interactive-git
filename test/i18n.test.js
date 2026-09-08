@@ -51,6 +51,33 @@ test('every lesson has title, intro, goal and hints', () => {
   }
 })
 
+test('hints escalate: every lesson has more than one', () => {
+  for (const lesson of LESSONS) {
+    const hints = messages.lessons[lesson.id].hints
+    assert.ok(
+      hints.length >= 2,
+      `lesson "${lesson.id}" has a single hint, so asking for help hands over the answer at once`,
+    )
+  }
+})
+
+test('the exact command is kept for the last hint, and no earlier', () => {
+  for (const lesson of LESSONS) {
+    const hints = messages.lessons[lesson.id].hints
+    const last = hints.at(-1)
+    assert.ok(
+      lesson.commands.some((command) => last.includes(command)),
+      `the last hint of "${lesson.id}" names none of its commands, so it is not concrete enough`,
+    )
+  }
+})
+
+test('the lesson text never lists the commands as an answer key', () => {
+  // The intro teaches a command by name, which is the point; what must not
+  // come back is a bare list of them sitting above the hints.
+  assert.equal(messages.lesson.commands, undefined)
+})
+
 test('no lesson translation is left over', () => {
   const ids = new Set(LESSONS.map((lesson) => lesson.id))
   const extra = Object.keys(messages.lessons).filter((id) => !ids.has(id))

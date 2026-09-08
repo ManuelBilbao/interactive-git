@@ -41,6 +41,9 @@ export default function LessonPanel({
   const key = `lessons.${lesson.id}`
   const hints = tList(`${key}.hints`)
   const isLast = index === LESSONS.length - 1
+  // The last hint spells out the command, so it is offered as what it is.
+  const solutionAt = hints.length - 1
+  const nextIsSolution = hintsShown === solutionAt
 
   return (
     <section className="panel lesson-panel">
@@ -60,17 +63,6 @@ export default function LessonPanel({
         <RichText text={t(`${key}.goal`)} />
       </div>
 
-      <div className="lesson-commands">
-        <h3>{t('lesson.commands')}</h3>
-        <ul>
-          {lesson.commands.map((command) => (
-            <li key={command}>
-              <code>{command}</code>
-            </li>
-          ))}
-        </ul>
-      </div>
-
       {has(`${key}.note`) && (
         <div className="lesson-note">
           <h3>{t('lesson.note')}</h3>
@@ -80,14 +72,26 @@ export default function LessonPanel({
 
       <div className="lesson-hints">
         {hints.slice(0, hintsShown).map((hint, position) => (
-          <div key={hint} className="hint">
-            <span className="hint-title">{t('lesson.hintTitle', { number: position + 1 })}</span>
+          <div key={hint} className={position === solutionAt ? 'hint solution' : 'hint'}>
+            <span className="hint-title">
+              {position === solutionAt
+                ? t('lesson.solutionTitle')
+                : t('lesson.hintTitle', { number: position + 1 })}
+            </span>
             <RichText text={hint} />
           </div>
         ))}
         {hintsShown < hints.length ? (
-          <button type="button" className="block" onClick={onHint}>
-            {t('lesson.hint')} ({hintsShown + 1}/{hints.length})
+          <button
+            type="button"
+            className={nextIsSolution ? 'block solution' : 'block'}
+            onClick={onHint}
+          >
+            {/* The solution counts towards the total: it is the last hint, not
+                something extra hiding behind them. */}
+            {`${nextIsSolution ? t('lesson.solution') : t('lesson.hint')} (${
+              hintsShown + 1
+            }/${hints.length})`}
           </button>
         ) : (
           <p className="legend">{t('lesson.noMoreHints')}</p>

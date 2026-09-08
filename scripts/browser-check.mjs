@@ -20,6 +20,25 @@ const PORT = Number(argument('port', '9333'))
 const CHROME =
   process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
+// A leftover headless Chrome from an earlier run holds the port and serves its
+// own pages on it, which otherwise shows up as a confusing "never served a
+// page" further down.
+try {
+  const response = await fetch(`http://127.0.0.1:${PORT}/json/version`, {
+    signal: AbortSignal.timeout(700),
+  })
+  if (response.ok) {
+    console.error(
+      `Something is already debugging on port ${PORT}, probably a headless Chrome`,
+      `left over from an earlier run.\n  Close it with:  pkill -f "remote-debugging-port=${PORT}"`,
+      `\n  Or use another port:  npm run check:browser -- --port=9444`,
+    )
+    process.exit(1)
+  }
+} catch {
+  // Nothing listening, which is what we want.
+}
+
 const profile = mkdtempSync(join(tmpdir(), 'git-interactivo-'))
 const chrome = spawn(
   CHROME,
@@ -63,7 +82,9 @@ async function connect() {
     }
     await wait(500)
   }
-  throw new Error(`Chrome never served a page from ${BASE_URL}. Is \`npm run dev\` running?`)
+  throw new Error(
+    `Chrome never served a page from ${BASE_URL}. Is \`npm run dev\` running there?`,
+  )
 }
 
 const page = await connect()

@@ -122,9 +122,14 @@ una lección imposible de completar, el test te lo dice.
    `check`. `setup` devuelve el mundo inicial; `check(world, history)` decide si
    se cumplió el objetivo. Después sumá su `id` a la lista `ORDER` del mismo
    archivo, que es la que define el orden del curso.
+
+   `commands` no se muestra: es metadata de qué enseña la lección. Con eso los
+   tests verifican que ninguna lección necesite un comando que se enseña más
+   adelante, y que la última pista nombre alguno de ellos.
 2. Agregá los textos en `src/i18n/locales/es-AR.json`, bajo `lessons.<id>`:
    `title`, `intro` (lista de párrafos), `goal`, `hints` (lista) y opcionalmente
-   `note`.
+   `note`. Poné al menos dos pistas, de lo general a lo concreto, y dejá el
+   comando exacto para la última: es la que se ofrece como *Mostrar solución*.
 3. Agregá una solución en `test/lessons.test.js`. El test falla si falta.
 
 En los textos podés usar `` `código` `` y `**negrita**`.

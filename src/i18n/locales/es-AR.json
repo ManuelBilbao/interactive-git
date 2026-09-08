@@ -17,7 +17,6 @@
   },
   "lesson": {
     "goal": "Objetivo",
-    "commands": "Comandos de esta lección",
     "hint": "Pedir una pista",
     "hintTitle": "Pista {number}",
     "noMoreHints": "No quedan más pistas. Probá reiniciar la lección y volver a empezar.",
@@ -25,7 +24,9 @@
     "solved": "¡Objetivo cumplido!",
     "next": "Siguiente lección",
     "finished": "Terminaste el curso",
-    "finishedBody": "Ya conocés los comandos con los que se trabaja todos los días. Reiniciá cualquier lección cuando quieras volver a practicar."
+    "finishedBody": "Ya conocés los comandos con los que se trabaja todos los días. Reiniciá cualquier lección cuando quieras volver a practicar.",
+    "solution": "Mostrar solución",
+    "solutionTitle": "Solución"
   },
   "terminal": {
     "title": "Terminal",
@@ -127,8 +128,8 @@
       ],
       "goal": "Convertí la carpeta en un repositorio de git.",
       "hints": [
-        "El comando es literalmente `git init`, sin nada más.",
-        "Escribilo en la terminal y apretá Enter."
+        "Es un solo comando, sin archivos ni opciones. Está nombrado en la explicación de arriba.",
+        "`git init`. Escribilo en la terminal y apretá Enter."
       ]
     },
     "status": {
@@ -140,8 +141,8 @@
       ],
       "goal": "Corré `git status` y mirá cómo aparece `recetas.md`.",
       "hints": [
-        "Escribí `git status` tal cual.",
-        "Fijate en la sección `{gitUntracked}`: ahí está `recetas.md`."
+        "Buscá el comando que te dice en qué anda el repositorio. Es el que más vas a usar en tu vida.",
+        "`git status`. Después fijate en la sección `{gitUntracked}`: ahí está `recetas.md`."
       ]
     },
     "add": {
@@ -153,9 +154,9 @@
       ],
       "goal": "Poné `recetas.md` y `compras.md` en el stage.",
       "hints": [
-        "Podés hacerlo en dos pasos: `git add recetas.md` y después `git add compras.md`.",
-        "O de una sola vez: `git add .`",
-        "Revisá con `git status`: los dos tienen que aparecer bajo `{gitToBeCommitted}`."
+        "Tenés que pasar los dos archivos al stage. El comando lleva el nombre del archivo.",
+        "Podés hacerlo de a uno, o todos juntos poniendo un punto en lugar del nombre.",
+        "`git add recetas.md` y `git add compras.md`, o `git add .` de una. Comprobalo con `git status`: los dos tienen que aparecer bajo `{gitToBeCommitted}`."
       ]
     },
     "commit": {
@@ -167,8 +168,9 @@
       ],
       "goal": "Hacé el primer commit del proyecto. Los archivos ya están en el stage.",
       "hints": [
-        "`git commit -m \"primer commit\"`",
-        "El mensaje puede decir cualquier cosa, pero conviene que describa el cambio."
+        "Lo que está en el stage ya está listo; falta guardarlo en la historia.",
+        "El comando pide un mensaje, y el mensaje va entre comillas después de `-m`.",
+        "`git commit -m \"primer commit\"`. El mensaje puede decir cualquier cosa, pero conviene que describa el cambio."
       ]
     },
     "cycle": {
@@ -180,10 +182,10 @@
       ],
       "goal": "Modificá `recetas.md`, mirá con `git status` cómo pasa de rojo a verde, y guardá un segundo commit.",
       "hints": [
-        "Primero cambiá el archivo: usá el botón Editar del panel Archivos.",
-        "Mirá `git status`: `recetas.md` aparece en rojo, bajo `{gitNotStaged}`.",
-        "Ponelo en el stage con `git add recetas.md` y volvé a mirar `git status`: ahora está en verde.",
-        "`git commit -m \"agrego milanesas\"`"
+        "Primero cambiá `recetas.md`: usá el botón Editar del panel Archivos.",
+        "Mirá `git status`: el archivo aparece en rojo, bajo `{gitNotStaged}`. Para que pase a verde tenés que ponerlo en el stage.",
+        "Con el archivo en verde ya se puede guardar.",
+        "`git add recetas.md`, mirá `git status` otra vez, y cerrá con `git commit -m \"agrego milanesas\"`."
       ]
     },
     "restore": {
@@ -195,9 +197,9 @@
       ],
       "goal": "Dejá el repositorio limpio otra vez, sin hacer ningún commit.",
       "hints": [
-        "Primero sacalo del stage: `git restore --staged recetas.md`",
-        "Después descartá los cambios del archivo: `git restore recetas.md`",
-        "`git status` tiene que terminar diciendo `{gitClean}`."
+        "Son dos pasos: sacar del stage lo que está ahí, y descartar lo que quedó escrito en la carpeta.",
+        "Los dos usan el mismo comando; el que toca el stage lleva `--staged`.",
+        "`git restore --staged recetas.md` y después `git restore recetas.md`. `git status` tiene que terminar diciendo `{gitClean}`."
       ]
     },
     "branch": {
@@ -209,8 +211,8 @@
       ],
       "goal": "Creá una rama llamada `postres`, sin moverte de `main`.",
       "hints": [
-        "`git branch postres`",
-        "Comprobá con `git branch`: tenés que ver `* main` y `postres` debajo."
+        "Crear una rama es un solo comando con el nombre que le querés poner. Ojo con una cosa: no te tiene que mover de `main`.",
+        "`git branch postres`. Comprobalo con `git branch`: tenés que ver `* main` y `postres` debajo."
       ]
     },
     "checkout": {
@@ -222,8 +224,8 @@
       ],
       "goal": "Pasate a la rama `postres`.",
       "hints": [
-        "`git checkout postres`",
-        "Después del checkout, fijate cómo apareció `postres.md` en la carpeta."
+        "Necesitás moverte a la otra rama. El comando lleva el nombre de la rama a la que vas.",
+        "`git checkout postres`. Después fijate cómo apareció `postres.md` en la carpeta."
       ]
     },
     "checkoutB": {
@@ -235,9 +237,9 @@
       ],
       "goal": "Creá la rama `bebidas`, pasate a ella y hacé un commit que agregue `bebidas.md`.",
       "hints": [
-        "`git checkout -b bebidas`",
-        "Creá el archivo con el botón Nuevo archivo, o con `echo \"Limonada\" > bebidas.md`.",
-        "Cerrá con `git add bebidas.md` y `git commit -m \"agrego bebidas\"`."
+        "Hay un comando que crea la rama y te para en ella de una sola vez: es el de la lección anterior con una opción de más.",
+        "Una vez ahí, el ciclo de siempre: creá el archivo, ponelo en el stage y guardalo.",
+        "`git checkout -b bebidas`, creá `bebidas.md` con el botón Nuevo archivo, y cerrá con `git add bebidas.md` y `git commit -m \"agrego bebidas\"`."
       ]
     },
     "merge": {
@@ -249,8 +251,8 @@
       ],
       "goal": "Estando en `main`, traé el trabajo de la rama `postres`.",
       "hints": [
-        "Chequeá dónde estás parado con `git status`.",
-        "`git merge postres`"
+        "Chequeá primero dónde estás parado: el merge trae el trabajo *hacia* la rama en la que estás.",
+        "Estando en `main`, `git merge postres`."
       ]
     },
     "mergeDiverged": {
@@ -262,8 +264,8 @@
       ],
       "goal": "Estando en `main`, hacé el merge de `postres`.",
       "hints": [
-        "`git merge postres`",
-        "Si `git status` no dice `On branch main`, primero `git checkout main`."
+        "Es el mismo comando de la lección anterior, aunque esta vez git tenga que crear un commit nuevo para juntar las dos historias.",
+        "Estando en `main`, `git merge postres`. Si `git status` no dice `En la rama main`, primero `git checkout main`."
       ]
     },
     "clone": {
@@ -275,8 +277,8 @@
       ],
       "goal": "Cloná el repositorio del curso.",
       "hints": [
-        "`git clone https://github.com/curso/recetas.git`",
-        "Cuando termine, mirá los dos paneles de Historia: tenés la misma cadena de commits de los dos lados."
+        "El comando lleva la URL del repositorio, que está en la explicación de arriba.",
+        "`git clone https://github.com/curso/recetas.git`. Cuando termine, mirá los dos paneles de Historia: tenés la misma cadena de commits de los dos lados."
       ]
     },
     "push": {
@@ -288,10 +290,9 @@
       ],
       "goal": "Hacé un commit y subilo al servidor.",
       "hints": [
-        "Editá `recetas.md` desde el panel Archivos.",
-        "`git add recetas.md` y después `git commit -m \"agrego milanesas\"`.",
-        "`git push`",
-        "Mirá cómo `origin/main` se mueve junto con `main`."
+        "Primero necesitás un commit propio: editá `recetas.md`, ponelo en el stage y guardalo.",
+        "Con el commit hecho, falta un solo comando para que llegue al servidor.",
+        "`git add recetas.md`, `git commit -m \"agrego milanesas\"` y después `git push`. Mirá cómo `origin/main` se mueve junto con `main`."
       ]
     },
     "pull": {
@@ -303,8 +304,8 @@
       ],
       "goal": "Traé a tu repositorio el commit que subió tu compañera.",
       "hints": [
-        "`git pull`",
-        "Cuando termine, abrí `recetas.md` y fijate que aparezca la receta nueva."
+        "El commit está en el servidor, no en tu repositorio. Git no lo trae solo.",
+        "`git pull`. Cuando termine, abrí `recetas.md` y fijate que aparezca la receta nueva."
       ]
     },
     "pushRejected": {
@@ -317,8 +318,8 @@
       "goal": "Conseguí que tu commit llegue al servidor.",
       "hints": [
         "Probá `git push` y leé el error entero: dice que el servidor rechazó el push y que primero traigas lo que hay allá.",
-        "Traé lo de afuera con `git pull`: baja el commit del servidor y lo mergea con el tuyo.",
-        "Ahora sí: `git push`."
+        "Traer lo de afuera y juntarlo con lo tuyo es un solo comando. Recién después vas a poder subir.",
+        "`git pull` y después `git push`."
       ]
     },
     "branchAll": {
@@ -330,9 +331,9 @@
       ],
       "goal": "Subí la rama `postres` al servidor y después listá todas las ramas.",
       "hints": [
-        "`git push -u origin postres`",
-        "`git branch -a`",
-        "Ahora `postres` aparece dos veces: la tuya y `remotes/origin/postres`."
+        "La rama `postres` existe solo en tu computadora. Subirla es el mismo push de antes, pero nombrando la rama; con una opción más queda además asociada.",
+        "Para listar todas las ramas, las tuyas y las del servidor, hay una opción de `git branch`.",
+        "`git push -u origin postres` y después `git branch -a`. Ahora `postres` aparece dos veces: la tuya y `remotes/origin/postres`."
       ]
     },
     "final": {
@@ -344,10 +345,10 @@
       ],
       "goal": "Cloná el repositorio, creá la rama `bebidas` con un commit que agregue `bebidas.md`, mergeala a `main` y hacé push.",
       "hints": [
-        "Arrancá clonando: `git clone https://github.com/curso/recetas.git`",
-        "`git checkout -b bebidas`, creá el archivo, `git add`, `git commit -m \"...\"`.",
-        "Volvé con `git checkout main` y traé el trabajo con `git merge bebidas`.",
-        "Cerrá con `git push`."
+        "Arrancá trayendo el repositorio del servidor a tu computadora.",
+        "Hacé el trabajo en una rama aparte: creala y pasate a ella en un paso, y commiteá `bebidas.md` ahí.",
+        "Volvé a `main` y traé lo que hiciste con un merge. Al final, subilo.",
+        "`git clone https://github.com/curso/recetas.git`, `git checkout -b bebidas`, `git add .`, `git commit -m \"agrego bebidas\"`, `git checkout main`, `git merge bebidas` y `git push`."
       ]
     }
   },
@@ -498,7 +499,7 @@
         "title": "La lección",
         "body": [
           "Acá va la explicación y, más abajo, el **objetivo**: lo que tenés que lograr para pasar a la que sigue.",
-          "Si te trabás, `Pedir una pista` te las va dando de a una, de lo general a lo concreto. La última siempre dice el comando exacto."
+          "Si te trabás, `Pedir una pista` te las va dando de a una, de lo general a lo concreto. La última, que ya dice el comando exacto, aparece como `Mostrar solución`: dejala para cuando de verdad la necesites."
         ]
       },
       "terminal": {
@@ -520,6 +521,13 @@
         "body": [
           "Son los archivos de tu carpeta. Podés crearlos y editarlos desde acá: es lo mismo que hacerlo con un editor de texto.",
           "Los carteles de la derecha te dicen en qué estado está cada uno. Git no se entera de ningún cambio hasta que hagas `git add`."
+        ]
+      },
+      "check": {
+        "title": "Mirá antes de escribir",
+        "body": [
+          "Cada lección arranca de una situación distinta: puede haber archivos nuevos, cambios a medio hacer, ramas ya creadas o commits que subió otra persona.",
+          "Así que antes de tipear nada, mirá estos dos paneles y corré `git status`. Leer en qué estado estás antes de tocar algo es la mitad de usar git bien."
         ]
       },
       "nav": {

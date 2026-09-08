@@ -17,6 +17,9 @@ const STEPS = [
   { id: 'terminal', selector: '.terminal' },
   { id: 'history', selector: '.graph-panel' },
   { id: 'files', selector: '.files-panel' },
+  // Both reference panels at once: the habit being taught is to read the
+  // situation before typing, and every lesson starts from a different one.
+  { id: 'check', selector: '.rail' },
   { id: 'nav', selector: '.lesson-nav' },
 ]
 
