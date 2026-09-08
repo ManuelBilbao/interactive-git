@@ -4,11 +4,19 @@ import FilesPanel from './components/FilesPanel.jsx'
 import GraphView from './components/GraphView.jsx'
 import LessonPanel from './components/LessonPanel.jsx'
 import Terminal from './components/Terminal.jsx'
+import Tour from './components/Tour.jsx'
 import { run } from './engine/commands/index.js'
 import { currentBranch } from './engine/model.js'
 import { useI18n } from './i18n/index.jsx'
 import { LESSONS } from './lessons/index.js'
-import { lessonFromUrl, loadProgress, saveProgress, writeLessonToUrl } from './storage.js'
+import {
+  hasSeenTour,
+  lessonFromUrl,
+  loadProgress,
+  markTourSeen,
+  saveProgress,
+  writeLessonToUrl,
+} from './storage.js'
 
 /** Two commits and a branch: the shape the whole course is about. */
 function BrandMark() {
@@ -41,7 +49,13 @@ export default function App() {
   const [solved, setSolved] = useState(false)
   const [hintsShown, setHintsShown] = useState(0)
   const [completed, setCompleted] = useState(() => new Set(stored.completed))
+  const [tourOpen, setTourOpen] = useState(() => !hasSeenTour())
   const entryId = useRef(0)
+
+  const closeTour = () => {
+    setTourOpen(false)
+    markTourSeen()
+  }
 
   const lesson = LESSONS[index]
 
@@ -166,6 +180,9 @@ export default function App() {
               </select>
             </label>
           )}
+          <button type="button" className="ghost" onClick={() => setTourOpen(true)}>
+            {t('tour.open')}
+          </button>
           <button type="button" onClick={resetProgress}>
             {t('nav.resetProgress')}
           </button>
@@ -202,6 +219,8 @@ export default function App() {
           />
         </aside>
       </main>
+
+      {tourOpen && <Tour onClose={closeTour} />}
     </div>
   )
 }

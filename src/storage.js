@@ -43,3 +43,23 @@ export function writeLessonToUrl(index) {
   url.searchParams.set(PARAM, String(index + 1))
   window.history.replaceState(null, '', url)
 }
+
+const TOUR_KEY = 'git-interactivo:tour-seen'
+
+/** The tour runs itself once, on a first visit, and then stays out of the way. */
+export function hasSeenTour() {
+  try {
+    return localStorage.getItem(TOUR_KEY) === 'true'
+  } catch {
+    // If storage is blocked, better to skip the tour than to show it forever.
+    return true
+  }
+}
+
+export function markTourSeen() {
+  try {
+    localStorage.setItem(TOUR_KEY, 'true')
+  } catch {
+    // Nothing worth failing over.
+  }
+}

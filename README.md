@@ -131,6 +131,17 @@ alguna entrada, o si una traducción se come un `{parámetro}`.
 - `docs/architecture.md` está en inglés porque describe el código;
   `docs/lessons.md` está en castellano porque describe el curso.
 
+## El recorrido guiado
+
+La primera vez que alguien abre el sitio arranca un recorrido que muestra para
+qué es cada panel. Se sale con **Saltar** o llegando al final, y queda siempre a
+mano en **¿Cómo funciona?**, arriba a la derecha. Clickear fuera no lo cierra:
+se sale por sus botones, o con Escape.
+
+Los pasos están en `STEPS`, en `src/components/Tour.jsx`: cada uno nombra una
+región por selector, y los textos viven en `tour.steps.<id>` del archivo de
+idioma. Un paso cuya región no está en pantalla se saltea solo.
+
 ## Enlaces directos
 
 `?leccion=N` abre una lección puntual, por ejemplo

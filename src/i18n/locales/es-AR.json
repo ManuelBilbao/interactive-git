@@ -478,5 +478,57 @@
     "Aborting": "Abortando",
     "error: The following untracked working tree files would be overwritten by {operation}:": "error: Estos archivos sin trackear se perderían con el {operation}:",
     "Please move or remove them before you continue.": "Movelos o borralos antes de seguir."
+  },
+  "tour": {
+    "open": "¿Cómo funciona?",
+    "skip": "Saltar",
+    "back": "Anterior",
+    "next": "Siguiente",
+    "done": "Empecemos",
+    "step": "{current} de {total}",
+    "steps": {
+      "welcome": {
+        "title": "Antes de empezar",
+        "body": [
+          "Esto es un simulador de git: no hay nada que instalar y no podés romper nada.",
+          "Te muestro en un minuto dónde está cada cosa. Si preferís explorar solo, saltealo: este recorrido queda siempre a mano arriba a la derecha."
+        ]
+      },
+      "lesson": {
+        "title": "La lección",
+        "body": [
+          "Acá va la explicación y, más abajo, el **objetivo**: lo que tenés que lograr para pasar a la que sigue.",
+          "Si te trabás, `Pedir una pista` te las va dando de a una, de lo general a lo concreto. La última siempre dice el comando exacto."
+        ]
+      },
+      "terminal": {
+        "title": "La terminal",
+        "body": [
+          "Escribí los comandos acá, igual que en una terminal de verdad. Las flechas ↑ y ↓ repiten lo que ya escribiste.",
+          "Cuando algo falla vas a ver el error de git tal cual, y abajo una tarjeta que te explica qué pasó. Escribí `help` para ver todo lo que podés usar."
+        ]
+      },
+      "history": {
+        "title": "La historia",
+        "body": [
+          "Cada círculo es un commit, con su mensaje al lado, y cada etiqueta es una rama.",
+          "En las lecciones con servidor vas a ver dos repositorios: el tuyo arriba y `origin` abajo. Compararlos es media clase de git."
+        ]
+      },
+      "files": {
+        "title": "Los archivos",
+        "body": [
+          "Son los archivos de tu carpeta. Podés crearlos y editarlos desde acá: es lo mismo que hacerlo con un editor de texto.",
+          "Los carteles de la derecha te dicen en qué estado está cada uno. Git no se entera de ningún cambio hasta que hagas `git add`."
+        ]
+      },
+      "nav": {
+        "title": "Cómo se avanza",
+        "body": [
+          "Apenas cumplís el objetivo aparece el aviso acá abajo y se habilita `Siguiente`.",
+          "No hay una única solución: si llegás al mismo resultado por otro camino, cuenta igual. Y `Reiniciar la lección` la deja como estaba, para probar de nuevo."
+        ]
+      }
+    }
   }
 }

@@ -1011,6 +1011,99 @@ button.reset {
   margin: 12px 0;
 }
 
+/* ---------- guided tour ---------- */
+
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+/* Full-size and invisible: it makes the tour modal by swallowing clicks that
+   land outside the card, without acting on them. */
+.tour-catcher {
+  position: absolute;
+  inset: 0;
+  cursor: default;
+}
+
+.tour-veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(24, 21, 18, 0.55);
+  pointer-events: none;
+}
+
+/* The cut-out draws the veil with its own shadow, so the region it frames
+   stays at full brightness. */
+.tour-hole {
+  position: fixed;
+  border-radius: 6px;
+  box-shadow: 0 0 0 9999px rgba(24, 21, 18, 0.55);
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  pointer-events: none;
+  transition: top 0.18s ease, left 0.18s ease, width 0.18s ease, height 0.18s ease;
+}
+
+.tour-card {
+  position: fixed;
+  z-index: 1;
+  width: min(330px, calc(100vw - 28px));
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  padding: 15px 16px 13px;
+  box-shadow: 0 10px 30px rgba(24, 21, 18, 0.22);
+}
+
+.tour-card:focus {
+  outline: none;
+}
+
+.tour-step {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.tour-title {
+  font-size: 17px;
+  letter-spacing: -0.015em;
+  margin: 6px 0 8px;
+}
+
+.tour-body {
+  margin: 0 0 9px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.tour-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+  margin-top: 13px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.tour-spacer {
+  flex: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-hole {
+    transition: none;
+  }
+}
+
 /* ---------- narrow screens ---------- */
 
 @media (max-width: 1100px) {

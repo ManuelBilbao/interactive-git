@@ -131,6 +131,10 @@ async function openLesson(number) {
   await evaluate(`history.replaceState(null, '', '?leccion=${number}'); location.reload()`)
   await wait(300)
   await waitFor('.terminal-input input')
+  await check(
+    `the tour stays closed on lesson ${number}`,
+    await evaluate("return document.querySelector('.tour-card') === null"),
+  )
   await evaluate(
     `if (!document.querySelector('.lesson-counter').innerText.includes('${number}')) {
        throw new Error('lesson ${number} did not open')
@@ -153,8 +157,54 @@ async function check(label, condition, detail) {
   console.error(`FAIL ${label}${extra ? `\n     ${String(extra).replaceAll('\n', '\n     ')}` : ''}`)
 }
 
+/** Clicks a button by the text on it, anywhere in a container. */
+async function clickButton(container, label) {
+  await evaluate(
+    `const button = [...document.querySelectorAll(${JSON.stringify(container)} + ' button')]
+       .find((candidate) => candidate.textContent.includes(${JSON.stringify(label)}))
+     if (!button) throw new Error('no button matching ${label}')
+     button.click()`,
+  )
+  await wait(180)
+}
+
 try {
   await waitFor('.terminal-input input')
+
+  // The guided tour shows itself on a first visit, so it is the first thing
+  // here too: check it, walk a step, then get it out of the way.
+  await waitFor('.tour-card')
+  await check(
+    'the tour opens on a first visit',
+    (await evaluate("return document.querySelector('.tour-title').innerText")).length > 0,
+  )
+  await clickButton('.tour-actions', 'Siguiente')
+  await check(
+    'it spotlights a region as you go',
+    await evaluate("return document.querySelector('.tour-hole') !== null"),
+  )
+  // Clicking past the tour must not dismiss it: only its own buttons do.
+  await evaluate("document.querySelector('.tour-catcher').click()")
+  await wait(150)
+  await check(
+    'a click outside leaves it open',
+    await evaluate("return document.querySelector('.tour-card') !== null"),
+  )
+
+  await clickButton('.tour-actions', 'Saltar')
+  await check(
+    'and closes when skipped',
+    await evaluate("return document.querySelector('.tour-card') === null"),
+  )
+
+  // Re-openable from the header, and not shown again on its own.
+  await clickButton('.header-actions', 'Cómo funciona')
+  await check(
+    'the header button reopens it',
+    await evaluate("return document.querySelector('.tour-card') !== null"),
+  )
+  await clickButton('.tour-actions', 'Saltar')
+
   await check('the four panels rendered', (await evaluate("return document.querySelectorAll('.panel').length")) === 4)
 
   // git speaks the language of the site, the way it follows LANG for real.

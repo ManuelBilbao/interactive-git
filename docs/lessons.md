@@ -145,6 +145,10 @@ de archivos.
 
 ## Ideas para el aula
 
+- La primera vez que abren el sitio les corre solo un recorrido guiado de seis
+  pasos que muestra para qué es cada panel. Si lo saltearon, vuelve con
+  **¿Cómo funciona?**, arriba a la derecha: sirve para arrancar la clase todos
+  mirando lo mismo.
 - Mandar `?leccion=N` para que todos arranquen en el mismo punto.
 - **Reiniciar lección** deja la lección como estaba: sirve para mostrar un
   camino, deshacerlo y que lo hagan ellos.
