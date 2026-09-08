@@ -42,6 +42,12 @@ const HELP = {
     options: [],
   }),
 
+  diff: () => ({
+    usage: msg('usage: git diff [--staged] [<commit> [<commit>]]'),
+    summary: msg('Show what changed, line by line, between two of the three places a file lives.'),
+    options: [option('--staged', msg('the staging area against the last commit'))],
+  }),
+
   add: () => ({
     usage: msg('usage: git add [-A | --all] <pathspec>...'),
     summary: msg('Copy the current state of a file into the staging area. Use . for all of them.'),

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { stripAnsi } from '../src/ansi.js'
+import { parseAnsi, stripAnsi } from '../src/ansi.js'
 import { readFileSync } from 'node:fs'
 
 import { GIT_COMMANDS, run } from '../src/engine/commands/index.js'
@@ -461,4 +461,120 @@ test('every kind a hint can carry has a name to show', () => {
     assert.equal(typeof titles[kind], 'string', `no title for a "${kind}" note`)
   }
   assert.deepEqual(Object.keys(titles).sort(), [...HINT_KINDS].sort())
+})
+
+test('diff compares the folder with the staging area', () => {
+  const world = play(
+    createWorld(),
+    'git init',
+    'echo "uno" > a.txt',
+    'git add .',
+    'git commit -m "a"',
+    'echo "dos" >> a.txt',
+  )
+  const shown = run(world, 'git diff').output.lines.map(stripAnsi)
+
+  assert.deepEqual(shown, [
+    'diff --git a/a.txt b/a.txt',
+    '--- a/a.txt',
+    '+++ b/a.txt',
+    '@@ -1 +1,2 @@',
+    ' uno',
+    '+dos',
+  ])
+})
+
+test('diff finds nothing once the change is staged, and says why', () => {
+  const world = play(
+    createWorld(),
+    'git init',
+    'echo "uno" > a.txt',
+    'git add .',
+    'git commit -m "a"',
+    'echo "dos" >> a.txt',
+    'git add a.txt',
+  )
+
+  // The confusion this lesson exists for: nothing to show, because the change
+  // moved to the other side of the comparison.
+  const plain = run(world, 'git diff').output
+  assert.deepEqual(plain.lines, [])
+  assert.equal(plain.hintKey, 'hint.diffNoChanges')
+  assert.equal(plain.hintKind, 'info')
+
+  const staged = run(world, 'git diff --staged').output.lines.map(stripAnsi)
+  assert.ok(staged.includes('+dos'))
+  assert.equal(run(world, 'git diff --cached').output.lines.length, staged.length)
+})
+
+test('diff marks a new file and a deleted one as git does', () => {
+  const world = play(
+    createWorld(),
+    'git init',
+    'echo "uno" > a.txt',
+    'git add .',
+    'git commit -m "a"',
+    'echo "nuevo" > b.txt',
+    'rm a.txt',
+  )
+  const shown = run(world, 'git diff').output.lines.map(stripAnsi).join('\n')
+
+  assert.match(shown, /deleted file mode 100644\n--- a\/a\.txt\n\+\+\+ \/dev\/null/)
+  assert.match(shown, /new file mode 100644\n--- \/dev\/null\n\+\+\+ b\/b\.txt/)
+  assert.match(shown, /@@ -0,0 \+1 @@/)
+})
+
+test('diff compares two branches', () => {
+  const world = play(
+    createWorld(),
+    'git init',
+    'echo "base" > a.txt',
+    'git add .',
+    'git commit -m "base"',
+    'git checkout -b otra',
+    'echo "suma" > b.txt',
+    'git add .',
+    'git commit -m "b"',
+    'git checkout main',
+  )
+
+  // Two names read from the first to the second, so what `otra` adds is new.
+  const forward = run(world, 'git diff main otra').output.lines.map(stripAnsi).join('\n')
+  assert.match(forward, /new file mode/)
+  assert.match(forward, /\+suma/)
+
+  // One name compares *that* point against the working tree, so the same
+  // change reads backwards: from `otra`, arriving here, the file is gone.
+  const backward = run(world, 'git diff otra').output.lines.map(stripAnsi).join('\n')
+  assert.match(backward, /deleted file mode/)
+  assert.match(backward, /-suma/)
+
+  // Comparing a branch with itself has nothing to say, and says that.
+  const same = run(world, 'git diff main main').output
+  assert.deepEqual(same.lines, [])
+  assert.equal(same.hintKey, 'hint.diffNoDifferences')
+
+  assert.equal(fails(world, 'git diff rama-inventada').hintKey, 'hint.diffUnknownRef')
+})
+
+test('diff paints additions green and removals red', () => {
+  const world = play(
+    createWorld(),
+    'git init',
+    'echo "uno\ndos" > a.txt',
+    'git add .',
+    'git commit -m "a"',
+    'echo "uno\ntres" > a.txt',
+  )
+  const lines = run(world, 'git diff').output.lines
+  const colourOf = (text) => {
+    const line = lines.find((entry) => stripAnsi(entry) === text)
+    assert.ok(line, `no line reading "${text}"`)
+    return parseAnsi(line)[0].color
+  }
+
+  assert.equal(colourOf('+tres'), 'green')
+  assert.equal(colourOf('-dos'), 'red')
+  assert.equal(colourOf(' uno'), null, 'context lines are not painted')
+  assert.equal(colourOf('@@ -1,2 +1,2 @@'), 'cyan')
 })

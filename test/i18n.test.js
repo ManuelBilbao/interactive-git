@@ -1,27 +1,23 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { test } from 'node:test'
 
 import { COURSE_REPO_URL, LESSONS } from '../src/lessons/index.js'
 
 const messages = JSON.parse(readFileSync(new URL('../src/i18n/locales/es-AR.json', import.meta.url)))
 
-/** Every `hint.*` key the engine can produce, read straight from the source. */
+/**
+ * Every `hint.*` key the engine can produce, read straight from the source.
+ *
+ * The whole engine directory is walked rather than a list of files being kept
+ * here: a list goes stale the moment a command lands in a new file, and it did.
+ */
 function hintKeysUsedInEngine() {
-  const sources = [
-    'commands/branching.js',
-    'commands/history.js',
-    'commands/index.js',
-    'commands/remote.js',
-    'commands/repoSetup.js',
-    'commands/shell.js',
-    'commands/staging.js',
-    'parser.js',
-    'workdir.js',
-  ]
+  const engine = new URL('../src/engine/', import.meta.url)
   const keys = new Set()
-  for (const file of sources) {
-    const text = readFileSync(new URL(`../src/engine/${file}`, import.meta.url), 'utf8')
+  for (const entry of readdirSync(engine, { recursive: true })) {
+    if (!entry.endsWith('.js')) continue
+    const text = readFileSync(new URL(entry, engine), 'utf8')
     for (const match of text.matchAll(/'hint\.(\w+)'/g)) keys.add(match[1])
   }
   return keys

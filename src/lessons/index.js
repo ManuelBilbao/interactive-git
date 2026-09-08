@@ -127,6 +127,27 @@ const DEFINITIONS = [
       ran(history, /^git\s+status\s*$/),
   },
   {
+    id: 'diff',
+    commands: ['git diff', 'git diff --staged'],
+    setup: () => {
+      const world = createWorld()
+      localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      // A change already made and not staged, so there is something to look at.
+      world.files = { 'recetas.md': `${RECIPE}\nMilanesas` }
+      return world
+    },
+    // The point of the lesson is what `git diff` says *after* `git add`, so the
+    // order matters here: look, stage, look again, then ask for the stage.
+    check: (_world, history) => {
+      const added = history.findIndex((line) => /^git\s+add\b/.test(line))
+      if (added === -1) return false
+      const lookedAgain = history.some(
+        (line, position) => position > added && /^git\s+diff\s*$/.test(line),
+      )
+      return lookedAgain && ran(history, /^git\s+diff\s+--(staged|cached)\s*$/)
+    },
+  },
+  {
     id: 'restore',
     commands: ['git restore', 'git restore --staged'],
     setup: () => {
@@ -202,6 +223,21 @@ const DEFINITIONS = [
         repo.branches.bebidas !== repo.branches.main
       )
     },
+  },
+  {
+    id: 'diffBranches',
+    commands: ['git diff'],
+    setup: () => {
+      const world = createWorld()
+      const repo = localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      repo.branches.postres = repo.branches.main
+      seed(world, repo, 'postres', 'flan', {
+        'recetas.md': RECIPE_V2,
+        'postres.md': 'Flan casero',
+      })
+      return world
+    },
+    check: (_world, history) => ran(history, /^git\s+diff\s+main\s+postres\s*$/),
   },
   {
     id: 'merge',
@@ -414,6 +450,7 @@ const ORDER = [
   'add',
   'commit',
   'cycle',
+  'diff',
   'restore',
   'log',
   // Branches
@@ -425,6 +462,7 @@ const ORDER = [
   'push',
   'pull',
   // Joining work back together
+  'diffBranches',
   'merge',
   'mergeDiverged',
   'branchDelete',

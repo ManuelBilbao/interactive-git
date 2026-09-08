@@ -223,6 +223,35 @@ work, shared by `checkout` and `merge`:
 
 Files the operation does not touch keep their modifications, as in real git.
 
+## Diffing
+
+`git status` says *which* files changed; `git diff` says *what* changed inside
+them. Both read the same three snapshots, and which two get compared is the
+whole subtlety of the command:
+
+| form | compares |
+| --- | --- |
+| `git diff` | the folder against the staging area |
+| `git diff --staged` | the staging area against the last commit |
+| `git diff <ref>` | that commit or branch against the folder |
+| `git diff <ref> <ref>` | one commit or branch against another |
+
+The default pair is the one beginners get wrong: after `git add`, `git diff`
+prints nothing, because the folder and the staging area now agree. That silence
+reads as a broken command, so an empty diff sets `world.notice` and the terminal
+answers with a hint instead of nothing at all (see *Errors, in two voices*).
+
+`engine/diff.js` does the comparing, and the files here are a few lines each, so
+it uses the plainest correct algorithm rather than a fast one: a
+longest-common-subsequence table, walked back into a list of `-`/`+`/` ` edits.
+Those edits are then grouped into hunks — runs of changed lines padded with
+three lines of context, merged when they come close enough to touch — and
+printed with the `@@ -1,4 +1,5 @@` headers, `new file mode 100644` lines and
+red/green colouring of real git.
+
+One thing is left out on purpose: git's `index 1234567..89abcde` line. Commit
+ids here are `C1` and `C2`, so a line of fake hashes would teach nothing.
+
 ## Merging
 
 `gitMerge` covers the three cases a beginner meets:
@@ -348,10 +377,13 @@ on demand.
 
 These are deliberate, and worth knowing before extending the project:
 
-- There is one folder and no subdirectories; file names are flat strings.
+- File names are flat strings, and the only subdirectory is the one `git clone`
+  creates; `cd` moves one level at a time, in or back out.
 - Merging compares whole file contents, not lines, so any two different versions
   of a file conflict. Good enough to teach what a conflict *is*.
 - `git log` supports `--oneline` and nothing else. No `stash`, `rebase`,
   `reset`, `remote add`, `fetch` on its own, or tags.
 - A remote exists only when a lesson seeds one; there is no `git remote add`.
 - Commit ids are `C1`, `C2`... rather than hashes, so they can be read aloud.
+- `git diff` compares lines but detects no renames, and takes no paths: it
+  always diffs the whole snapshot.

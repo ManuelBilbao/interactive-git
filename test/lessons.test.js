@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 
 import { run } from '../src/engine/commands/index.js'
 import { COURSE_REPO_URL, LESSONS } from '../src/lessons/index.js'
 
-const URL = COURSE_REPO_URL
+const REPO = COURSE_REPO_URL
 
 /** One known-good solution per lesson, in the same order as the course. */
 const SOLUTIONS = {
@@ -18,6 +19,7 @@ const SOLUTIONS = {
     'git status',
     'git commit -m "agrego milanesas"',
   ],
+  diff: ['git diff', 'git add recetas.md', 'git diff', 'git diff --staged'],
   restore: ['git restore --staged recetas.md', 'git restore recetas.md'],
   log: ['git log', 'git log --oneline'],
   branch: ['git branch postres'],
@@ -28,10 +30,11 @@ const SOLUTIONS = {
     'git add bebidas.md',
     'git commit -m "limonada"',
   ],
+  diffBranches: ['git diff main postres'],
   merge: ['git merge postres'],
   mergeDiverged: ['git merge postres'],
   branchDelete: ['git branch -d postres'],
-  clone: [`git clone ${URL}`, 'cd interactive-git'],
+  clone: [`git clone ${REPO}`, 'cd interactive-git'],
   push: [
     'echo "Milanesas" >> recetas.md',
     'git add recetas.md',
@@ -42,7 +45,7 @@ const SOLUTIONS = {
   pushRejected: ['git pull', 'git push'],
   branchAll: ['git push -u origin postres', 'git branch -a'],
   final: [
-    `git clone ${URL}`,
+    `git clone ${REPO}`,
     'cd interactive-git',
     'git checkout -b bebidas',
     'echo "Limonada" > bebidas.md',
@@ -131,4 +134,24 @@ test('no lesson needs a command that a later lesson introduces', () => {
       )
     }
   }
+})
+
+test('the course table in the docs matches the course', () => {
+  // It has drifted every single time the order changed, so it is checked here.
+  const doc = readFileSync(new URL('../docs/lessons.md', import.meta.url), 'utf8')
+  const rows = [...doc.matchAll(/^\| (\d+) \| `([\w]+)` \|/gm)].map((match) => ({
+    number: Number(match[1]),
+    id: match[2],
+  }))
+
+  assert.deepEqual(
+    rows.map((row) => row.id),
+    LESSONS.map((lesson) => lesson.id),
+    'docs/lessons.md lists the lessons in a different order than the course',
+  )
+  assert.deepEqual(
+    rows.map((row) => row.number),
+    LESSONS.map((_lesson, index) => index + 1),
+    'the numbers in docs/lessons.md are not 1..n in order',
+  )
 })

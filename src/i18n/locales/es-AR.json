@@ -120,14 +120,17 @@
     "unknownGitCommandDidYouMean": "`{name}` no existe. ¿Quisiste escribir `git {suggestion}`?",
     "unknownCommand": "`{name}` no es un comando. Escribí `help` para ver la lista completa.",
     "unknownCommandDidYouMean": "`{name}` no es un comando. ¿Quisiste escribir `{suggestion}`?",
-    "gitHelp": "Comandos de git que podés usar acá:\n\ngit init      convierte la carpeta en un repositorio\ngit clone     trae un repositorio del servidor\ngit status    muestra qué cambió y qué está en el stage\ngit add       pone cambios en el stage\ngit restore   deshace cambios (con --staged, saca del stage)\ngit commit    guarda lo que está en el stage\ngit log       muestra la historia\ngit branch    lista o crea ramas (-a incluye las del servidor)\ngit checkout  te mueve de rama (-b crea una nueva)\ngit merge     trae el trabajo de otra rama\ngit push      sube tus commits al servidor\ngit pull      baja los commits del servidor\n\nCon `git <comando> --help` ves qué hace cada uno y qué opciones acepta acá.",
+    "gitHelp": "Comandos de git que podés usar acá:\n\ngit init      convierte la carpeta en un repositorio\ngit clone     trae un repositorio del servidor\ngit status    muestra qué cambió y qué está en el stage\ngit diff      muestra qué cambió, línea por línea\ngit add       pone cambios en el stage\ngit restore   deshace cambios (con --staged, saca del stage)\ngit commit    guarda lo que está en el stage\ngit log       muestra la historia\ngit branch    lista o crea ramas (-a incluye las del servidor)\ngit checkout  te mueve de rama (-b crea una nueva)\ngit merge     trae el trabajo de otra rama\ngit push      sube tus commits al servidor\ngit pull      baja los commits del servidor\n\nCon `git <comando> --help` ves qué hace cada uno y qué opciones acepta acá.",
     "shellHelp": "Comandos de git: git init, git clone, git status, git add, git restore, git commit, git log, git branch, git checkout, git merge, git push, git pull.\nEscribí `git` solo para ver la lista, o `git <comando> --help` para ver uno en detalle.\n\nComandos de la terminal: ls, cd, cat, touch, rm, echo, pwd, clear.\n\nTambién podés crear y editar archivos desde el panel Archivos, sin usar la terminal.",
-    "statusUnknownOption": "`git status` no lleva esa opción. Escribilo a secas: la sección `Changes to be committed`, en verde, es justamente lo que ya está en el stage.",
+    "statusUnknownOption": "`git status` no lleva esa opción. Escribilo a secas: la sección `Changes to be committed`, en verde, es lo que ya está en el stage. Y si querés ver *qué* cambió ahí, `git diff --staged`.",
     "reducedHelp": "Esta ayuda es reducida: lista solo lo que funciona en este simulador. Git tiene muchas más opciones, y la ayuda de verdad la vas a ver corriendo `git {command} --help` en una terminal.",
     "mergeConflict": "El merge quedó a medio hacer. Los archivos en conflicto tienen marcas `<<<<<<<`, `=======` y `>>>>>>>`: editalos para dejar la versión que quieras, y después `git add <archivo>` y `git commit` para cerrarlo.",
     "cdNeedsName": "A `cd` hay que decirle a dónde ir: `cd <carpeta>`.",
     "cdNoSuchDirectory": "No hay ninguna carpeta `{name}` acá. Mirá qué hay con `ls`: las carpetas terminan en `/`.",
-    "cdNotADirectory": "`{name}` es un archivo, no una carpeta."
+    "cdNotADirectory": "`{name}` es un archivo, no una carpeta.",
+    "diffUnknownRef": "No hay ninguna rama ni commit que se llame `{name}`. Listá las ramas con `git branch -a` y los commits con `git log --oneline`.",
+    "diffNoChanges": "`git diff` no imprimió nada, y eso es una respuesta: no hay diferencias entre tu carpeta y el stage. Si acabás de hacer `git add`, el cambio ya está en el stage; para verlo, `git diff --staged`.",
+    "diffNoDifferences": "Sin salida quiere decir sin diferencias: lo que comparaste es idéntico de los dos lados."
   },
   "lessons": {
     "init": {
@@ -392,6 +395,35 @@
         "La opción es una sola letra. Si no te acordás, `git branch --help` la lista.",
         "`git branch -d postres`. Probá después `git branch -d experimento`: git se niega, porque ese commit no está en ninguna otra rama. `-D` fuerza el borrado, y ese trabajo se pierde."
       ]
+    },
+    "diff": {
+      "title": "Ver qué cambió",
+      "intro": [
+        "`git status` te dice **qué archivos** cambiaron. `git diff` te dice **qué cambió adentro**: línea por línea, lo que se agregó en verde con un `+` y lo que se borró en rojo con un `-`.",
+        "Acá `recetas.md` tiene un cambio sin guardar. Miralo con `git diff`, ponelo en el stage, y volvé a correr `git diff`.",
+        "Lo que pasa entonces confunde a todo el mundo la primera vez, así que vale la pena verlo ahora y no en un parcial."
+      ],
+      "goal": "Mirá el cambio, ponelo en el stage, volvé a mirar, y después mirá lo que quedó guardado ahí.",
+      "hints": [
+        "El comando es uno solo, sin argumentos, y compara tu carpeta contra el stage. Por eso, una vez que hacés `git add`, no encuentra nada que mostrar: el cambio ya está del otro lado.",
+        "Para ver lo que está en el stage hace falta una opción, la misma que le falta a `git status`.",
+        "```\ngit diff\ngit add recetas.md\ngit diff\ngit diff --staged\n```\nEl tercero no imprime nada, y está bien: no hay diferencia entre la carpeta y el stage."
+      ]
+    },
+    "diffBranches": {
+      "title": "Ver qué trae otra rama",
+      "intro": [
+        "`git diff` no solo compara tu carpeta con el stage: también compara dos puntos cualesquiera de la historia, dos ramas entre ellas por ejemplo.",
+        "Es lo que conviene hacer antes de mergear: mirar qué trae la otra rama, en vez de mergear y después ver qué pasó.",
+        "Con dos nombres, se lee **del primero al segundo**: lo que hay que hacerle al primero para llegar al segundo. Ese orden importa, y si lo das al revés vas a ver los `+` y los `-` cambiados de lado."
+      ],
+      "goal": "Averiguá qué le falta a `main` para ser igual que `postres`, sin mergear nada.",
+      "hints": [
+        "Es el mismo comando de antes, pero con dos nombres al lado en vez de nada.",
+        "Los nombres son los de las dos ramas, y el orden es del punto de partida al de llegada: de donde estás a donde querés mirar.",
+        "`git diff main postres`. Vas a ver `postres.md` como archivo nuevo y una línea más en `recetas.md`: eso es exactamente lo que traería el merge."
+      ],
+      "note": "Con un solo nombre, `git diff postres` compara esa rama contra tu carpeta, que es el camino inverso: el mismo cambio aparece con los signos al revés. Por eso acá van los dos."
     }
   },
   "git": {
@@ -428,6 +460,7 @@
     "CONFLICT (content): Merge conflict in {name}": "CONFLICTO (contenido): conflicto de merge en {name}",
     "Automatic merge failed; fix conflicts and then commit the result.": "El merge automático falló; arreglá los conflictos y después hacé el commit del resultado.",
     "Merge made by the 'ort' strategy.": "Merge hecho con la estrategia 'ort'.",
+    "fatal: ambiguous argument '{name}': unknown revision or path not in the working tree.": "fatal: argumento ambiguo '{name}': no es una revisión conocida ni una ruta del directorio de trabajo.",
     "error: Committing is not possible because you have unmerged files.": "error: No se puede hacer el commit porque tenés archivos sin mergear.",
     "hint: Fix them up in the work tree, and then use 'git add <file>'": "hint: Arreglalos en el directorio de trabajo y después usá 'git add <archivo>'",
     "hint: as appropriate to mark resolution and make a commit.": "hint: para marcarlos como resueltos y hacer el commit.",
@@ -520,6 +553,9 @@
     "Copy a repository from a server into a new folder, with all of its history.": "Trae una copia de un repositorio del servidor a una carpeta nueva, con toda su historia.",
     "usage: git status": "uso: git status",
     "Show what is staged, what is not, and which files git is not tracking.": "Muestra qué está en el stage, qué no, y qué archivos git no está trackeando.",
+    "usage: git diff [--staged] [<commit> [<commit>]]": "uso: git diff [--staged] [<commit> [<commit>]]",
+    "Show what changed, line by line, between two of the three places a file lives.": "Muestra qué cambió, línea por línea, entre dos de los tres lugares donde vive un archivo.",
+    "the staging area against the last commit": "el stage contra el último commit",
     "usage: git add [-A | --all] <pathspec>...": "uso: git add [-A | --all] <ruta>...",
     "Copy the current state of a file into the staging area. Use . for all of them.": "Copia el estado actual de un archivo al stage. Con . los agrega todos.",
     "every change in the folder": "todos los cambios de la carpeta",

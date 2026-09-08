@@ -7,6 +7,7 @@ import { hintKind } from '../hints.js'
 import { msg } from '../messages.js'
 import { tokenize } from '../parser.js'
 import { gitBranch, gitCheckout, gitMerge } from './branching.js'
+import { gitDiff } from './diff.js'
 import { gitCommit, gitLog } from './history.js'
 import { gitPull, gitPush } from './remote.js'
 import { gitClone, gitInit } from './repoSetup.js'
@@ -20,6 +21,7 @@ const GIT_COMMANDS = {
   init: gitInit,
   clone: gitClone,
   status: gitStatus,
+  diff: gitDiff,
   add: gitAdd,
   restore: gitRestore,
   commit: gitCommit,

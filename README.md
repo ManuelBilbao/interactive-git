@@ -65,12 +65,12 @@ configuración de SPA ni un `404.html`.
 
 ## Qué enseña
 
-Diecinueve lecciones, en orden, sobre estos comandos:
+Veintiuna lecciones, en orden, sobre estos comandos:
 
 `git init`, `git clone`, `git status`, `git add`,
-`git restore [--staged]`, `git commit -m`, `git log [--oneline]`,
-`git branch [-a] [-d]`, `git checkout [-b]`, `git merge`, `git push [-u]`,
-`git pull`.
+`git restore [--staged]`, `git commit -m`, `git diff [--staged]`,
+`git log [--oneline]`, `git branch [-a] [-d]`, `git checkout [-b]`,
+`git merge`, `git push [-u]`, `git pull`.
 
 El detalle de cada lección está en [docs/lessons.md](docs/lessons.md).
 
@@ -96,6 +96,7 @@ src/
     workdir.js       cambiar de snapshot sin pisar trabajo sin guardar
     parser.js        de una línea de texto a tokens
     errors.js        GitError: mensaje de git + clave de la pista traducida
+    diff.js          comparar dos snapshots, con formato de `git diff`
     commands/        un archivo por familia de comandos
   lessons/index.js   las lecciones: setup y condición de victoria
   i18n/              proveedor de traducciones y locales
