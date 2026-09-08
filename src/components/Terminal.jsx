@@ -50,7 +50,8 @@ export default function Terminal({ entries, hint, onSubmit }) {
         </div>
         {entries.map((entry) => (
           <pre key={entry.key} className={`terminal-line terminal-${entry.type}`}>
-            {entry.type === 'command' ? `$ ${entry.text}` : entry.text}
+            {/* A non-breaking space keeps git's blank separator lines visible. */}
+            {entry.type === 'command' ? `$ ${entry.text}` : entry.text || '\u00a0'}
           </pre>
         ))}
         <form className="terminal-input" onSubmit={submit}>
