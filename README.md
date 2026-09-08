@@ -10,9 +10,9 @@ modela el repositorio, el stage y el remoto, y que responde con los mismos
 mensajes que git. Cuando algo falla, aparece el error de git y al lado una
 tarjeta que explica qué pasó y cómo seguir.
 
-La terminal viene en castellano, igual que git de verdad cuando corre con
-`LANG` en español. El switch **Terminal en castellano**, arriba a la derecha, la
-pasa al inglés que se ve por defecto en la mayoría de las máquinas.
+La terminal habla en castellano, igual que git de verdad cuando corre con `LANG`
+en español. Las palabras clave quedan en inglés: commit, stage, push, pull,
+merge.
 
 ## Cómo correrlo
 
@@ -106,8 +106,9 @@ El selector de idioma aparece solo cuando hay más de uno. Los tests de i18n
 verifican que no falte ninguna pista.
 
 El bloque `git` de ese archivo es aparte: es el catálogo de la salida de la
-terminal, con el texto en inglés como clave, igual que hace gettext. Para
-regenerar la lista de mensajes que hay que traducir:
+terminal, con el texto en inglés como clave, igual que hace gettext. Cada idioma
+trae el suyo, y la terminal usa el del idioma activo. Para regenerar la lista de
+mensajes que hay que traducir:
 
 ```bash
 node scripts/extract-messages.mjs

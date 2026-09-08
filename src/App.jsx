@@ -31,8 +31,7 @@ const stored = loadProgress()
 const initialLesson = lessonFromUrl(LESSONS.length) ?? Math.min(stored.lesson, LESSONS.length - 1)
 
 export default function App() {
-  const { t, locale, setLocale, locales, available, translateOutput, setTranslateOutput } =
-    useI18n()
+  const { t, locale, setLocale, locales, available } = useI18n()
 
   const [index, setIndex] = useState(initialLesson)
   const [world, setWorld] = useState(() => LESSONS[initialLesson].setup())
@@ -157,14 +156,6 @@ export default function App() {
               </select>
             </label>
           )}
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={translateOutput}
-              onChange={(event) => setTranslateOutput(event.target.checked)}
-            />
-            {t('app.translateOutput')}
-          </label>
           <button type="button" onClick={resetProgress}>
             {t('nav.resetProgress')}
           </button>

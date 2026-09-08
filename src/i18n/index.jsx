@@ -4,7 +4,6 @@ import { setMessages, translateWith } from '../engine/messages.js'
 import { AVAILABLE_LOCALES, DEFAULT_LOCALE, LOCALES } from './locales/index.js'
 
 const LOCALE_KEY = 'git-interactivo:locale'
-const OUTPUT_KEY = 'git-interactivo:translate-output'
 const I18nContext = createContext(null)
 
 function read(key, fallback) {
@@ -44,7 +43,7 @@ function interpolate(text, params) {
 /**
  * Lines of git output that the lesson texts quote. They are available to every
  * `t()` call as parameters, so a hint that points at a section of `git status`
- * keeps pointing at the right words whichever language the terminal is in.
+ * quotes it in the same words the terminal just used, in any locale.
  */
 function gitQuotes(catalogue) {
   const quote = (text) => translateWith(catalogue, text).replace(/:$/, '')
@@ -58,24 +57,17 @@ function gitQuotes(catalogue) {
 
 export function I18nProvider({ children }) {
   const [locale, setLocaleState] = useState(readStoredLocale)
-  const [translateOutput, setTranslateOutputState] = useState(
-    () => read(OUTPUT_KEY, 'true') !== 'false',
-  )
 
   const setLocale = useCallback((next) => {
     setLocaleState(next)
     write(LOCALE_KEY, next)
   }, [])
 
-  const setTranslateOutput = useCallback((next) => {
-    setTranslateOutputState(next)
-    write(OUTPUT_KEY, String(next))
-  }, [])
-
   const messages = LOCALES[locale]?.messages ?? LOCALES[DEFAULT_LOCALE].messages
-  const gitCatalogue = translateOutput ? (messages.git ?? null) : null
+  const gitCatalogue = messages.git ?? null
 
   // git picks its language from the environment; this is that environment.
+  // Here the environment is simply the locale the site is running in.
   useEffect(() => {
     setMessages(gitCatalogue)
   }, [gitCatalogue])
@@ -106,15 +98,13 @@ export function I18nProvider({ children }) {
     return {
       locale,
       setLocale,
-      translateOutput,
-      setTranslateOutput,
       t,
       tList,
       has,
       locales: LOCALES,
       available: AVAILABLE_LOCALES,
     }
-  }, [locale, setLocale, messages, gitCatalogue, translateOutput, setTranslateOutput])
+  }, [locale, setLocale, messages, gitCatalogue])
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }

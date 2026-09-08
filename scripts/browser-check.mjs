@@ -138,15 +138,6 @@ async function openLesson(number) {
   )
 }
 
-/** Flips the "terminal in Spanish" switch in the header. */
-async function setSpanishOutput(wanted) {
-  await evaluate(
-    `const box = document.querySelector('.toggle input')
-     if (box.checked !== ${wanted}) box.click()`,
-  )
-  await wait(150)
-}
-
 const terminal = () => evaluate("return document.querySelector('.terminal').innerText")
 const hint = () => evaluate("return document.querySelector('.hint-card')?.innerText ?? ''")
 const solved = () => evaluate("return Boolean(document.querySelector('.lesson-solved'))")
@@ -166,40 +157,35 @@ try {
   await waitFor('.terminal-input input')
   await check('the four panels rendered', (await evaluate("return document.querySelectorAll('.panel').length")) === 4)
 
-  // Out of the box the terminal speaks Spanish, like git under a Spanish LANG.
+  // git speaks the language of the site, the way it follows LANG for real.
   await type('git status')
   await check(
-    'git speaks Spanish by default',
+    'a git command before `git init` fails',
     (await terminal()).includes('no es un repositorio git'),
     terminal,
   )
-
-  // The switch in the header puts it back into git's own English.
-  await setSpanishOutput(false)
-  await type('git status')
-  await check('the toggle switches git back to English', (await terminal()).includes('not a git repository'), terminal)
-
-  // A command that fails must show git's wording and the translated hint.
-  await type('git status')
-  await check('a git command before `git init` fails', (await terminal()).includes('not a git repository'), terminal)
-  await check('the hint card explains it in Spanish', (await hint()).includes('git init'), hint)
+  await check('the hint card explains what to do', (await hint()).includes('git init'), hint)
 
   await type('git init')
-  await check('git init succeeds', (await terminal()).includes('Initialized empty Git repository'), terminal)
+  await check('git init succeeds', (await terminal()).includes('Inicializado un repositorio Git'), terminal)
   await check('the goal is detected', await solved())
 
   await openLesson(4)
   await type('git commit')
-  await check('a commit without a message is refused', (await terminal()).includes('empty commit message'), terminal)
+  await check(
+    'a commit without a message is refused',
+    (await terminal()).includes('mensaje está vacío'),
+    terminal,
+  )
   await type('git commit -m "primer commit"')
-  await check('the commit is created', (await terminal()).includes('root-commit'), terminal)
+  await check('the commit is created', (await terminal()).includes('commit-raíz'), terminal)
   await check('the graph drew the commit', (await evaluate("return document.querySelectorAll('.graph .node').length")) === 1)
   await check('lesson 4 is solved', await solved())
 
   // The whole remote round trip, including the rejected push.
   await openLesson(15)
   await type('git push')
-  await check('the push is rejected', (await terminal()).includes('[rejected]'), terminal)
+  await check('the push is rejected', (await terminal()).includes('[rechazado]'), terminal)
   await check('the rejection is explained', (await hint()).includes('git pull'), hint)
   await type('git pull')
   await type('git push')
@@ -225,7 +211,11 @@ try {
   `)
   await wait(150)
   await type('git status')
-  await check('an edit from the files panel shows as modified', (await terminal()).includes('modified:'), terminal)
+  await check(
+    'an edit from the files panel shows as modified',
+    (await terminal()).includes('modificado:'),
+    terminal,
+  )
 
   // Colour carries the meaning lessons 3 to 6 are built on, so check it lands
   // in the DOM and not just in the output string.
@@ -240,16 +230,17 @@ try {
   await check('a staged change is green', await painted('green'))
 
   await type('git status --staged')
-  await check('`git status --staged` is refused', (await terminal()).includes('unknown option'), terminal)
+  await check(
+    '`git status --staged` is refused',
+    (await terminal()).includes('opción desconocida'),
+    terminal,
+  )
   await check('and the hint points at the green section', (await hint()).includes('stage'), hint)
 
-  // The same status, in Spanish, with the colours still in place.
-  await setSpanishOutput(true)
   await type('git status')
   const spanish = await terminal()
   await check('status is translated', spanish.includes('En la rama main'), terminal)
   await check('so are its sections', spanish.includes('Cambios listos para el commit:'), terminal)
-  await check('and the colours survive translation', await painted('green'))
 } finally {
   socket.close()
   await cleanUp()

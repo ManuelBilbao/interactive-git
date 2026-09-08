@@ -2,8 +2,7 @@
   "app": {
     "title": "Git interactivo",
     "subtitle": "Aprendé los comandos básicos de git escribiéndolos",
-    "language": "Idioma",
-    "translateOutput": "Terminal en castellano"
+    "language": "Idioma"
   },
   "nav": {
     "lessons": "Lecciones",

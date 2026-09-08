@@ -104,19 +104,18 @@ punta a punta, así que una lección imposible de completar rompe los tests.
 
 ## El idioma de la terminal
 
-La terminal arranca en castellano, como git de verdad cuando la máquina tiene
-`LANG` en español. El switch **Terminal en castellano** la pasa al inglés, que
-es lo que van a ver en la mayoría de las computadoras y en todo lo que busquen
-en internet.
+La terminal habla en castellano, igual que git de verdad cuando la máquina tiene
+`LANG` en español. No hay nada que configurar: el idioma de la salida es el
+idioma del sitio.
 
-Vale la pena usar los dos en algún momento del curso: empezar en castellano para
-que el error se entienda sin traducir mentalmente, y pasar a inglés antes de que
-salgan a trabajar con git afuera. Las pistas de las lecciones se acomodan solas:
-cuando citan una sección de `git status`, la citan en el idioma que esté puesto.
+Las palabras clave quedan en inglés igual: commit, stage, push, pull, merge. Son
+las que van a tipear toda su vida y las que van a encontrar en cualquier
+búsqueda. Los mensajes de commit tampoco se traducen, porque son contenido del
+repositorio y no salida del programa.
 
-Las palabras clave quedan en inglés en los dos idiomas: commit, stage, push,
-pull, merge. Los mensajes de commit tampoco se traducen, porque son contenido
-del repositorio y no salida del programa.
+Vale la pena avisarles en algún momento que en una máquina con `LANG` en inglés
+—que es lo más común— los mismos mensajes salen en inglés, y que lo que están
+leyendo acá es el mismo texto en el otro idioma.
 
 ## Errores y pistas
 

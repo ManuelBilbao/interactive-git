@@ -206,20 +206,6 @@ code {
   font-size: 13px;
 }
 
-.toggle {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  cursor: pointer;
-  color: var(--text-2);
-  user-select: none;
-}
-
-.toggle input {
-  accent-color: var(--accent);
-  margin: 0;
-}
-
 .progress {
   display: flex;
   gap: 9px;
@@ -253,9 +239,9 @@ code {
   /* The side columns give ground first, so the terminal keeps enough width for
      git's longer lines instead of wrapping them. */
   grid-template-columns:
-    clamp(272px, 23vw, 342px)
+    clamp(264px, 21vw, 330px)
     minmax(0, 1fr)
-    clamp(272px, 23vw, 346px);
+    clamp(352px, 27vw, 420px);
   gap: 12px;
   padding: 12px;
   overflow: hidden;
@@ -652,6 +638,12 @@ button.reset {
   font-size: 11.5px;
   font-weight: 500;
   fill: var(--text);
+}
+
+.node-message {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  fill: var(--muted);
 }
 
 .ref {
