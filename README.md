@@ -21,15 +21,47 @@ npm install
 npm run dev      # http://localhost:5173
 ```
 
-Para publicarlo:
+Para revisar el build:
 
 ```bash
 npm run build    # deja el sitio en dist/
-npm run preview  # para revisarlo antes de subirlo
+npm run preview
 ```
 
-El build usa rutas relativas (`base: './'` en `vite.config.js`), así que `dist/`
-funciona tal cual en GitHub Pages o en cualquier carpeta de un servidor.
+## Publicar en GitHub Pages
+
+Ya está el workflow (`.github/workflows/deploy.yml`): cada push a `main` corre
+los tests, hace el build y publica. Si algo falla, no publica nada.
+
+La primera vez hay que hacer tres cosas:
+
+1. Crear el repositorio en GitHub y subir `main`:
+
+   ```bash
+   gh repo create <usuario>/<repo> --public --source=. --remote=origin --push
+   ```
+
+   o, si el repo ya existe:
+
+   ```bash
+   git remote add origin git@github.com:<usuario>/<repo>.git
+   git push -u origin main
+   ```
+
+2. En **Settings → Pages**, poner **Source: GitHub Actions**. (Con *Deploy from
+   a branch* no funciona: el sitio se arma en el workflow, no está commiteado.)
+
+3. Esperar el primer deploy. Queda en
+   `https://<usuario>.github.io/<repo>/`; para este repo,
+   <https://manuelbilbao.github.io/interactive-git/>.
+
+De ahí en adelante, publicar es hacer push. También se puede correr el workflow
+a mano desde la pestaña **Actions**.
+
+El build usa rutas relativas (`base: './'` en `vite.config.js`), así que anda
+igual en la raíz de un dominio que en un subdirectorio como `/<repo>/`. Los
+enlaces `?leccion=N` son query params, no rutas, así que no hace falta ninguna
+configuración de SPA ni un `404.html`.
 
 ## Qué enseña
 
