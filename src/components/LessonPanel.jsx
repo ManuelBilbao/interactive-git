@@ -7,9 +7,7 @@ function LessonList({ current, completed, onSelect }) {
 
   return (
     <details className="lesson-list">
-      <summary>
-        {t('nav.lessons')} · {t('nav.progress', { done: completed.size, total: LESSONS.length })}
-      </summary>
+      <summary>{t('nav.lessons')}</summary>
       <ol>
         {LESSONS.map((lesson, index) => (
           <li key={lesson.id}>
@@ -88,37 +86,39 @@ export default function LessonPanel({
           </div>
         ))}
         {hintsShown < hints.length ? (
-          <button type="button" onClick={onHint}>
-            {t('lesson.hint')}
+          <button type="button" className="block" onClick={onHint}>
+            {t('lesson.hint')} ({hintsShown + 1}/{hints.length})
           </button>
         ) : (
           <p className="legend">{t('lesson.noMoreHints')}</p>
         )}
-      </div>
-
-      {solved && (
-        <div className="lesson-solved">
-          <h3>{isLast ? t('lesson.finished') : t('lesson.solved')}</h3>
-          {isLast ? (
-            <p>{t('lesson.finishedBody')}</p>
-          ) : (
-            <button type="button" className="primary" onClick={() => onSelect(index + 1)}>
-              {t('lesson.next')} →
-            </button>
-          )}
-        </div>
-      )}
-
-      <div className="lesson-nav">
-        <button type="button" disabled={index === 0} onClick={() => onSelect(index - 1)}>
-          ← {t('nav.previous')}
-        </button>
-        <button type="button" onClick={onReset}>
+        <button type="button" className="block ghost reset" onClick={onReset}>
           {t('nav.reset')}
         </button>
-        <button type="button" disabled={isLast} onClick={() => onSelect(index + 1)}>
-          {t('nav.next')} →
-        </button>
+      </div>
+
+      {/* The footer is pinned, so when the goal is reached the banner and the
+          way onwards are both in view without scrolling back down. */}
+      <div className="lesson-nav">
+        {solved && (
+          <div className="lesson-solved">
+            <h3>{isLast ? t('lesson.finished') : t('lesson.solved')}</h3>
+            {isLast && <p>{t('lesson.finishedBody')}</p>}
+          </div>
+        )}
+        <div className="lesson-steps">
+          <button type="button" disabled={index === 0} onClick={() => onSelect(index - 1)}>
+            ← {t('nav.previous')}
+          </button>
+          <button
+            type="button"
+            className={solved && !isLast ? 'primary' : undefined}
+            disabled={isLast}
+            onClick={() => onSelect(index + 1)}
+          >
+            {t('nav.next')} →
+          </button>
+        </div>
       </div>
     </section>
   )

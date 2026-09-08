@@ -16,6 +16,17 @@ function RefChips({ refs, x, y }) {
   ))
 }
 
+/**
+ * A commit in the same column joins its parent with a straight line; one that
+ * branched off curves across, which is what makes a merge read as two lines
+ * coming back together rather than as a triangle.
+ */
+function edgePath({ from, to }) {
+  if (from.x === to.x) return `M ${from.x} ${from.y} L ${to.x} ${to.y}`
+  const bend = (from.y - to.y) * 0.42
+  return `M ${from.x} ${from.y} C ${from.x} ${from.y - bend}, ${to.x} ${to.y + bend}, ${to.x} ${to.y}`
+}
+
 function Graph({ repo }) {
   const { t } = useI18n()
   const layout = layoutGraph(repo)
@@ -34,14 +45,7 @@ function Graph({ repo }) {
         aria-label={t('graph.title')}
       >
         {layout.edges.map((edge) => (
-          <line
-            key={edge.key}
-            className="edge"
-            x1={edge.from.x}
-            y1={edge.from.y}
-            x2={edge.to.x}
-            y2={edge.to.y}
-          />
+          <path key={edge.key} className="edge" d={edgePath(edge)} />
         ))}
         {layout.nodes.map((node) => (
           <g key={node.id}>

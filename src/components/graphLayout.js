@@ -12,9 +12,9 @@
 import { commitsInOrder, currentBranch, generation } from '../engine/model.js'
 
 export const NODE_RADIUS = 17
-const MIN_COLUMN_WIDTH = 78
-const MIN_ROW_HEIGHT = 72
-const PADDING = 28
+const MIN_COLUMN_WIDTH = 72
+const MIN_ROW_HEIGHT = 62
+const PADDING = 22
 const CHIP_HEIGHT = 22
 const CHIP_GAP = 4
 // The gaps leave room for the radius of the node in the next row or column,

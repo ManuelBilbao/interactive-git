@@ -1,25 +1,49 @@
-/* One stylesheet for the whole site. The design is deliberately plain: the
-   commit graph and the terminal are what the student should be looking at. */
+/* One stylesheet for the whole site.
+   The commit graph and the terminal are what the student should be looking at,
+   so everything else is quiet: one accent colour for "do this next", one green
+   for "staged / done", one red for "not yet". */
 
 :root {
-  --bg: #f5f4f2;
+  --bg: #f6f6f4;
   --panel: #ffffff;
-  --border: #e2dfda;
-  --text: #1c1917;
-  --muted: #6b6560;
+  --surface: #f7f6f4;
+  --border: #e6e3de;
+  --border-strong: #d7d3cc;
+
+  --text: #1a1917;
+  --text-2: #57534e;
+  --muted: #857f78;
+
   --accent: #2f6fdb;
-  --accent-soft: #e8f0fe;
-  --success: #1a7f4b;
-  --success-soft: #e6f4ec;
-  --warning: #9a6700;
-  --warning-soft: #fdf3d7;
+  --accent-hover: #2560c4;
+  --accent-soft: #eaf1fd;
+  --accent-border: #c6daf8;
+
+  --success: #157347;
+  --success-soft: #e8f4ee;
+  --success-border: #bcdfcd;
+
+  --warning: #8a5d08;
+  --warning-soft: #fdf3dc;
+  --warning-border: #ecd9a6;
+
   --danger: #b3261e;
-  --terminal-bg: #1d1d24;
-  --terminal-text: #e6e6e6;
-  --terminal-error: #ff8a80;
+  --danger-soft: #fbeae9;
+
+  --brand: #f05033;
+
+  --terminal-bg: #1b1b21;
+  --terminal-text: #e4e4e7;
+  --terminal-dim: #9c9caa;
+  --terminal-error: #ff9b93;
   --terminal-prompt: #7ee787;
-  --radius: 8px;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 2px rgba(28, 25, 23, 0.05), 0 1px 3px rgba(28, 25, 23, 0.04);
+
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 * {
@@ -30,26 +54,47 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 15px/1.55 var(--sans);
+  -webkit-font-smoothing: antialiased;
 }
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 650;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- controls ---------- */
 
 button {
   font: inherit;
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   background: var(--panel);
-  color: var(--text);
+  color: var(--text-2);
   cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
 }
 
 button:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
+  background: var(--accent-soft);
 }
 
 button:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: default;
 }
 
@@ -60,33 +105,57 @@ button.primary {
 }
 
 button.primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
   color: #fff;
-  filter: brightness(1.08);
+}
+
+/* Full width, for the one action a panel is offering right now. */
+button.block {
+  display: block;
+  width: 100%;
+}
+
+/* Quieter than a normal button: available, but not what to click next. */
+button.ghost {
+  background: none;
+  border-style: dashed;
+  border-color: var(--border-strong);
+  color: var(--muted);
+}
+
+button.tiny {
+  padding: 3px 8px;
+  font-size: 12px;
 }
 
 input,
 textarea,
 select {
   font: inherit;
-  padding: 6px 8px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  font-size: 13px;
+  padding: 6px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   background: var(--panel);
   color: var(--text);
 }
 
-code {
-  font-family: var(--mono);
-  font-size: 0.9em;
-  background: #efece7;
-  border-radius: 4px;
-  padding: 1px 5px;
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
-h1,
-h2,
-h3 {
-  margin: 0;
+code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5px 5px;
+  white-space: nowrap;
 }
 
 /* ---------- layout ---------- */
@@ -100,74 +169,145 @@ h3 {
 .header {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 11px 16px;
   background: var(--panel);
   border-bottom: 1px solid var(--border);
 }
 
+.brand {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+}
+
+.brand-mark {
+  flex: none;
+  color: var(--brand);
+}
+
 .header h1 {
-  font-size: 17px;
+  font-size: 16px;
+  letter-spacing: -0.01em;
 }
 
 .header p {
-  margin: 2px 0 0;
+  margin: 1px 0 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12.5px;
 }
 
 .header-actions {
   display: flex;
-  gap: 10px;
+  gap: 14px;
   align-items: center;
   font-size: 13px;
 }
 
 .toggle {
   display: flex;
-  gap: 5px;
+  gap: 6px;
   align-items: center;
   cursor: pointer;
-  color: var(--muted);
+  color: var(--text-2);
+  user-select: none;
 }
 
+.toggle input {
+  accent-color: var(--accent);
+  margin: 0;
+}
+
+.progress {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-track {
+  width: 84px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--success);
+  transition: width 0.3s ease;
+}
+
+/* Three columns: the lesson to read, the terminal to work in, and a rail of
+   reference panels. The terminal is the tall one because it is where the
+   student actually spends the lesson. */
 .workspace {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr) 288px;
+  /* The side columns give ground first, so the terminal keeps enough width for
+     git's longer lines instead of wrapping them. */
+  grid-template-columns:
+    clamp(272px, 23vw, 342px)
+    minmax(0, 1fr)
+    clamp(272px, 23vw, 346px);
   gap: 12px;
   padding: 12px;
   overflow: hidden;
 }
 
-.center {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+/* Each panel in the rail is as tall as its contents; the rail scrolls as a
+   whole, so leftover space falls outside the panels rather than inside them. */
+.rail {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  overflow: hidden;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.rail .panel {
+  flex: 0 0 auto;
+  overflow: visible;
 }
 
 .panel {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow);
   padding: 14px;
   overflow: auto;
 }
 
 .panel-title {
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .empty,
 .legend {
   color: var(--muted);
   font-size: 13px;
+}
+
+.files-panel .legend {
+  font-size: 11.5px;
+  line-height: 1.45;
+  margin-bottom: 0;
 }
 
 .warning {
@@ -177,6 +317,11 @@ h3 {
 
 /* ---------- lesson panel ---------- */
 
+.lesson-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 .lesson-list {
   margin-bottom: 14px;
   font-size: 13px;
@@ -184,36 +329,76 @@ h3 {
 
 .lesson-list summary {
   cursor: pointer;
+  color: var(--text-2);
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  list-style: none;
+}
+
+.lesson-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.lesson-list summary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 7px;
   color: var(--muted);
+  transition: transform 0.15s;
+}
+
+.lesson-list[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.lesson-list summary:hover {
+  border-color: var(--border-strong);
 }
 
 .lesson-list ol {
   list-style: none;
-  margin: 8px 0 0;
-  padding: 0;
+  margin: 6px 0 0;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  max-height: 260px;
+  overflow: auto;
 }
 
 .lesson-link {
   display: flex;
-  gap: 8px;
+  gap: 9px;
   align-items: baseline;
   width: 100%;
   text-align: left;
   border: none;
   background: none;
-  padding: 4px 6px;
-  border-radius: 6px;
+  padding: 5px 7px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-2);
+  white-space: normal;
+}
+
+.lesson-link:hover {
+  background: var(--surface);
+  color: var(--text);
 }
 
 .lesson-link.current {
   background: var(--accent-soft);
   color: var(--accent);
+  font-weight: 550;
 }
 
 .lesson-number {
   color: var(--muted);
   font-variant-numeric: tabular-nums;
-  min-width: 18px;
+  font-size: 12px;
+  min-width: 16px;
 }
 
 .check {
@@ -222,145 +407,223 @@ h3 {
 }
 
 .lesson-counter {
+  display: inline-block;
   margin: 0;
-  font-size: 12px;
-  color: var(--muted);
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: var(--muted);
 }
 
 .lesson-title {
-  font-size: 19px;
-  margin: 4px 0 10px;
+  font-size: 20px;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  margin: 9px 0 10px;
 }
 
 .lesson-intro {
   margin: 0 0 10px;
-}
-
-.lesson-goal,
-.lesson-note,
-.lesson-commands {
-  margin-top: 14px;
-}
-
-.lesson-goal h3,
-.lesson-note h3,
-.lesson-commands h3,
-.lesson-solved h3 {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  margin-bottom: 4px;
+  color: var(--text-2);
 }
 
 .lesson-goal {
-  border-left: 3px solid var(--accent);
-  padding-left: 10px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+}
+
+.lesson-goal h3 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent);
+  margin-bottom: 4px;
 }
 
 .lesson-goal p {
   margin: 0;
 }
 
+.lesson-goal code {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: var(--accent-border);
+}
+
 .lesson-note {
+  margin-top: 14px;
   background: var(--warning-soft);
-  border-radius: var(--radius);
-  padding: 10px;
+  border: 1px solid var(--warning-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
   font-size: 13px;
+}
+
+.lesson-note h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--warning);
+  margin-bottom: 3px;
 }
 
 .lesson-note p {
   margin: 0;
 }
 
+.lesson-commands {
+  margin-top: 14px;
+}
+
+.lesson-commands h3 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+
 .lesson-commands ul {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
   margin: 0;
   padding: 0;
 }
 
+.lesson-commands code {
+  background: var(--panel);
+  border-color: var(--border-strong);
+  padding: 3px 7px;
+  font-size: 12px;
+}
+
 .lesson-hints {
-  margin-top: 16px;
+  margin-top: 14px;
+}
+
+button.reset {
+  margin-top: 8px;
+  border-style: solid;
+  border-color: var(--border);
+  font-size: 12.5px;
 }
 
 .hint {
-  background: var(--bg);
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  margin-bottom: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  margin-bottom: 7px;
   font-size: 14px;
+  color: var(--text-2);
 }
 
 .hint p {
   margin: 0;
 }
 
+.hint code {
+  background: var(--panel);
+}
+
 .hint-title {
   display: block;
-  font-size: 11px;
+  font-size: 10.5px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.07em;
   color: var(--muted);
+  margin-bottom: 2px;
 }
 
 .lesson-solved {
-  margin-top: 16px;
-  padding: 12px;
-  border-radius: var(--radius);
+  padding: 9px 12px;
+  margin-bottom: 2px;
+  border-radius: var(--radius-sm);
   background: var(--success-soft);
-  border: 1px solid #bfe0cd;
+  border: 1px solid var(--success-border);
 }
 
 .lesson-solved h3 {
+  display: flex;
+  gap: 7px;
+  align-items: center;
   color: var(--success);
-  font-size: 15px;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-.lesson-solved p {
-  margin: 6px 0 0;
   font-size: 14px;
 }
 
-.lesson-solved button {
-  margin-top: 8px;
+.lesson-solved h3::before {
+  content: "✓";
+  font-size: 12px;
 }
 
+.lesson-solved p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* Pinned to the bottom of the lesson panel, so moving on never means scrolling
+   back down through the hints first. */
 .lesson-nav {
-  display: flex;
-  gap: 8px;
-  margin-top: 18px;
-  flex-wrap: wrap;
+  position: sticky;
+  bottom: -14px;
+  display: grid;
+  gap: 6px;
+  margin: auto -14px -14px;
+  padding: 12px 14px 14px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+}
+
+.lesson-steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.lesson-steps button {
+  text-align: center;
 }
 
 /* ---------- graph ---------- */
 
-/* The two repositories stay side by side: seeing yours next to the server's is
-   the whole point. Each takes the width it needs and the row scrolls. */
+/* Your repository sits above the server's, the way Learn Git Branching stacks
+   them, so both fit in the rail and the labels are never cut off. */
 .graph-columns {
   display: flex;
-  gap: 28px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 18px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 2px;
 }
 
-/* Each graph takes the width it needs; the panel scrolls when both together
-   do not fit, so a branch label is never cut in half. */
 .graph-column {
   flex: 0 0 auto;
+  min-width: min-content;
+}
+
+.graph-column + .graph-column {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
 }
 
 .graph-label {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 8px;
 }
 
 .graph-scroll {
@@ -368,30 +631,32 @@ h3 {
 }
 
 .edge {
-  stroke: #b9b3ac;
+  fill: none;
+  stroke: #c9c4bc;
   stroke-width: 2;
 }
 
 .node {
   fill: var(--panel);
-  stroke: #57534e;
+  stroke: #6b655e;
   stroke-width: 2;
 }
 
 .node-merge {
-  fill: #efe7fb;
+  fill: #f0e9fc;
   stroke: #7c5cbf;
 }
 
 .node-text {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 11.5px;
+  font-weight: 500;
   fill: var(--text);
 }
 
 .ref {
-  fill: #eeece8;
-  stroke: #d8d4cd;
+  fill: var(--surface);
+  stroke: var(--border-strong);
 }
 
 .ref-head {
@@ -401,17 +666,18 @@ h3 {
 
 .ref-remote {
   fill: var(--warning-soft);
-  stroke: #e7cf95;
+  stroke: var(--warning-border);
 }
 
 .ref-text {
   font-family: var(--mono);
-  font-size: 12px;
-  fill: var(--text);
+  font-size: 11.5px;
+  fill: var(--text-2);
 }
 
 .ref-text-head {
   fill: #fff;
+  font-weight: 500;
 }
 
 .ref-text-remote {
@@ -431,16 +697,19 @@ h3 {
   overflow: auto;
   background: var(--terminal-bg);
   color: var(--terminal-text);
-  border-radius: var(--radius);
-  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
   font-family: var(--mono);
   font-size: 13px;
+  line-height: 1.5;
   cursor: text;
 }
 
 .terminal-welcome {
-  color: #9a9aa8;
-  margin-bottom: 8px;
+  color: var(--terminal-dim);
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .terminal-welcome p {
@@ -448,7 +717,8 @@ h3 {
 }
 
 .terminal-welcome code {
-  background: #2c2c36;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.14);
   color: var(--terminal-text);
 }
 
@@ -456,11 +726,13 @@ h3 {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .terminal-command {
   color: var(--terminal-prompt);
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .terminal-error {
@@ -469,7 +741,7 @@ h3 {
 
 /* Colours git asks for through ANSI codes, mapped onto the dark terminal. */
 .ansi-red {
-  color: #ff8a80;
+  color: #ff9b93;
 }
 
 .ansi-green {
@@ -498,9 +770,9 @@ h3 {
 
 .terminal-input {
   display: flex;
-  gap: 8px;
+  gap: 9px;
   align-items: center;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .prompt {
@@ -519,15 +791,25 @@ h3 {
 
 .terminal-input input:focus {
   outline: none;
+  box-shadow: none;
 }
 
+.terminal-input input::placeholder {
+  color: #6f6f7d;
+}
+
+/* The hint lives inside the transcript, so it is styled to read as commentary
+   on the output above it rather than as more output. */
 .hint-card {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  background: var(--accent-soft);
-  border: 1px solid #cadcfa;
-  font-size: 14px;
+  margin: 9px 0 11px;
+  padding: 9px 12px;
+  border-radius: 5px;
+  border-left: 3px solid #4f86e8;
+  background: rgba(79, 134, 232, 0.15);
+  color: #d8e5fb;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.5;
 }
 
 .hint-card p {
@@ -535,45 +817,54 @@ h3 {
   white-space: pre-wrap;
 }
 
+.hint-card p:last-child {
+  margin-bottom: 0;
+}
+
 .hint-card code {
-  background: #d8e5fb;
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #fff;
 }
 
 .hint-card-title {
   display: block;
-  font-size: 11px;
+  font-size: 10.5px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-  margin-bottom: 4px;
+  letter-spacing: 0.08em;
+  color: #93b6f2;
+  margin-bottom: 3px;
 }
 
 /* ---------- files ---------- */
 
 .file-list {
   list-style: none;
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   padding: 0;
 }
 
 .file {
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  margin-bottom: 8px;
+  border-radius: var(--radius-sm);
+  padding: 8px 9px;
+  margin-bottom: 7px;
 }
 
 .file-head {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
   align-items: center;
   justify-content: space-between;
 }
 
 .file-name {
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 12.5px;
+  font-weight: 500;
+  word-break: break-all;
 }
 
 .file-badges {
@@ -583,64 +874,85 @@ h3 {
 }
 
 .badge {
-  font-size: 11px;
-  padding: 1px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 2px 7px;
   border-radius: 999px;
-  background: #eeece8;
+  background: var(--surface);
+  border: 1px solid var(--border);
   color: var(--muted);
   white-space: nowrap;
 }
 
+.badge::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
 .badge-staged {
   background: var(--success-soft);
+  border-color: var(--success-border);
   color: var(--success);
 }
 
 .badge-modified {
   background: var(--warning-soft);
+  border-color: var(--warning-border);
   color: var(--warning);
 }
 
 .badge-untracked,
 .badge-deleted {
-  background: #f6e2e0;
+  background: var(--danger-soft);
+  border-color: #f0cfcc;
   color: var(--danger);
 }
 
 .badge-conflict {
   background: var(--danger);
+  border-color: var(--danger);
   color: #fff;
 }
 
 .file-preview {
-  margin: 6px 0;
-  padding: 6px 8px;
-  background: var(--bg);
-  border-radius: 6px;
+  margin: 7px 0;
+  padding: 7px 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-2);
   white-space: pre-wrap;
   word-break: break-word;
-  max-height: 140px;
+  max-height: 104px;
   overflow: auto;
 }
 
 .file-actions {
   display: flex;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 5px;
+  margin-top: 7px;
 }
 
 .file-actions button {
   padding: 3px 8px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .file-editor textarea {
   width: 100%;
   font-family: var(--mono);
   font-size: 12px;
-  margin-top: 6px;
+  line-height: 1.5;
+  margin-top: 7px;
   resize: vertical;
 }
 
@@ -653,7 +965,7 @@ h3 {
 
 .file-create input {
   flex: 1;
-  min-width: 120px;
+  min-width: 110px;
 }
 
 /* ---------- narrow screens ---------- */
@@ -668,8 +980,7 @@ h3 {
     overflow: visible;
   }
 
-  .center {
-    grid-template-rows: auto auto;
+  .rail {
     overflow: visible;
   }
 
@@ -678,10 +989,6 @@ h3 {
   }
 
   .terminal {
-    min-height: 260px;
-  }
-
-  .graph-columns {
-    flex-direction: column;
+    min-height: 320px;
   }
 }

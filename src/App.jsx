@@ -9,6 +9,24 @@ import { useI18n } from './i18n/index.jsx'
 import { LESSONS } from './lessons/index.js'
 import { lessonFromUrl, loadProgress, saveProgress, writeLessonToUrl } from './storage.js'
 
+/** Two commits and a branch: the shape the whole course is about. */
+function BrandMark() {
+  return (
+    <svg className="brand-mark" width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+      <path
+        d="M8 19V9a3 3 0 0 1 3-3h7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <circle cx="8" cy="20.5" r="2.6" fill="currentColor" />
+      <circle cx="8" cy="7" r="2.6" fill="currentColor" />
+      <circle cx="19" cy="6" r="2.6" fill="currentColor" />
+    </svg>
+  )
+}
+
 const stored = loadProgress()
 const initialLesson = lessonFromUrl(LESSONS.length) ?? Math.min(stored.lesson, LESSONS.length - 1)
 
@@ -20,7 +38,6 @@ export default function App() {
   const [world, setWorld] = useState(() => LESSONS[initialLesson].setup())
   const [entries, setEntries] = useState([])
   const [history, setHistory] = useState([])
-  const [hint, setHint] = useState(null)
   const [solved, setSolved] = useState(false)
   const [hintsShown, setHintsShown] = useState(0)
   const [completed, setCompleted] = useState(() => new Set(stored.completed))
@@ -36,6 +53,12 @@ export default function App() {
   const makeEntry = (type, text) => {
     entryId.current += 1
     return { key: entryId.current, type, text }
+  }
+
+  /** A hint travels in the transcript, right under the command it explains. */
+  const makeHint = (hintKey, hintParams) => {
+    entryId.current += 1
+    return { key: entryId.current, type: 'hint', hintKey, hintParams }
   }
 
   /** Re-checks the goal after anything that can change the world. */
@@ -61,7 +84,6 @@ export default function App() {
     setWorld(LESSONS[target].setup())
     setEntries([])
     setHistory([])
-    setHint(null)
     setSolved(false)
     setHintsShown(0)
   }, [])
@@ -72,7 +94,6 @@ export default function App() {
 
     if (output.clear) {
       setEntries([])
-      setHint(null)
       return
     }
 
@@ -80,8 +101,8 @@ export default function App() {
       ...previous,
       makeEntry('command', line),
       ...output.lines.map((text) => makeEntry(output.error ? 'error' : 'out', text)),
+      ...(output.hintKey ? [makeHint(output.hintKey, output.hintParams)] : []),
     ])
-    setHint(output.hintKey ? { key: output.hintKey, params: output.hintParams } : null)
 
     if (output.error) return
 
@@ -107,11 +128,23 @@ export default function App() {
   return (
     <div className="app">
       <header className="header">
-        <div>
-          <h1>{t('app.title')}</h1>
-          <p>{t('app.subtitle')}</p>
+        <div className="brand">
+          <BrandMark />
+          <div>
+            <h1>{t('app.title')}</h1>
+            <p>{t('app.subtitle')}</p>
+          </div>
         </div>
         <div className="header-actions">
+          <div className="progress">
+            <span className="progress-track">
+              <span
+                className="progress-fill"
+                style={{ width: `${(completed.size / LESSONS.length) * 100}%` }}
+              />
+            </span>
+            <span>{t('nav.progress', { done: completed.size, total: LESSONS.length })}</span>
+          </div>
           {available.length > 1 && (
             <label>
               {t('app.language')}{' '}
@@ -150,17 +183,21 @@ export default function App() {
           onReset={() => startLesson(index)}
         />
 
-        <div className="center">
-          <GraphView world={world} />
-          <Terminal entries={entries} hint={hint} onSubmit={handleCommand} />
-        </div>
-
-        <FilesPanel
-          world={world}
-          onEdit={(name, content) => changeFiles((files) => { files[name] = content })}
-          onCreate={(name) => changeFiles((files) => { files[name] = '' })}
-          onDelete={(name) => changeFiles((files) => { delete files[name] })}
+        <Terminal
+          entries={entries}
+          onSubmit={handleCommand}
+          onClear={() => setEntries([])}
         />
+
+        <aside className="rail">
+          <GraphView world={world} />
+          <FilesPanel
+            world={world}
+            onEdit={(name, content) => changeFiles((files) => { files[name] = content })}
+            onCreate={(name) => changeFiles((files) => { files[name] = '' })}
+            onDelete={(name) => changeFiles((files) => { delete files[name] })}
+          />
+        </aside>
       </main>
     </div>
   )

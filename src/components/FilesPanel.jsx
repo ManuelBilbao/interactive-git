@@ -141,7 +141,7 @@ export default function FilesPanel({ world, onEdit, onCreate, onDelete }) {
           {error && <p className="warning">{error}</p>}
         </form>
       ) : (
-        <button type="button" onClick={() => setCreating(true)}>
+        <button type="button" className="block ghost" onClick={() => setCreating(true)}>
           + {t('files.new')}
         </button>
       )}

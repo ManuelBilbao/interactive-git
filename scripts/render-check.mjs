@@ -102,7 +102,16 @@ for (const [name, build] of cases) {
     const html = [
       wrap(h(GraphView, { world })),
       wrap(h(FilesPanel, { world, onEdit() {}, onCreate() {}, onDelete() {} })),
-      wrap(h(Terminal, { entries: [], hint: { key: 'hint.notARepo', params: {} }, onSubmit() {} })),
+      wrap(
+        h(Terminal, {
+          entries: [
+            { key: 1, type: 'command', text: 'git status' },
+            { key: 2, type: 'error', text: 'fatal: not a git repository' },
+            { key: 3, type: 'hint', hintKey: 'hint.notARepo', hintParams: {} },
+          ],
+          onSubmit() {},
+        }),
+      ),
     ].join('')
     if (html.length === 0) throw new Error('rendered nothing')
     console.log(`ok   ${name} (${html.length} chars)`)

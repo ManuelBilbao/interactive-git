@@ -10,7 +10,7 @@
     "lesson": "Lección {number} de {total}",
     "previous": "Anterior",
     "next": "Siguiente",
-    "reset": "Reiniciar lección",
+    "reset": "Reiniciar la lección",
     "resetProgress": "Borrar todo el progreso",
     "progress": "{done} de {total} completadas",
     "open": "Ver lecciones",
@@ -49,7 +49,7 @@
     "save": "Guardar",
     "delete": "Borrar",
     "contentPlaceholder": "Escribí el contenido del archivo",
-    "legend": "Los cambios que hagas acá son iguales a editar el archivo con un editor de texto: git no se entera hasta que hagas `git add`.",
+    "legend": "Editar acá es como editar con un editor de texto: git no se entera hasta `git add`.",
     "duplicate": "Ya existe un archivo con ese nombre."
   },
   "state": {

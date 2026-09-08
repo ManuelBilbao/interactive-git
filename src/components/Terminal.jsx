@@ -27,7 +27,7 @@ function AnsiLine({ text }) {
   })
 }
 
-export default function Terminal({ entries, hint, onSubmit }) {
+export default function Terminal({ entries, onSubmit, onClear }) {
   const { t, tList } = useI18n()
   const [draft, setDraft] = useState('')
   const [recalled, setRecalled] = useState(null)
@@ -38,7 +38,7 @@ export default function Terminal({ entries, hint, onSubmit }) {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: 'end' })
-  }, [entries, hint])
+  }, [entries])
 
   const submit = (event) => {
     event.preventDefault()
@@ -64,18 +64,29 @@ export default function Terminal({ entries, hint, onSubmit }) {
 
   return (
     <section className="panel terminal-panel">
-      <h2 className="panel-title">{t('terminal.title')}</h2>
+      <h2 className="panel-title">
+        {t('terminal.title')}
+        {entries.length > 0 && (
+          <button type="button" className="tiny ghost" onClick={onClear}>
+            {t('terminal.clear')}
+          </button>
+        )}
+      </h2>
       <div className="terminal" onClick={() => inputRef.current?.focus()} role="presentation">
         <div className="terminal-welcome">
           {tList('terminal.welcome').map((line) => (
             <RichText key={line} text={line} />
           ))}
         </div>
-        {entries.map((entry) => (
-          <pre key={entry.key} className={`terminal-line terminal-${entry.type}`}>
-            {entry.type === 'command' ? `$ ${entry.text}` : <AnsiLine text={entry.text} />}
-          </pre>
-        ))}
+        {entries.map((entry) =>
+          entry.type === 'hint' ? (
+            <HintCard key={entry.key} hintKey={entry.hintKey} params={entry.hintParams} />
+          ) : (
+            <pre key={entry.key} className={`terminal-line terminal-${entry.type}`}>
+              {entry.type === 'command' ? `$ ${entry.text}` : <AnsiLine text={entry.text} />}
+            </pre>
+          ),
+        )}
         <form className="terminal-input" onSubmit={submit}>
           <span className="prompt">$</span>
           <input
@@ -93,7 +104,6 @@ export default function Terminal({ entries, hint, onSubmit }) {
         </form>
         <div ref={bottomRef} />
       </div>
-      <HintCard hint={hint} />
     </section>
   )
 }

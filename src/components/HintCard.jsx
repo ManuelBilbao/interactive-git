@@ -2,14 +2,14 @@ import { useI18n } from '../i18n/index.jsx'
 import RichText from './RichText.jsx'
 
 /**
- * The friendly half of an error: git's own wording stays in the terminal, and
- * the explanation of what to do about it shows up here.
+ * The friendly half of an error. It sits in the terminal transcript, directly
+ * under the command it explains: git's own wording above, what to do about it
+ * right below, and both scroll away together as the session goes on.
  */
-export default function HintCard({ hint }) {
+export default function HintCard({ hintKey, params }) {
   const { t } = useI18n()
-  if (!hint) return null
+  const text = t(hintKey, params ?? {})
 
-  const text = t(hint.key, hint.params ?? {})
   return (
     <aside className="hint-card">
       <span className="hint-card-title">{t('terminal.hintTitle')}</span>
