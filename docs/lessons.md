@@ -5,23 +5,37 @@ Diecisiete lecciones, pensadas para hacerse en orden y de una sentada
 avanza hasta que el objetivo se cumple.
 
 Cada lección se puede abrir directo con `?leccion=N`, por ejemplo
-`http://localhost:5173/?leccion=12`.
+`http://localhost:5173/?leccion=10`.
+
+El orden vive en la lista `ORDER` de `src/lessons/index.js`: reordenar el curso
+es editar esa lista y nada más. Los tests verifican que ninguna lección use un
+comando que recién se enseña más adelante.
 
 ## El hilo
 
-El curso está armado en cuatro bloques:
+El curso está armado en cinco bloques:
 
 1. **Un repositorio solo tuyo** (1–6): init, status, add, commit, el ciclo de
    trabajo y cómo deshacer.
-2. **Ramas** (7–11): qué es una rama, cómo moverse, y los dos tipos de merge.
-3. **El servidor** (12–15): clone, push, pull, y el push rechazado.
-4. **Cierre** (16–17): ramas locales contra ramas del servidor, y el flujo
-   completo sin pistas paso a paso.
+2. **Ramas** (7–9): qué es una rama y cómo moverse entre ellas.
+3. **El servidor** (10–12): clone, push y pull.
+4. **Juntar el trabajo** (13–14): los dos tipos de merge.
+5. **Las dos cosas a la vez** (15–17): el push rechazado, las ramas del
+   servidor, y el flujo completo sin pistas paso a paso.
 
-La decisión de fondo es dejar el remoto para la segunda mitad. Casi todos los
-tutoriales meten `git clone` en el primer minuto, y el resultado es que se
-aprende a copiar comandos antes de entender qué es un commit. Acá el servidor
-recién aparece cuando el ciclo *editar → add → commit* ya está incorporado.
+Hay dos decisiones de fondo detrás de ese orden.
+
+**El remoto no va primero.** Casi todos los tutoriales meten `git clone` en el
+primer minuto, y el resultado es que se aprende a copiar comandos antes de
+entender qué es un commit. Acá el servidor recién aparece cuando el ciclo
+*editar → add → commit* ya está incorporado.
+
+**Pero sí va antes del merge.** `git pull` sobre una rama que no tocaste es
+solamente adelantar la etiqueta, así que clone, push y pull se pueden enseñar
+sin hablar de merge todavía. Y cuando el merge ya se entiende, el push rechazado
+de la lección 15 se lee por lo que realmente es: un push y un merge chocando.
+Al revés —merge primero, remoto después— el push rechazado obliga a explicar
+las dos cosas al mismo tiempo.
 
 ## Las lecciones
 
@@ -36,11 +50,11 @@ recién aparece cuando el ciclo *editar → add → commit* ya está incorporado
 | 7 | `branch` | `git branch` | Crear una rama sin moverse de `main`. |
 | 8 | `checkout` | `git checkout` | Pasarse a otra rama y ver que cambian los archivos. |
 | 9 | `checkoutB` | `git checkout -b` | Crear una rama, saltar a ella y commitear ahí. |
-| 10 | `merge` | `git merge` | Un merge que es un fast-forward. |
-| 11 | `mergeDiverged` | `git merge` | Un merge de verdad, con commit de merge. |
-| 12 | `clone` | `git clone` | Traer un repositorio del servidor. |
-| 13 | `push` | `git push` | Subir un commit propio. |
-| 14 | `pull` | `git pull` | Bajar el commit que subió otra persona. |
+| 10 | `clone` | `git clone` | Traer un repositorio del servidor. |
+| 11 | `push` | `git push` | Subir un commit propio. |
+| 12 | `pull` | `git pull` | Bajar el commit que subió otra persona. |
+| 13 | `merge` | `git merge` | Un merge que es un fast-forward. |
+| 14 | `mergeDiverged` | `git merge` | Un merge de verdad, con commit de merge. |
 | 15 | `pushRejected` | `git pull`, `git push` | Resolver un push rechazado. |
 | 16 | `branchAll` | `git push -u`, `git branch -a` | Subir una rama y listar todas. |
 | 17 | `final` | todos | El flujo completo, sin pistas paso a paso. |
@@ -61,15 +75,17 @@ La lección arranca con el repositorio ya ensuciado —una línea a medio escrib
 el stage y basura tipeada en el archivo— para que las dos formas de `git restore`
 se usen una detrás de la otra y se vea la diferencia.
 
-**Dos lecciones de merge (10 y 11).** El fast-forward y el merge con commit se
+**Dos lecciones de merge (13 y 14).** El fast-forward y el merge con commit se
 ven distintos en el grafo y confunden si se explican juntos. Primero el caso en
 que git solo adelanta una etiqueta, después el caso en que tiene que inventar un
 commit nuevo.
 
-**El push rechazado tiene su propia lección (15).** Es el error más frecuente de
-todos. El texto invita explícitamente a correr `git push` primero, leer el
-rechazo entero y recién ahí arreglarlo. Aprender a leer ese error vale más que
-memorizar la secuencia `pull`, `push`.
+**El push rechazado tiene su propia lección (15), y va después del merge.** Es
+el error más frecuente de todos. El texto invita explícitamente a correr
+`git push` primero, leer el rechazo entero y recién ahí arreglarlo. Llegar acá
+sabiendo qué es un merge cambia el error de "algo se rompió" a "las dos
+historias divergieron", que es lo que dice de verdad. Aprender a leerlo vale más
+que memorizar la secuencia `pull`, `push`.
 
 **La 17 no da la solución.** Repite el flujo completo sin pistas paso a paso, con
 `git status` como única brújula.
@@ -133,7 +149,7 @@ de archivos.
 - Mandar `?leccion=N` para que todos arranquen en el mismo punto.
 - **Reiniciar lección** deja la lección como estaba: sirve para mostrar un
   camino, deshacerlo y que lo hagan ellos.
-- La lección 11 es un buen lugar para frenar y dibujar el grafo en el pizarrón
+- La lección 14 es un buen lugar para frenar y dibujar el grafo en el pizarrón
   antes de correr el merge.
 - Para mostrar un conflicto: en la lección 9, editar el mismo archivo en las dos
   ramas y mergear. Los conflictos están implementados aunque ninguna lección los

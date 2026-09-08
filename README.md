@@ -88,7 +88,8 @@ una lección imposible de completar, el test te lo dice.
 
 1. Agregá una entrada en `src/lessons/index.js` con `id`, `commands`, `setup` y
    `check`. `setup` devuelve el mundo inicial; `check(world, history)` decide si
-   se cumplió el objetivo.
+   se cumplió el objetivo. Después sumá su `id` a la lista `ORDER` del mismo
+   archivo, que es la que define el orden del curso.
 2. Agregá los textos en `src/i18n/locales/es-AR.json`, bajo `lessons.<id>`:
    `title`, `intro` (lista de párrafos), `goal`, `hints` (lista) y opcionalmente
    `note`.

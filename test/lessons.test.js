@@ -89,3 +89,43 @@ test('the push lesson rejects a push that skipped the pull', () => {
   assert.equal(step.output.error, true)
   assert.equal(step.output.hintKey, 'hint.pushRejected')
 })
+
+test('the course order covers every lesson exactly once', () => {
+  const ids = LESSONS.map((lesson) => lesson.id)
+  assert.equal(new Set(ids).size, ids.length, 'a lesson appears twice in the order')
+  assert.equal(ids.length, Object.keys(SOLUTIONS).length)
+})
+
+test('remotes are taught before merging', () => {
+  const at = (id) => LESSONS.findIndex((lesson) => lesson.id === id)
+
+  for (const id of ['clone', 'push', 'pull']) {
+    assert.ok(at(id) < at('merge'), `${id} should come before merge`)
+  }
+  // The rejected push is a push and a merge colliding, so it needs both.
+  assert.ok(at('pushRejected') > at('mergeDiverged'))
+  assert.ok(at('pushRejected') > at('push'))
+})
+
+test('no lesson needs a command that a later lesson introduces', () => {
+  const introduced = new Map()
+  for (const [position, lesson] of LESSONS.entries()) {
+    for (const command of lesson.commands) {
+      // `git commit -m` introduces `git commit`; compare on the first two words.
+      const name = command.split(' ').slice(0, 2).join(' ')
+      if (!introduced.has(name)) introduced.set(name, position)
+    }
+  }
+
+  for (const [position, lesson] of LESSONS.entries()) {
+    for (const line of SOLUTIONS[lesson.id]) {
+      const name = line.split(' ').slice(0, 2).join(' ')
+      if (!name.startsWith('git ')) continue
+      const taught = introduced.get(name)
+      assert.ok(
+        taught !== undefined && taught <= position,
+        `lesson "${lesson.id}" uses ${name}, which no earlier lesson introduces`,
+      )
+    }
+  }
+})

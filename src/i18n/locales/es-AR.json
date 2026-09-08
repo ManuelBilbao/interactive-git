@@ -299,7 +299,7 @@
       "title": "Pull: bajar lo que hicieron otros",
       "intro": [
         "Mientras vos no mirabas, alguien más subió un commit al servidor. Tu repositorio no se entera solo: git nunca habla con el servidor si vos no se lo pedís.",
-        "`git pull` hace dos cosas: baja lo que hay en el servidor y lo mergea en la rama donde estás parado.",
+        "`git pull` hace dos cosas: baja lo que hay en el servidor y lo integra en la rama donde estás parado. Acá, como vos no tocaste nada mientras tanto, integrar es simplemente adelantar tu rama hasta el commit nuevo.",
         "Conviene hacerlo antes de empezar a trabajar, para arrancar desde lo último."
       ],
       "goal": "Traé a tu repositorio el commit que subió tu compañera.",
@@ -312,8 +312,8 @@
       "title": "Cuando el push te lo rechazan",
       "intro": [
         "Este es el error más común de todos, y te va a pasar mil veces: vos hiciste un commit, pero en el servidor hay otro commit que vos no tenés.",
-        "Git rechaza el push. No es que esté roto: es que no puede decidir por vos cómo se combinan las dos historias.",
-        "Probá `git push` primero para ver el error entero. No rompe nada."
+        "Las dos historias divergieron, igual que cuando mergeaste dos ramas. La diferencia es que ahora una de las dos está en otra computadora, y el servidor no elige por vos: rechaza el push.",
+        "Probá `git push` primero para ver el error entero. No rompe nada, y el `git pull` que venga después va a terminar en un **commit de merge**, igual que el que ya hiciste a mano."
       ],
       "goal": "Conseguí que tu commit llegue al servidor.",
       "hints": [

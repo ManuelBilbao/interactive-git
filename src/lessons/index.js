@@ -55,7 +55,7 @@ function ran(history, pattern) {
 const RECIPE = '# Recetas\n\nTortilla de papas'
 const RECIPE_V2 = '# Recetas\n\nTortilla de papas\nÑoquis del 29'
 
-export const LESSONS = [
+const DEFINITIONS = [
   {
     id: 'init',
     commands: ['git init'],
@@ -334,6 +334,46 @@ function cloneInto(world, remote) {
   world.repo = repo
   return repo
 }
+
+/**
+ * The order the course runs in. Reordering the course means editing this list
+ * and nothing else; the lessons themselves do not care where they sit.
+ *
+ * Remotes come before merging on purpose. `git pull` on an untouched branch is
+ * only a fast-forward, so clone/push/pull can be taught without merges — and
+ * once merging is understood, the rejected push at the end lands as what it
+ * really is: a push and a merge colliding.
+ */
+const ORDER = [
+  // A repository of your own
+  'init',
+  'status',
+  'add',
+  'commit',
+  'cycle',
+  'restore',
+  // Branches
+  'branch',
+  'checkout',
+  'checkoutB',
+  // The server
+  'clone',
+  'push',
+  'pull',
+  // Joining work back together
+  'merge',
+  'mergeDiverged',
+  // Both at once
+  'pushRejected',
+  'branchAll',
+  'final',
+]
+
+export const LESSONS = ORDER.map((id) => {
+  const lesson = DEFINITIONS.find((definition) => definition.id === id)
+  if (!lesson) throw new Error(`ORDER names a lesson that does not exist: ${id}`)
+  return lesson
+})
 
 export const LESSON_IDS = LESSONS.map((lesson) => lesson.id)
 
