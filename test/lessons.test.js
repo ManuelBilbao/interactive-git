@@ -19,6 +19,7 @@ const SOLUTIONS = {
     'git commit -m "agrego milanesas"',
   ],
   restore: ['git restore --staged recetas.md', 'git restore recetas.md'],
+  log: ['git log', 'git log --oneline'],
   branch: ['git branch postres'],
   checkout: ['git checkout postres'],
   checkoutB: [
@@ -29,6 +30,7 @@ const SOLUTIONS = {
   ],
   merge: ['git merge postres'],
   mergeDiverged: ['git merge postres'],
+  branchDelete: ['git branch -d postres'],
   clone: [`git clone ${URL}`, 'cd interactive-git'],
   push: [
     'echo "Milanesas" >> recetas.md',

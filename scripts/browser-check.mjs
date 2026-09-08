@@ -10,6 +10,16 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { LESSONS } from '../src/lessons/index.js'
+
+/** Lessons are addressed by number in the URL, but named here, so that
+ *  reordering the course cannot silently point a check at the wrong lesson. */
+function lessonNumber(id) {
+  const index = LESSONS.findIndex((lesson) => lesson.id === id)
+  if (index === -1) throw new Error(`there is no lesson called "${id}"`)
+  return index + 1
+}
+
 const argument = (name, fallback) => {
   const found = process.argv.find((value) => value.startsWith(`--${name}=`))
   return found ? found.slice(name.length + 3) : fallback
@@ -148,12 +158,13 @@ async function type(command) {
   await wait(150)
 }
 
-async function openLesson(number) {
+async function openLesson(id) {
+  const number = lessonNumber(id)
   await evaluate(`history.replaceState(null, '', '?leccion=${number}'); location.reload()`)
   await wait(300)
   await waitFor('.terminal-input input')
   await check(
-    `the tour stays closed on lesson ${number}`,
+    `the tour stays closed on "${id}"`,
     await evaluate("return document.querySelector('.tour-card') === null"),
   )
   await evaluate(
@@ -254,7 +265,7 @@ try {
   await check('git init succeeds', (await terminal()).includes('Inicializado un repositorio Git'), terminal)
   await check('the goal is detected', await solved())
 
-  await openLesson(4)
+  await openLesson('commit')
   await type('git commit')
   await check(
     'a commit without a message is refused',
@@ -264,24 +275,24 @@ try {
   await type('git commit -m "primer commit"')
   await check('the commit is created', (await terminal()).includes('commit-raíz'), terminal)
   await check('the graph drew the commit', (await evaluate("return document.querySelectorAll('.graph .node').length")) === 1)
-  await check('lesson 4 is solved', await solved())
+  await check('the commit lesson is solved', await solved())
 
   // The whole remote round trip, including the rejected push.
-  await openLesson(15)
+  await openLesson('pushRejected')
   await type('git push')
   await check('the push is rejected', (await terminal()).includes('[rechazado]'), terminal)
   await check('the rejection is explained', (await hint()).includes('git pull'), hint)
   await type('git pull')
   await type('git push')
   await check('the push works after the pull', (await terminal()).includes('main -> main'), terminal)
-  await check('lesson 15 is solved', await solved())
+  await check('the rejected-push lesson is solved', await solved())
   await check(
     'both repositories are drawn',
     (await evaluate("return document.querySelectorAll('.graph-column').length")) === 2,
   )
 
   // Editing a file from the panel is what `git add` should then pick up.
-  await openLesson(5)
+  await openLesson('cycle')
   await evaluate(`
     document.querySelectorAll('.file-actions button')[0].click()
   `)
@@ -329,12 +340,12 @@ try {
   // Layout, last so it does not disturb the lesson above: a code block has to
   // show every line it holds. The lesson panel is a flex column, and a flex
   // child that shrinks below its content clips whatever it cannot fit.
-  await openLesson(10)
+  await openLesson('clone')
   await check(
     'the repository URL block shows all of its lines',
     await evaluate(
       `const pre = document.querySelector('.commands')
-       if (!pre) throw new Error('lesson 10 shows no command block')
+       if (!pre) throw new Error('the clone lesson shows no command block')
        return pre.scrollHeight <= pre.clientHeight + 1`,
     ),
     () =>

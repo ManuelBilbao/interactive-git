@@ -143,6 +143,21 @@ const DEFINITIONS = [
       ran(history, /^git\s+restore\b/),
   },
   {
+    id: 'log',
+    commands: ['git log', 'git log --oneline'],
+    setup: () => {
+      const world = createWorld()
+      localRepo(world, [
+        ['primeras recetas', { 'recetas.md': RECIPE }],
+        ['agrego ñoquis', { 'recetas.md': RECIPE_V2 }],
+        ['lista de compras', { 'recetas.md': RECIPE_V2, 'compras.md': 'papas\nhuevos' }],
+      ])
+      return world
+    },
+    check: (_world, history) =>
+      ran(history, /^git\s+log\s*$/) && ran(history, /^git\s+log\s+--oneline\s*$/),
+  },
+  {
     id: 'branch',
     commands: ['git branch'],
     setup: () => {
@@ -228,6 +243,35 @@ const DEFINITIONS = [
       const head = world.repo.commits[headCommitId(world.repo)]
       return Boolean(head) && head.parents.length === 2
     },
+  },
+  {
+    id: 'branchDelete',
+    commands: ['git branch -d'],
+    setup: () => {
+      const world = createWorld()
+      const repo = localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+
+      // `postres` was merged into main: main was fast-forwarded onto it, so
+      // its commit is already part of the main history and the label is spare.
+      repo.branches.postres = repo.branches.main
+      seed(world, repo, 'postres', 'flan', {
+        'recetas.md': RECIPE,
+        'postres.md': 'Flan casero',
+      })
+      repo.branches.main = repo.branches.postres
+      world.files = { ...repo.commits[repo.branches.main].tree }
+      repo.index = { ...world.files }
+
+      // `experimento` has a commit nothing else has, so git will refuse to
+      // delete it — which is the other half of the lesson.
+      repo.branches.experimento = repo.branches.main
+      seed(world, repo, 'experimento', 'probando algo', {
+        ...world.files,
+        'experimento.md': 'a medio hacer',
+      })
+      return world
+    },
+    check: (world) => !Object.hasOwn(world.repo.branches, 'postres'),
   },
   {
     id: 'clone',
@@ -371,6 +415,7 @@ const ORDER = [
   'commit',
   'cycle',
   'restore',
+  'log',
   // Branches
   'branch',
   'checkout',
@@ -382,6 +427,7 @@ const ORDER = [
   // Joining work back together
   'merge',
   'mergeDiverged',
+  'branchDelete',
   // Both at once
   'pushRejected',
   'branchAll',

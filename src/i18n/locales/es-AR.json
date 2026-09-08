@@ -364,6 +364,34 @@
         "Volvé a `main` y traé lo que hiciste con un merge. Al final, subilo.",
         "Creá `bebidas.md` desde el panel Archivos cuando estés en la rama. Los comandos son:\n```\ngit clone {repoUrl}\ncd interactive-git\ngit checkout -b bebidas\ngit add .\ngit commit -m \"agrego bebidas\"\ngit checkout main\ngit merge bebidas\ngit push\n```"
       ]
+    },
+    "log": {
+      "title": "Leer la historia",
+      "intro": [
+        "El panel Historia te dibuja los commits. En una terminal no hay panel: la historia se lee con `git log`.",
+        "Cada commit sale con su identificador, las ramas que lo están apuntando y su mensaje, del más nuevo al más viejo.",
+        "`git log --oneline` te da lo mismo en una línea por commit. Así se lee el 90% de las veces, porque lo que casi siempre buscás es \"¿qué pasó últimamente?\"."
+      ],
+      "goal": "Mirá la historia completa del proyecto, y después su versión de una línea por commit.",
+      "hints": [
+        "Es un solo comando, sin argumentos, para ver la historia entera.",
+        "La versión corta es el mismo comando con una opción, y la opción está nombrada arriba.",
+        "```\ngit log\ngit log --oneline\n```\nFijate que `HEAD -> main` marca dónde estás parado, igual que la etiqueta del grafo."
+      ]
+    },
+    "branchDelete": {
+      "title": "Borrar una rama",
+      "intro": [
+        "`postres` ya está mergeada en `main`: su trabajo forma parte de la historia principal y la etiqueta no tiene más nada que hacer ahí.",
+        "Borrar una rama borra **la etiqueta, no los commits**. Los commits ya son de `main`, y se quedan donde están.",
+        "Y git te cuida: si la rama tiene commits que no están en ninguna otra parte, se niega a borrarla. En este repositorio hay una así, `experimento`; probá borrarla y leé lo que dice."
+      ],
+      "goal": "Borrá la rama `postres`, que ya está mergeada.",
+      "hints": [
+        "Es el mismo comando con el que creás las ramas, con una opción para borrar.",
+        "La opción es una sola letra. Si no te acordás, `git branch --help` la lista.",
+        "`git branch -d postres`. Probá después `git branch -d experimento`: git se niega, porque ese commit no está en ninguna otra rama. `-D` fuerza el borrado, y ese trabajo se pierde."
+      ]
     }
   },
   "git": {

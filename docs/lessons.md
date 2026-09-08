@@ -1,6 +1,6 @@
 # El curso
 
-Diecisiete lecciones, pensadas para hacerse en orden y de una sentada
+Diecinueve lecciones, pensadas para hacerse en orden y de una sentada
 (aproximadamente 45 minutos). Cada una introduce un comando o una idea, y no
 avanza hasta que el objetivo se cumple.
 
@@ -15,15 +15,27 @@ comando que recién se enseña más adelante.
 
 El curso está armado en cinco bloques:
 
-1. **Un repositorio solo tuyo** (1–6): init, status, add, commit, el ciclo de
-   trabajo y cómo deshacer.
-2. **Ramas** (7–9): qué es una rama y cómo moverse entre ellas.
-3. **El servidor** (10–12): clone, push y pull.
-4. **Juntar el trabajo** (13–14): los dos tipos de merge.
-5. **Las dos cosas a la vez** (15–17): el push rechazado, las ramas del
+1. **Un repositorio solo tuyo** (1–7): init, status, add, commit, el ciclo de
+   trabajo, cómo deshacer y cómo leer la historia.
+2. **Ramas** (8–10): qué es una rama y cómo moverse entre ellas.
+3. **El servidor** (11–13): clone, push y pull.
+4. **Juntar el trabajo** (14–16): los dos tipos de merge, y borrar la rama
+   cuando su trabajo ya está adentro.
+5. **Las dos cosas a la vez** (17–19): el push rechazado, las ramas del
    servidor, y el flujo completo sin pistas paso a paso.
 
 Hay dos decisiones de fondo detrás de ese orden.
+
+**Leer antes que escribir (7).** `git log` viene apenas hay tres commits para
+mirar, antes de las ramas. El panel Historia ya les dibuja lo mismo, así que la
+lección es sobre traducir el dibujo al comando: en una terminal no hay panel.
+
+**Borrar la rama es parte del merge (16).** En un proyecto de verdad, mergear y
+borrar la rama son el mismo movimiento. La lección viene con dos ramas: una
+mergeada, que se borra, y una con trabajo propio, que git se niega a borrar. Esa
+negativa es la mitad de la lección: borrar una rama borra la etiqueta, no los
+commits, salvo que se fuerce con `-D` y esos commits no estén en ningún otro
+lado.
 
 **`clone` no te mete adentro.** Crea la carpeta y te deja afuera, igual que en
 git de verdad, así que hace falta un `cd`. Es de las cosas que más se olvidan, y
@@ -39,7 +51,7 @@ entender qué es un commit. Acá el servidor recién aparece cuando el ciclo
 **Pero sí va antes del merge.** `git pull` sobre una rama que no tocaste es
 solamente adelantar la etiqueta, así que clone, push y pull se pueden enseñar
 sin hablar de merge todavía. Y cuando el merge ya se entiende, el push rechazado
-de la lección 15 se lee por lo que realmente es: un push y un merge chocando.
+de la lección 17 se lee por lo que realmente es: un push y un merge chocando.
 Al revés —merge primero, remoto después— el push rechazado obliga a explicar
 las dos cosas al mismo tiempo.
 
@@ -53,17 +65,19 @@ las dos cosas al mismo tiempo.
 | 4 | `commit` | `git commit -m` | Hacer el primer commit. |
 | 5 | `cycle` | `git status`, `git add`, `git commit -m` | Modificar un archivo y verlo pasar de rojo a verde antes de commitear. |
 | 6 | `restore` | `git restore`, `git restore --staged` | Dejar todo limpio sin hacer ningún commit. |
-| 7 | `branch` | `git branch` | Crear una rama sin moverse de `main`. |
-| 8 | `checkout` | `git checkout` | Pasarse a otra rama y ver que cambian los archivos. |
-| 9 | `checkoutB` | `git checkout -b` | Crear una rama, saltar a ella y commitear ahí. |
-| 10 | `clone` | `git clone` | Traer un repositorio del servidor y entrar en la carpeta. |
-| 11 | `push` | `git push` | Subir un commit propio. |
-| 12 | `pull` | `git pull` | Bajar el commit que subió otra persona. |
-| 13 | `merge` | `git merge` | Un merge que es un fast-forward. |
-| 14 | `mergeDiverged` | `git merge` | Un merge de verdad, con commit de merge. |
-| 15 | `pushRejected` | `git pull`, `git push` | Resolver un push rechazado. |
-| 16 | `branchAll` | `git push -u`, `git branch -a` | Subir una rama y listar todas. |
-| 17 | `final` | todos | El flujo completo, sin pistas paso a paso. |
+| 7 | `log` | `git log` | Leer la historia en la terminal, entera y en una línea. |
+| 8 | `branch` | `git branch` | Crear una rama sin moverse de `main`. |
+| 9 | `checkout` | `git checkout` | Pasarse a otra rama y ver que cambian los archivos. |
+| 10 | `checkoutB` | `git checkout -b` | Crear una rama, saltar a ella y commitear ahí. |
+| 11 | `clone` | `git clone` | Traer un repositorio del servidor y entrar en la carpeta. |
+| 12 | `push` | `git push` | Subir un commit propio. |
+| 13 | `pull` | `git pull` | Bajar el commit que subió otra persona. |
+| 14 | `merge` | `git merge` | Un merge que es un fast-forward. |
+| 15 | `mergeDiverged` | `git merge` | Un merge de verdad, con commit de merge. |
+| 16 | `branchDelete` | `git branch -d` | Borrar una rama mergeada, y ver que git protege la que no lo está. |
+| 17 | `pushRejected` | `git pull`, `git push` | Resolver un push rechazado. |
+| 18 | `branchAll` | `git push -u`, `git branch -a` | Subir una rama y listar todas. |
+| 19 | `final` | todos | El flujo completo, sin pistas paso a paso. |
 
 ## Por qué está armado así
 
@@ -81,19 +95,19 @@ La lección arranca con el repositorio ya ensuciado —una línea a medio escrib
 el stage y basura tipeada en el archivo— para que las dos formas de `git restore`
 se usen una detrás de la otra y se vea la diferencia.
 
-**Dos lecciones de merge (13 y 14).** El fast-forward y el merge con commit se
+**Dos lecciones de merge (14 y 15).** El fast-forward y el merge con commit se
 ven distintos en el grafo y confunden si se explican juntos. Primero el caso en
 que git solo adelanta una etiqueta, después el caso en que tiene que inventar un
 commit nuevo.
 
-**El push rechazado tiene su propia lección (15), y va después del merge.** Es
+**El push rechazado tiene su propia lección (17), y va después del merge.** Es
 el error más frecuente de todos. El texto invita explícitamente a correr
 `git push` primero, leer el rechazo entero y recién ahí arreglarlo. Llegar acá
 sabiendo qué es un merge cambia el error de "algo se rompió" a "las dos
 historias divergieron", que es lo que dice de verdad. Aprender a leerlo vale más
 que memorizar la secuencia `pull`, `push`.
 
-**La 17 no da la solución.** Repite el flujo completo sin pistas paso a paso, con
+**La 19 no da la solución.** Repite el flujo completo sin pistas paso a paso, con
 `git status` como única brújula.
 
 ## Cómo se valida cada objetivo
@@ -182,8 +196,8 @@ de archivos.
 - Mandar `?leccion=N` para que todos arranquen en el mismo punto.
 - **Reiniciar lección** deja la lección como estaba: sirve para mostrar un
   camino, deshacerlo y que lo hagan ellos.
-- La lección 14 es un buen lugar para frenar y dibujar el grafo en el pizarrón
+- La lección 15 es un buen lugar para frenar y dibujar el grafo en el pizarrón
   antes de correr el merge.
-- Para mostrar un conflicto: en la lección 9, editar el mismo archivo en las dos
+- Para mostrar un conflicto: en la lección 10, editar el mismo archivo en las dos
   ramas y mergear. Los conflictos están implementados aunque ninguna lección los
   exija, y se resuelven como en la vida real, con `git add` y `git commit`.

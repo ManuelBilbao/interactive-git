@@ -65,11 +65,12 @@ configuración de SPA ni un `404.html`.
 
 ## Qué enseña
 
-Diecisiete lecciones, en orden, sobre estos comandos:
+Diecinueve lecciones, en orden, sobre estos comandos:
 
 `git init`, `git clone`, `git status`, `git add`,
-`git restore [--staged]`, `git commit -m`, `git branch [-a]`,
-`git checkout [-b]`, `git merge`, `git push [-u]`, `git pull`.
+`git restore [--staged]`, `git commit -m`, `git log [--oneline]`,
+`git branch [-a] [-d]`, `git checkout [-b]`, `git merge`, `git push [-u]`,
+`git pull`.
 
 El detalle de cada lección está en [docs/lessons.md](docs/lessons.md).
 
