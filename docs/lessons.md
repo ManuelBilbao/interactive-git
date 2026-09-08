@@ -122,8 +122,13 @@ leyendo acá es el mismo texto en el otro idioma.
 Cuando un comando falla pasan dos cosas al mismo tiempo:
 
 - la terminal muestra el error de git, palabra por palabra;
-- abajo aparece una tarjeta **Qué pasó** que lo explica en castellano y dice cómo
-  seguir.
+- abajo aparece una tarjeta que lo explica en castellano y dice cómo seguir.
+
+La tarjeta dice de qué tipo de nota se trata: **Error** cuando git se negó a
+hacer algo, **Ojo** cuando algo quedó a medio hacer (un merge con conflictos, por
+ejemplo, que no es un error pero deja trabajo pendiente), **Info** cuando es
+información —la ayuda de un comando— y **Tip** cuando es una sugerencia, como
+cuando escribieron mal el nombre de un comando.
 
 Los errores están escritos para que valga la pena leerlos. Un `git comit` sugiere
 `git commit`; un commit sin nada en el stage muestra el `git status` completo; un
@@ -165,6 +170,9 @@ de archivos.
   pasos que muestra para qué es cada panel. Si lo saltearon, vuelve con
   **¿Cómo funciona?**, arriba a la derecha: sirve para arrancar la clase todos
   mirando lo mismo.
+- `git <comando> --help` está para todos los comandos: sirve para que se
+  acostumbren a preguntarle a la herramienta antes de preguntar. La ayuda de acá
+  es reducida y lo dice, y los manda a correr la de verdad en una terminal.
 - Mandar `?leccion=N` para que todos arranquen en el mismo punto.
 - **Reiniciar lección** deja la lección como estaba: sirve para mostrar un
   camino, deshacerlo y que lo hagan ellos.

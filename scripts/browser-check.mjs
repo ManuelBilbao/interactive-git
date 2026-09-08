@@ -164,7 +164,9 @@ async function openLesson(number) {
 }
 
 const terminal = () => evaluate("return document.querySelector('.terminal').innerText")
-const hint = () => evaluate("return document.querySelector('.hint-card')?.innerText ?? ''")
+/** The newest hint in the transcript: hints accumulate, they do not replace. */
+const hint = () =>
+  evaluate("return [...document.querySelectorAll('.hint-card')].at(-1)?.innerText ?? ''")
 const solved = () => evaluate("return Boolean(document.querySelector('.lesson-solved'))")
 
 let failures = 0
@@ -236,6 +238,17 @@ try {
     terminal,
   )
   await check('the hint card explains what to do', (await hint()).includes('git init'), hint)
+
+  // Help needs no repository, and asking for it must not trip over the option
+  // checking of the command itself.
+  await type('git commit --help')
+  await check('--help prints a usage line', (await terminal()).includes('uso: git commit'), terminal)
+  await check('and lists the options that work here', (await terminal()).includes('-m, --message'), terminal)
+  await check('and says so, that the help is reduced', (await hint()).includes('reducida'), hint)
+  await check(
+    'and is labelled as information, not as an error',
+    await evaluate("return [...document.querySelectorAll('.hint-card')].at(-1).classList.contains('hint-info')"),
+  )
 
   await type('git init')
   await check('git init succeeds', (await terminal()).includes('Inicializado un repositorio Git'), terminal)

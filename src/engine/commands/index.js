@@ -2,6 +2,8 @@
 // goes wrong, the key of a friendly explanation the UI shows beside the error.
 
 import { GitError, gitError } from '../errors.js'
+import { helpFor, isHelpRequest } from '../help.js'
+import { hintKind } from '../hints.js'
 import { msg } from '../messages.js'
 import { tokenize } from '../parser.js'
 import { gitBranch, gitCheckout, gitMerge } from './branching.js'
@@ -13,6 +15,9 @@ import { gitAdd, gitRestore, gitStatus } from './staging.js'
 
 /** Git subcommands that work without an existing repository. */
 const WITHOUT_REPO = new Set(['init', 'clone'])
+
+/** The subcommands that can leave a merge half-finished. */
+const MERGING = new Set(['merge', 'pull'])
 
 const GIT_COMMANDS = {
   init: gitInit,
@@ -61,11 +66,28 @@ function closest(word, candidates) {
 }
 
 function result(lines, extra = {}) {
-  return { lines, error: false, hintKey: null, hintParams: {}, clear: false, ...extra }
+  const output = { lines, error: false, hintKey: null, hintParams: {}, clear: false, ...extra }
+  return { ...output, hintKind: hintKind(output.hintKey, output.error) }
+}
+
+/**
+ * The reduced help for one command, with the caveat about it being reduced
+ * carried as a hint rather than printed as if git had said it.
+ */
+function helpResult(command) {
+  return result(helpFor(command), {
+    hintKey: 'hint.reducedHelp',
+    hintParams: { command },
+  })
 }
 
 function runGit(world, args) {
   const [subcommand, ...rest] = args
+
+  // `git help <command>` is the same as `git <command> --help`.
+  if (subcommand === 'help' && rest.length > 0 && helpFor(rest[0])) {
+    return helpResult(rest[0])
+  }
   if (!subcommand || subcommand === '--help' || subcommand === 'help') {
     return result([], { hintKey: 'hint.gitHelp' })
   }
@@ -81,13 +103,25 @@ function runGit(world, args) {
       { name: subcommand, suggestion },
     )
   }
+  // Help comes before everything else: it needs no repository, and asking for
+  // it must never trip over the option checking of the command itself.
+  if (isHelpRequest(rest) && helpFor(subcommand)) return helpResult(subcommand)
+
   if (!world.repo && !WITHOUT_REPO.has(subcommand)) {
     throw gitError(
       msg('fatal: not a git repository (or any of the parent directories): .git'),
       'hint.notARepo',
     )
   }
-  return result(command(world, rest))
+
+  const lines = command(world, rest)
+
+  // A merge that ends in conflicts is not a failure, but it leaves the student
+  // mid-operation with something to do and no error to read about it.
+  if (world.repo?.merge && MERGING.has(subcommand)) {
+    return result(lines, { hintKey: 'hint.mergeConflict' })
+  }
+  return result(lines)
 }
 
 /**
@@ -127,6 +161,7 @@ export function run(world, line) {
           error: true,
           hintKey: error.hintKey,
           hintParams: error.hintParams,
+          hintKind: hintKind(error.hintKey, true),
           clear: false,
         },
       }

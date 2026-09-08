@@ -6,13 +6,13 @@ import RichText from './RichText.jsx'
  * under the command it explains: git's own wording above, what to do about it
  * right below, and both scroll away together as the session goes on.
  */
-export default function HintCard({ hintKey, params }) {
+export default function HintCard({ hintKey, params, kind = 'error' }) {
   const { t } = useI18n()
   const text = t(hintKey, params ?? {})
 
   return (
-    <aside className="hint-card">
-      <span className="hint-card-title">{t('terminal.hintTitle')}</span>
+    <aside className={`hint-card hint-${kind}`}>
+      <span className="hint-card-title">{t(`terminal.hint.${kind}`)}</span>
       {text.split('\n').map((line, index) =>
         line === '' ? (
           // eslint-disable-next-line react/no-array-index-key

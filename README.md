@@ -73,6 +73,10 @@ Diecisiete lecciones, en orden, sobre estos comandos:
 
 El detalle de cada lección está en [docs/lessons.md](docs/lessons.md).
 
+`git <comando> --help` (o `-h`, o `git help <comando>`) muestra qué hace cada
+comando y qué opciones acepta **acá**: es una ayuda reducida a propósito, y la
+tarjeta que la acompaña manda a leer la de verdad en una terminal.
+
 La terminal también acepta `ls`, `cat`, `touch`, `rm`, `echo`, `pwd`, `clear` y
 `help`, para crear y mirar archivos sin salir del teclado. Lo mismo se puede
 hacer con el panel **Archivos**, que hace las veces de editor de texto.

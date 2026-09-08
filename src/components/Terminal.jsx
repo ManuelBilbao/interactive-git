@@ -91,7 +91,12 @@ export default function Terminal({ entries, folder, branch, onSubmit, onClear })
         </div>
         {entries.map((entry) =>
           entry.type === 'hint' ? (
-            <HintCard key={entry.key} hintKey={entry.hintKey} params={entry.hintParams} />
+            <HintCard
+              key={entry.key}
+              hintKey={entry.hintKey}
+              params={entry.hintParams}
+              kind={entry.hintKind}
+            />
           ) : (
             <pre key={entry.key} className={`terminal-line terminal-${entry.type}`}>
               {entry.type === 'command' ? `$ ${entry.text}` : <AnsiLine text={entry.text} />}

@@ -100,6 +100,17 @@ the same sentence, in the same shape, that a real terminal prints. The hint is
 what *this course* says about it: which command to reach for next, and why. One
 is a fact about git, the other is teaching.
 
+Each hint carries the kind of note it is, so the card can say which: **Error**
+for something git refused, **Ojo** for something half-done, **Info** for plain
+information, **Tip** for a suggestion, each in the terminal's own colour.
+`src/engine/hints.js` holds that mapping in one table — an unlisted hint is an
+error when the command failed and information when it did not, which is right
+often enough that only six of them need naming.
+
+The one that earns "Ojo" is worth pointing out: a merge ending in conflicts is
+**not** a failed command, so nothing was flagging it. It leaves the student
+mid-operation with work to do, and now says so.
+
 `test/i18n.test.js` walks the engine source for `'hint.*'` literals and fails
 when one has no translation, or when a translation is no longer used.
 
@@ -169,6 +180,28 @@ Colour is emitted in the three places git emits it: `git status` (staged green,
 unstaged and untracked red), `git branch` (current branch green, the server's
 branches red) and `git log` (commit ids yellow, `HEAD` cyan, branches green,
 remote branches red). Section headers stay uncoloured, as in real git.
+
+## Help
+
+`src/engine/help.js` answers `git <command> --help`, `-h` and
+`git help <command>`. Real git opens a man page; there is none here, so what
+gets printed has the shape of `git <command> -h` — a usage line and the options
+— plus a one-line summary, which a beginner needs more than completeness.
+
+Two things about it are deliberate:
+
+- **The list covers only what works here.** Saying so is not git's job, so the
+  caveat travels as `hint.reducedHelp` and the UI shows it beside the output,
+  in the student's language, pointing them at the real help in a terminal.
+- **Help is answered before anything else** — before the repository check and
+  before the command's own option parsing. `git status` rejects every option,
+  but not when the option is `--help`.
+
+A test asserts that every command in `GIT_COMMANDS` has an entry and that no
+entry lacks a command, so a command cannot be added without documenting it. A
+second one asserts every option line fits the terminal column: it is a column
+in a page, not a full-width shell, and a line that wraps continues at the left
+edge and loses the alignment.
 
 ## The working directory
 

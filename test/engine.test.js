@@ -2,7 +2,17 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
 import { stripAnsi } from '../src/ansi.js'
-import { run } from '../src/engine/commands/index.js'
+import { readFileSync } from 'node:fs'
+
+import { GIT_COMMANDS, run } from '../src/engine/commands/index.js'
+import { setMessages } from '../src/engine/messages.js'
+import { HELP_COMMANDS } from '../src/engine/help.js'
+import { HINT_KINDS } from '../src/engine/hints.js'
+
+const SPANISH_UI = JSON.parse(
+  readFileSync(new URL('../src/i18n/locales/es-AR.json', import.meta.url)),
+)
+const SPANISH = SPANISH_UI.git
 import { createRepo, createWorld, headCommitId, writeCommit } from '../src/engine/model.js'
 import { computeStatus } from '../src/engine/status.js'
 
@@ -298,4 +308,118 @@ test('clone names the directory after the repository, as git does', () => {
   const cloned = play(other, 'git clone https://github.com/quien/mi-repo.git')
   assert.equal(cloned.folder, 'mi-repo')
   assert.match(run(other, 'git clone https://github.com/quien/mi-repo.git').output.lines[0], /mi-repo/)
+})
+
+test('every git command answers --help', () => {
+  for (const name of Object.keys(GIT_COMMANDS)) {
+    const step = run(createWorld(), `git ${name} --help`)
+    assert.equal(step.output.error, false, `git ${name} --help failed`)
+    assert.match(step.output.lines[0], /^usage: git /, `git ${name} --help printed no usage`)
+    assert.equal(step.output.hintKey, 'hint.reducedHelp')
+    assert.equal(step.output.hintParams.command, name)
+  }
+})
+
+test('help works without a repository and before any option checking', () => {
+  // `git status` rejects every option, but not when the option is --help.
+  const asked = run(createWorld(), 'git status --help')
+  assert.equal(asked.output.error, false)
+  assert.match(asked.output.lines.join('\n'), /uso|usage/)
+
+  // And -h is the same thing, as it is in git.
+  assert.equal(run(createWorld(), 'git add -h').output.error, false)
+  assert.deepEqual(
+    run(createWorld(), 'git add -h').output.lines,
+    run(createWorld(), 'git add --help').output.lines,
+  )
+})
+
+test('help lists the options the command really accepts', () => {
+  const shown = (name) => run(createWorld(), `git ${name} --help`).output.lines.join('\n')
+
+  assert.match(shown('restore'), /--staged/)
+  assert.match(shown('branch'), /-a, --all/)
+  assert.match(shown('branch'), /-d, --delete/)
+  assert.match(shown('checkout'), /-b <name>/)
+  assert.match(shown('push'), /-u, --set-upstream/)
+  // Nothing invented: merge takes no options here, so none are listed.
+  assert.equal(/^ {4}-/m.test(shown('merge')), false)
+})
+
+test('an option line fits the terminal without wrapping', () => {
+  // The terminal is a column in a page, not a full-width shell: a line that
+  // wraps continues at the left edge and the flag column stops lining up.
+  setMessages(SPANISH)
+  try {
+    for (const name of Object.keys(GIT_COMMANDS)) {
+      for (const line of run(createWorld(), `git ${name} --help`).output.lines) {
+        if (!/^ {4}-/.test(line)) continue
+        assert.ok(line.length <= 56, `too long for the terminal: "${line}" (${line.length})`)
+      }
+    }
+  } finally {
+    setMessages(null)
+  }
+})
+
+test('`git help <command>` is the same as `git <command> --help`', () => {
+  assert.deepEqual(
+    run(createWorld(), 'git help merge').output.lines,
+    run(createWorld(), 'git merge --help').output.lines,
+  )
+  // `git help` on its own still lists the commands.
+  assert.equal(run(createWorld(), 'git help').output.hintKey, 'hint.gitHelp')
+})
+
+test('a command with no help entry cannot slip in', () => {
+  const documented = new Set(HELP_COMMANDS)
+  const missing = Object.keys(GIT_COMMANDS).filter((name) => !documented.has(name))
+  assert.deepEqual(missing, [], 'these commands have no --help')
+  const extra = HELP_COMMANDS.filter((name) => !Object.hasOwn(GIT_COMMANDS, name))
+  assert.deepEqual(extra, [], 'these help entries have no command')
+})
+
+test('every hint is labelled with the kind of note it is', () => {
+  const kindOf = (line) => run(createWorld(), line).output.hintKind
+
+  assert.equal(kindOf('git status'), 'error', 'a refusal is an error')
+  assert.equal(kindOf('git comit'), 'tip', 'a "did you mean" is a suggestion')
+  assert.equal(kindOf('git commit --help'), 'info', 'help is information')
+  assert.equal(kindOf('git'), 'info', 'the command list is information')
+  assert.equal(kindOf('git init'), null, 'nothing to say, no note')
+})
+
+test('a conflicted merge warns, without being an error', () => {
+  const world = play(
+    createWorld(),
+    'git init',
+    'echo "base" > a.txt',
+    'git add .',
+    'git commit -m "base"',
+    'git checkout -b otra',
+    'echo "otra" > a.txt',
+    'git add .',
+    'git commit -m "o"',
+    'git checkout main',
+    'echo "main" > a.txt',
+    'git add .',
+    'git commit -m "m"',
+  )
+  const step = run(world, 'git merge otra')
+
+  assert.equal(step.output.error, false, 'a conflict is not a failed command')
+  assert.equal(step.output.hintKey, 'hint.mergeConflict')
+  assert.equal(step.output.hintKind, 'warn')
+
+  // And it stops warning once the conflict is dealt with.
+  const fixed = play(step.world, 'echo "resuelto" > a.txt', 'git add a.txt')
+  assert.equal(run(fixed, 'git status').output.hintKey, null)
+})
+
+test('every kind a hint can carry has a name to show', () => {
+  const titles = SPANISH_UI.terminal.hint
+  for (const kind of HINT_KINDS) {
+    assert.equal(typeof titles[kind], 'string', `no title for a "${kind}" note`)
+  }
+  assert.deepEqual(Object.keys(titles).sort(), [...HINT_KINDS].sort())
 })

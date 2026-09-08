@@ -903,6 +903,33 @@ button.reset {
   line-height: 1.5;
 }
 
+/* The kind of note it is, in the terminal's own colours: red for what git
+   refused, amber for what is half-done, blue for plain information, and the
+   accent for a suggestion. */
+.hint-error {
+  border-left-color: var(--term-red);
+}
+
+.hint-error .hint-card-title {
+  color: var(--term-red);
+}
+
+.hint-warn {
+  border-left-color: #e3b552;
+}
+
+.hint-warn .hint-card-title {
+  color: #e3b552;
+}
+
+.hint-info {
+  border-left-color: #8ab8ea;
+}
+
+.hint-info .hint-card-title {
+  color: #8ab8ea;
+}
+
 .hint-card p {
   margin: 0 0 4px;
   white-space: pre-wrap;

@@ -70,9 +70,9 @@ export default function App() {
   }
 
   /** A hint travels in the transcript, right under the command it explains. */
-  const makeHint = (hintKey, hintParams) => {
+  const makeHint = (hintKey, hintParams, hintKind) => {
     entryId.current += 1
-    return { key: entryId.current, type: 'hint', hintKey, hintParams }
+    return { key: entryId.current, type: 'hint', hintKey, hintParams, hintKind }
   }
 
   /** Re-checks the goal after anything that can change the world. */
@@ -115,7 +115,7 @@ export default function App() {
       ...previous,
       makeEntry('command', line),
       ...output.lines.map((text) => makeEntry(output.error ? 'error' : 'out', text)),
-      ...(output.hintKey ? [makeHint(output.hintKey, output.hintParams)] : []),
+      ...(output.hintKey ? [makeHint(output.hintKey, output.hintParams, output.hintKind)] : []),
     ])
 
     if (output.error) return
