@@ -7,9 +7,12 @@ vuelta con un servidor.
 
 No hay ningún git de verdad atrás: hay un simulador escrito en JavaScript que
 modela el repositorio, el stage y el remoto, y que responde con los mismos
-mensajes que git. Cuando algo falla, el error aparece tal cual (en inglés, como
-en una terminal real) y al lado se muestra una tarjeta que explica en castellano
-qué pasó y cómo seguir.
+mensajes que git. Cuando algo falla, aparece el error de git y al lado una
+tarjeta que explica qué pasó y cómo seguir.
+
+La terminal viene en castellano, igual que git de verdad cuando corre con
+`LANG` en español. El switch **Terminal en castellano**, arriba a la derecha, la
+pasa al inglés que se ve por defecto en la mayoría de las máquinas.
 
 ## Cómo correrlo
 
@@ -48,6 +51,7 @@ hacer con el panel **Archivos**, que hace las veces de editor de texto.
 src/
   ansi.js            colores: el motor los emite, la terminal los pinta
   engine/            el simulador de git (no sabe nada de React)
+    messages.js      catálogo de mensajes al estilo gettext: msg('On branch {branch}')
     model.js         el "mundo": archivos, repositorio local, remoto
     status.js        la comparación entre commit, stage y carpeta
     workdir.js       cambiar de snapshot sin pisar trabajo sin guardar
@@ -60,7 +64,7 @@ src/
   components/        la interfaz
   styles/app.css
 docs/                arquitectura y catálogo de lecciones
-scripts/             chequeos de render y de navegador
+scripts/             chequeos de render y de navegador, y el extractor de mensajes
 test/                tests del simulador, de las lecciones y del grafo
 ```
 
@@ -100,14 +104,27 @@ En los textos podés usar `` `código` `` y `**negrita**`.
 El selector de idioma aparece solo cuando hay más de uno. Los tests de i18n
 verifican que no falte ninguna pista.
 
+El bloque `git` de ese archivo es aparte: es el catálogo de la salida de la
+terminal, con el texto en inglés como clave, igual que hace gettext. Para
+regenerar la lista de mensajes que hay que traducir:
+
+```bash
+node scripts/extract-messages.mjs
+```
+
+Lo que falte queda en inglés, nunca en blanco. Los tests fallan si sobra o falta
+alguna entrada, o si una traducción se come un `{parámetro}`.
+
 ## Convenciones
 
 - **El código, los identificadores y los comentarios están en inglés.** Las
   palabras clave de git (`commit`, `push`, `pull`, `merge`, `stage`) se dejan en
   inglés también en los textos en castellano, porque es como se las nombra.
-- **La salida de la terminal no se traduce**: es la de git, y aprender a leerla
-  es parte del objetivo. Lo que sí se traduce es todo lo demás, incluidas las
-  tarjetas que explican cada error.
+- **La salida de la terminal se traduce, pero los mensajes de commit no**: eso
+  último es contenido del repositorio, no salida, y git tampoco lo traduce.
+- Las pistas que citan una sección de `git status` no la escriben a mano: usan
+  parámetros como `{gitUntracked}`, así siguen siendo correctas en los dos
+  idiomas.
 - Los textos del sitio están en castellano rioplatense (voseo).
 - `docs/architecture.md` está en inglés porque describe el código;
   `docs/lessons.md` está en castellano porque describe el curso.

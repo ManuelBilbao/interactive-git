@@ -138,6 +138,15 @@ async function openLesson(number) {
   )
 }
 
+/** Flips the "terminal in Spanish" switch in the header. */
+async function setSpanishOutput(wanted) {
+  await evaluate(
+    `const box = document.querySelector('.toggle input')
+     if (box.checked !== ${wanted}) box.click()`,
+  )
+  await wait(150)
+}
+
 const terminal = () => evaluate("return document.querySelector('.terminal').innerText")
 const hint = () => evaluate("return document.querySelector('.hint-card')?.innerText ?? ''")
 const solved = () => evaluate("return Boolean(document.querySelector('.lesson-solved'))")
@@ -156,6 +165,19 @@ async function check(label, condition, detail) {
 try {
   await waitFor('.terminal-input input')
   await check('the four panels rendered', (await evaluate("return document.querySelectorAll('.panel').length")) === 4)
+
+  // Out of the box the terminal speaks Spanish, like git under a Spanish LANG.
+  await type('git status')
+  await check(
+    'git speaks Spanish by default',
+    (await terminal()).includes('no es un repositorio git'),
+    terminal,
+  )
+
+  // The switch in the header puts it back into git's own English.
+  await setSpanishOutput(false)
+  await type('git status')
+  await check('the toggle switches git back to English', (await terminal()).includes('not a git repository'), terminal)
 
   // A command that fails must show git's wording and the translated hint.
   await type('git status')
@@ -220,6 +242,14 @@ try {
   await type('git status --staged')
   await check('`git status --staged` is refused', (await terminal()).includes('unknown option'), terminal)
   await check('and the hint points at the green section', (await hint()).includes('stage'), hint)
+
+  // The same status, in Spanish, with the colours still in place.
+  await setSpanishOutput(true)
+  await type('git status')
+  const spanish = await terminal()
+  await check('status is translated', spanish.includes('En la rama main'), terminal)
+  await check('so are its sections', spanish.includes('Cambios listos para el commit:'), terminal)
+  await check('and the colours survive translation', await painted('green'))
 } finally {
   socket.close()
   await cleanUp()

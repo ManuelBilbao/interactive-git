@@ -20,7 +20,7 @@ a typed line
         ┌───────────────────┴───────────────────┐
         ▼                                       ▼
   terminal output                    HintCard: t(hintKey)
-  (git's English)                    (translated explanation)
+  (git's words, msg())               (translated explanation)
 ```
 
 ## The world
@@ -92,15 +92,61 @@ throw gitError(
 )
 ```
 
-The message is git's own wording, in English, and goes to the terminal
-unchanged. The `hintKey` is looked up in the locale file and rendered as a card
-below the terminal, in the student's language.
+The message is git's own wording; the `hintKey` is looked up in the locale file
+and rendered as a card below the terminal, in the student's language.
 
-This split is deliberate. Students will meet these exact strings in a real
-terminal, and a translated simulator would teach them to recognise text they
-will never see again. `test/i18n.test.js` walks the engine source for
-`'hint.*'` literals and fails when one has no translation, or when a
-translation is no longer used.
+The two are different things and stay separate. The message is what git says —
+the same sentence, in the same shape, that a real terminal prints. The hint is
+what *this course* says about it: which command to reach for next, and why. One
+is a fact about git, the other is teaching.
+
+`test/i18n.test.js` walks the engine source for `'hint.*'` literals and fails
+when one has no translation, or when a translation is no longer used.
+
+## Translating git's output
+
+git itself is localised: every message goes through gettext's `_()`, and the
+catalogue is picked from the `LANG` environment variable. The simulator copies
+that design rather than inventing one.
+
+`src/engine/messages.js` is the whole mechanism:
+
+```js
+lines.push(msg('On branch {branch}', { branch }))
+```
+
+The **English text is the key**. That has three consequences worth knowing:
+
+- a missing translation degrades to English, never to a blank line or a raw
+  identifier;
+- the source stays readable — you see the sentence, not `status.onBranch`;
+- extracting the catalogue is a matter of scanning for `msg(`, which is what
+  `scripts/extract-messages.mjs` does, in the spirit of `xgettext`.
+
+The catalogue is process-wide, exactly like git's locale: `setMessages()` swaps
+it and `setMessages(null)` goes back to English. The React side sets it from a
+switch in the header, so a class can be run in either language, and the tests
+leave it on English so they assert against git's real wording.
+
+Three things are deliberately **not** translated:
+
+- **Commit messages.** `Merge branch 'postres'` is stored in the repository, so
+  it is data, not output. Real git does not translate it either, and if it did,
+  toggling the language would rewrite history.
+- **Refs, file names, URLs and commit ids.** They travel as parameters.
+- **Anything the student typed.**
+
+`test/messages.test.js` checks that every extracted msgid has a translation,
+that none is stale, that no translation drops or renames a `{placeholder}`, and
+that the words the course keeps in English — commit, stage, push, pull, merge —
+were not translated away.
+
+Two details fall out of translating a terminal. Status labels are padded to the
+longest label *in the active language*, so `archivo nuevo:` lines up the same
+way `new file:` does. And lesson hints that quote a section of `git status` do
+not hardcode the English: `t()` supplies the quoted lines as parameters, so
+`` `{gitUntracked}` `` reads as `Untracked files` or `Archivos sin trackear`
+depending on the switch.
 
 ## Colour
 

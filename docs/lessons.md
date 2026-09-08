@@ -86,11 +86,27 @@ Ninguna lección exige una secuencia exacta de comandos: si llegás al mismo est
 por otro camino, cuenta igual. `test/lessons.test.js` resuelve las diecisiete de
 punta a punta, así que una lección imposible de completar rompe los tests.
 
+## El idioma de la terminal
+
+La terminal arranca en castellano, como git de verdad cuando la máquina tiene
+`LANG` en español. El switch **Terminal en castellano** la pasa al inglés, que
+es lo que van a ver en la mayoría de las computadoras y en todo lo que busquen
+en internet.
+
+Vale la pena usar los dos en algún momento del curso: empezar en castellano para
+que el error se entienda sin traducir mentalmente, y pasar a inglés antes de que
+salgan a trabajar con git afuera. Las pistas de las lecciones se acomodan solas:
+cuando citan una sección de `git status`, la citan en el idioma que esté puesto.
+
+Las palabras clave quedan en inglés en los dos idiomas: commit, stage, push,
+pull, merge. Los mensajes de commit tampoco se traducen, porque son contenido
+del repositorio y no salida del programa.
+
 ## Errores y pistas
 
 Cuando un comando falla pasan dos cosas al mismo tiempo:
 
-- la terminal muestra el error de git, en inglés y palabra por palabra;
+- la terminal muestra el error de git, palabra por palabra;
 - abajo aparece una tarjeta **Qué pasó** que lo explica en castellano y dice cómo
   seguir.
 
