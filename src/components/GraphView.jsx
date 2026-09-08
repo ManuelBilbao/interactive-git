@@ -1,14 +1,11 @@
 import { useI18n } from '../i18n/index.jsx'
 import RichText from './RichText.jsx'
-import { CHIP_STEP, NODE_RADIUS, chipWidth, layoutGraph } from './graphLayout.js'
+import { CHIP_HEIGHT, NODE_RADIUS, layoutGraph } from './graphLayout.js'
 
-function RefChips({ refs, x, y }) {
-  return refs.map((ref, position) => (
-    <g
-      key={ref.name}
-      transform={`translate(${x + NODE_RADIUS + 12}, ${y + position * CHIP_STEP - 11})`}
-    >
-      <rect className={`ref ref-${ref.kind}`} width={chipWidth(ref.name)} height={22} rx={4} />
+function RefChips({ refs }) {
+  return refs.map((ref) => (
+    <g key={ref.name} transform={`translate(${ref.x}, ${ref.y})`}>
+      <rect className={`ref ref-${ref.kind}`} width={ref.width} height={CHIP_HEIGHT} rx={4} />
       <text className={`ref-text ref-text-${ref.kind}`} x={8} y={15}>
         {ref.name}
       </text>
@@ -58,8 +55,12 @@ function Graph({ repo }) {
             <text className="node-text" x={node.x} y={node.y + 4} textAnchor="middle">
               {node.id}
             </text>
-            <title>{node.message}</title>
-            <RefChips refs={node.refs} x={node.x} y={node.y} />
+            <RefChips refs={node.refs} />
+            <text className="node-message" x={node.message.x} y={node.message.y}>
+              {node.message.text}
+            </text>
+            {/* The tooltip carries the message in full, however long it is. */}
+            <title>{`${node.id} · ${node.message.full}`}</title>
           </g>
         ))}
       </svg>

@@ -11,27 +11,85 @@ function play(world, lines) {
 
 const lesson = (id) => LESSONS.find((item) => item.id === id)
 
-test('the drawing is big enough for every node and every ref chip', () => {
-  const world = play(lesson('mergeDiverged').setup(), ['git merge postres'])
-  const layout = layoutGraph(world.repo)
+/** Every repository the course can put on screen, including mid-merge ones. */
+function everyRepo() {
+  const worlds = LESSONS.flatMap((item) => {
+    const world = item.setup()
+    return [world, world.remote && { ...world, repo: world.remote }].filter(Boolean)
+  })
+  worlds.push(play(lesson('mergeDiverged').setup(), ['git merge postres']))
+  worlds.push(play(lesson('branchAll').setup(), ['git push -u origin postres']))
+  worlds.push(play(lesson('pushRejected').setup(), ['git pull']))
+  worlds.push(play(lesson('branch').setup(), ['git checkout C1']))
+  return worlds.filter((world) => world.repo).map((world) => world.repo)
+}
 
-  for (const node of layout.nodes) {
-    assert.ok(node.x <= layout.width, `${node.id} sticks out to the right`)
-    assert.ok(
-      node.y + node.refs.length * 26 <= layout.height,
-      `the refs of ${node.id} fall outside the drawing`,
-    )
+function overlaps(a, b) {
+  return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom
+}
+
+test('no commit is drawn on top of another commit or its labels', () => {
+  for (const repo of everyRepo()) {
+    const nodes = layoutGraph(repo).nodes
+    for (let i = 0; i < nodes.length; i += 1) {
+      for (let j = i + 1; j < nodes.length; j += 1) {
+        assert.equal(
+          overlaps(nodes[i].bounds, nodes[j].bounds),
+          false,
+          `${nodes[i].id} and ${nodes[j].id} overlap`,
+        )
+      }
+    }
   }
 })
 
-test('two ref chips on one commit both fit vertically', () => {
-  // A freshly cloned repository stacks `main` and `origin/main` on one commit.
-  const world = lesson('push').setup()
-  const layout = layoutGraph(world.repo)
-  const node = layout.nodes.at(-1)
+test('the drawing is big enough for everything in it', () => {
+  for (const repo of everyRepo()) {
+    const layout = layoutGraph(repo)
+    for (const node of layout.nodes) {
+      assert.ok(node.bounds.right <= layout.width, `${node.id} sticks out to the right`)
+      assert.ok(node.bounds.bottom <= layout.height, `${node.id} sticks out of the bottom`)
+      assert.ok(node.bounds.left >= 0 && node.bounds.top >= 0, `${node.id} starts off-canvas`)
+    }
+  }
+})
 
-  assert.equal(node.refs.length, 2)
-  assert.ok(node.y + 2 * 26 <= layout.height)
+test('every commit shows its message', () => {
+  const world = lesson('branch').setup()
+  const messages = layoutGraph(world.repo).nodes.map((node) => node.message.text)
+
+  assert.deepEqual(messages, ['primeras recetas', 'agrego ñoquis'])
+})
+
+test('a long message is cut short but kept whole in the tooltip', () => {
+  const world = play(lesson('pushRejected').setup(), ['git pull'])
+  const merge = layoutGraph(world.repo).nodes.at(-1)
+
+  assert.ok(merge.message.full.startsWith('Merge branch'))
+  assert.ok(merge.message.full.length > merge.message.text.length)
+  assert.ok(merge.message.text.endsWith('…'))
+  assert.ok(merge.message.full.startsWith(merge.message.text.slice(0, -1).trimEnd()))
+})
+
+test('refs stack below the commit without touching each other', () => {
+  // A freshly cloned repository puts `main` and `origin/main` on one commit.
+  const node = layoutGraph(lesson('push').setup().repo).nodes.at(-1)
+
+  assert.deepEqual(
+    node.refs.map((ref) => ref.name),
+    ['main', 'origin/main'],
+  )
+  assert.equal(node.refs[0].x, node.refs[1].x, 'both chips share a left edge')
+  assert.ok(node.refs[0].y + 22 <= node.refs[1].y, 'the chips overlap each other')
+  assert.ok(node.refs[0].y > node.y, 'the chips should sit below the commit')
+})
+
+test('the message sits on the commit line, clear of the chips', () => {
+  const node = layoutGraph(lesson('push').setup().repo).nodes.at(-1)
+
+  assert.ok(Math.abs(node.message.y - node.y) < 10, 'the message left the commit line')
+  assert.ok(node.message.y < node.refs[0].y, 'the message runs into the chips')
+  assert.ok(node.message.x > node.x + 17, 'the message runs into the circle')
 })
 
 test('a merge shows as a commit with two parents and two edges', () => {
@@ -40,7 +98,10 @@ test('a merge shows as a commit with two parents and two edges', () => {
   const merge = layout.nodes.find((node) => node.isMerge)
 
   assert.ok(merge, 'no merge commit was drawn')
-  assert.equal(layout.edges.filter((edge) => edge.from.x === merge.x && edge.from.y === merge.y).length, 2)
+  assert.equal(
+    layout.edges.filter((edge) => edge.from.x === merge.x && edge.from.y === merge.y).length,
+    2,
+  )
 })
 
 test('branches get their own column', () => {
@@ -52,38 +113,4 @@ test('branches get their own column', () => {
 test('an empty repository lays out without blowing up', () => {
   const layout = layoutGraph(lesson('status').setup().repo)
   assert.deepEqual(layout.nodes, [])
-})
-
-/** Bounding box of a commit and the labels hanging off it. */
-function boxOf(node) {
-  const widest = Math.max(0, ...node.refs.map((ref) => ref.name.length * 7.5 + 16))
-  return {
-    left: node.x - 17,
-    right: node.refs.length > 0 ? node.x + 29 + widest : node.x + 17,
-    top: node.y - 17,
-    bottom: node.refs.length > 0 ? node.y - 11 + node.refs.length * 26 : node.y + 17,
-  }
-}
-
-function overlap(a, b) {
-  return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom
-}
-
-test('no commit is drawn on top of another commit or its labels', () => {
-  const worlds = LESSONS.map((item) => item.setup()).filter((world) => world.repo)
-  worlds.push(play(lesson('mergeDiverged').setup(), ['git merge postres']))
-  worlds.push(play(lesson('branchAll').setup(), ['git push -u origin postres']))
-
-  for (const world of worlds) {
-    const boxes = layoutGraph(world.repo).nodes.map((node) => ({ id: node.id, box: boxOf(node) }))
-    for (let i = 0; i < boxes.length; i += 1) {
-      for (let j = i + 1; j < boxes.length; j += 1) {
-        assert.equal(
-          overlap(boxes[i].box, boxes[j].box),
-          false,
-          `${boxes[i].id} and ${boxes[j].id} overlap`,
-        )
-      }
-    }
-  }
 })

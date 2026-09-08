@@ -124,9 +124,10 @@ The **English text is the key**. That has three consequences worth knowing:
   `scripts/extract-messages.mjs` does, in the spirit of `xgettext`.
 
 The catalogue is process-wide, exactly like git's locale: `setMessages()` swaps
-it and `setMessages(null)` goes back to English. The React side sets it from a
-switch in the header, so a class can be run in either language, and the tests
-leave it on English so they assert against git's real wording.
+it and `setMessages(null)` goes back to English. The React side sets it from the
+locale the site is running in — there is no separate switch, the same way git
+takes its language from the environment and not from a flag. The tests leave it
+unset, so they assert against git's own English wording.
 
 Three things are deliberately **not** translated:
 
@@ -209,13 +210,24 @@ student who wanders into one can get out the same way they would in real life.
   parents, each branch claims the commits nothing before it claimed. `main` goes
   first so it keeps the left column; commits reachable only through a merge's
   second parent get a column of their own.
-- **Rows and columns are sized from their contents.** The `main` and
-  `origin/main` chips hang off a commit to the right and stack downwards, so a
-  fixed grid would put them on top of the neighbouring commit. Each column is as
-  wide as its widest label, plus clearance for the next node's radius.
+- **Each commit carries two labels.** Its message sits on the commit's own
+  line, right after the circle — the order `git log --oneline` prints them in —
+  and the refs pointing at it stack on the lines below, tucked under the circle.
+- **Rows and columns are sized from their contents**, not on a fixed grid, or a
+  label would land on the neighbouring commit. Each column is as wide as its
+  widest label plus clearance for the next node's radius.
 
-`test/graph.test.js` asserts that no two commit boxes (circle plus labels)
-overlap, across every lesson.
+The label arrangement is also what keeps the drawing inside the rail it lives
+in. Message and chips take a line each rather than competing for one, and the
+chips stack rather than sitting side by side, because `main` and `origin/main`
+together are wider than the rail; only two commits in the course carry two refs,
+so stacking costs almost no height. Messages longer than 18 characters are cut
+with an ellipsis and kept whole in the tooltip — in practice that is only the
+`Merge branch ...` messages git generates itself.
+
+Every node exposes its `bounds`, so `test/graph.test.js` can assert that no two
+commits overlap and that everything fits inside the drawing, across every
+lesson, without repeating the geometry.
 
 ## i18n
 
