@@ -300,6 +300,8 @@ export function gitMerge(world, args) {
 
   if (conflicts.length > 0) {
     repo.merge = { from: target, fromCommit: theirCommit, conflicts }
+    // Not a failure, but the merge is half-done and says so.
+    world.notice = { key: 'hint.mergeConflict' }
     lines.push(
       ...conflicts.map((name) => msg('CONFLICT (content): Merge conflict in {name}', { name })),
       msg('Automatic merge failed; fix conflicts and then commit the result.'),

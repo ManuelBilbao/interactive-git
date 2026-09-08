@@ -15,6 +15,8 @@ export function createWorld(overrides = {}) {
     nextId: 1, // commits are named C1, C2, C3... like on the graph
     folder: 'proyecto', // name of the folder the student is standing in
     files: {}, // working directory: { filename: content }
+    subdirs: {}, // folders sitting next to you: name -> { repo, files }
+    parent: null, // where `cd ..` goes back to, once you have gone in
     repo: null, // local repository
     remote: null, // repository living on the "server"
     remoteUrl: null,
@@ -33,6 +35,12 @@ export function createRepo(overrides = {}) {
     merge: null, // { from, fromCommit, conflicts: [filename] } while merging
     ...overrides,
   }
+}
+
+/** The directory `git clone` creates: the last path segment, minus `.git`. */
+export function folderFromUrl(url) {
+  const last = url.replace(/\/+$/, '').split('/').pop() ?? ''
+  return last.replace(/\.git$/, '') || 'proyecto'
 }
 
 export function nextCommitId(world) {

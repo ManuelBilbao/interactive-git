@@ -29,7 +29,7 @@ const SOLUTIONS = {
   ],
   merge: ['git merge postres'],
   mergeDiverged: ['git merge postres'],
-  clone: [`git clone ${URL}`],
+  clone: [`git clone ${URL}`, 'cd interactive-git'],
   push: [
     'echo "Milanesas" >> recetas.md',
     'git add recetas.md',
@@ -41,6 +41,7 @@ const SOLUTIONS = {
   branchAll: ['git push -u origin postres', 'git branch -a'],
   final: [
     `git clone ${URL}`,
+    'cd interactive-git',
     'git checkout -b bebidas',
     'echo "Limonada" > bebidas.md',
     'git add bebidas.md',

@@ -7,6 +7,7 @@ import {
   REMOTE_NAME,
   ancestors,
   createRepo,
+  folderFromUrl,
   treeOf,
 } from '../model.js'
 
@@ -22,12 +23,6 @@ export function gitInit(world) {
   ]
 }
 
-/** The directory `git clone` creates: the last path segment, minus `.git`. */
-function folderFromUrl(url) {
-  const last = url.replace(/\/+$/, '').split('/').pop() ?? ''
-  return last.replace(/\.git$/, '') || 'proyecto'
-}
-
 export function gitClone(world, args) {
   const url = args[0]
   if (!url) {
@@ -36,10 +31,11 @@ export function gitClone(world, args) {
       'hint.cloneNeedsUrl',
     )
   }
-  if (world.repo) {
+  const folder = folderFromUrl(url)
+  if (Object.hasOwn(world.subdirs, folder) || Object.hasOwn(world.files, folder)) {
     throw gitError(
       msg("fatal: destination path '{folder}' already exists and is not an empty directory.", {
-        folder: world.folder,
+        folder,
       }),
       'hint.cloneOverExisting',
     )
@@ -76,14 +72,15 @@ export function gitClone(world, args) {
 
   const tree = treeOf(repo, repo.branches[defaultBranch])
   repo.index = { ...tree }
-  world.files = { ...tree }
-  world.repo = repo
   world.remoteUrl = url
-  world.folder = folderFromUrl(url)
+
+  // git clones *into* a new folder and leaves you where you were. Walking in
+  // is a separate step, and the lesson lets them find that out.
+  world.subdirs[folder] = { repo, files: { ...tree } }
 
   const count = Object.keys(repo.commits).length
   return [
-    msg("Cloning into '{folder}'...", { folder: world.folder }),
+    msg("Cloning into '{folder}'...", { folder }),
     msg('remote: Enumerating objects: {count}, done.', { count }),
     msg('remote: Counting objects: 100% ({count}/{count}), done.', { count }),
     msg('Receiving objects: 100% ({count}/{count}), done.', { count }),

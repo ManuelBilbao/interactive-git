@@ -40,6 +40,9 @@ export default function FilesPanel({ world, onEdit, onCreate, onDelete }) {
   const [error, setError] = useState(null)
 
   const files = describeFiles(world)
+  // Folders `git clone` left next to you: not editable, but they are there,
+  // and the panel saying "empty" while `ls` shows one would be a lie.
+  const folders = Object.keys(world.subdirs).sort()
 
   const startEditing = (file) => {
     setEditing(file.name)
@@ -69,9 +72,19 @@ export default function FilesPanel({ world, onEdit, onCreate, onDelete }) {
     <section className="panel files-panel">
       <h2 className="panel-title">{t('files.title')}</h2>
 
-      {files.length === 0 && <p className="empty">{t('files.empty')}</p>}
+      {files.length === 0 && folders.length === 0 && <p className="empty">{t('files.empty')}</p>}
 
       <ul className="file-list">
+        {folders.map((name) => (
+          <li key={name} className="file folder">
+            <div className="file-head">
+              <span className="file-name">{name}/</span>
+              <span className="file-badges">
+                <span className="badge">{t('files.folder')}</span>
+              </span>
+            </div>
+          </li>
+        ))}
         {files.map((file) => (
           <li key={file.name} className="file">
             <div className="file-head">

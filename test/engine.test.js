@@ -210,7 +210,7 @@ test('a conflict is reported and resolved by add + commit', () => {
 
 /** A world whose server already holds one commit, as if a teammate created it. */
 function worldWithRemote() {
-  const world = createWorld({ remoteUrl: 'https://github.com/curso/proyecto.git' })
+  const world = createWorld({ remoteUrl: 'https://github.com/curso/recetas.git' })
   const remote = createRepo({ head: { type: 'branch', name: 'main' } })
   const id = writeCommit(world, remote, {
     parents: [],
@@ -223,7 +223,13 @@ function worldWithRemote() {
 }
 
 test('clone brings the server history down', () => {
-  const world = play(worldWithRemote(), 'git clone https://github.com/curso/proyecto.git')
+  const cloned = play(worldWithRemote(), 'git clone https://github.com/curso/recetas.git')
+  // The folder is there, but you are still outside it.
+  assert.equal(cloned.repo, null)
+  assert.deepEqual(Object.keys(cloned.subdirs), ['recetas'])
+
+  const world = play(cloned, 'cd recetas')
+  assert.equal(world.folder, 'recetas')
   assert.equal(world.files['README.md'], 'proyecto del curso')
   assert.equal(world.repo.branches.main, 'C1')
   assert.equal(world.repo.remoteTracking['origin/main'], 'C1')
@@ -237,7 +243,8 @@ test('clone rejects an unknown url', () => {
 test('push moves the branch on the server', () => {
   const world = play(
     worldWithRemote(),
-    'git clone https://github.com/curso/proyecto.git',
+    'git clone https://github.com/curso/recetas.git',
+    'cd recetas',
     'echo "nota" > notas.txt',
     'git add .',
     'git commit -m "notas"',
@@ -248,7 +255,7 @@ test('push moves the branch on the server', () => {
 })
 
 test('push is rejected when the server moved ahead', () => {
-  let world = play(worldWithRemote(), 'git clone https://github.com/curso/proyecto.git')
+  let world = play(worldWithRemote(), 'git clone https://github.com/curso/recetas.git', 'cd recetas')
   const serverCommit = writeCommit(world, world.remote, {
     parents: [world.remote.branches.main],
     message: 'trabajo de otra persona',
@@ -260,7 +267,7 @@ test('push is rejected when the server moved ahead', () => {
 })
 
 test('pull brings the server commits and merges them', () => {
-  let world = play(worldWithRemote(), 'git clone https://github.com/curso/proyecto.git')
+  let world = play(worldWithRemote(), 'git clone https://github.com/curso/recetas.git', 'cd recetas')
   const serverCommit = writeCommit(world, world.remote, {
     parents: [world.remote.branches.main],
     message: 'trabajo de otra persona',
@@ -273,7 +280,7 @@ test('pull brings the server commits and merges them', () => {
 })
 
 test('branch -a lists remote-tracking branches', () => {
-  const world = play(worldWithRemote(), 'git clone https://github.com/curso/proyecto.git')
+  const world = play(worldWithRemote(), 'git clone https://github.com/curso/recetas.git', 'cd recetas')
   const listed = run(world, 'git branch -a').output.lines.map(stripAnsi)
   assert.deepEqual(listed, ['* main', '  remotes/origin/main'])
 })
@@ -291,23 +298,55 @@ test('a failed command leaves the world untouched', () => {
   assert.equal(step.world, world)
 })
 
-test('clone names the directory after the repository, as git does', () => {
-  const world = play(worldWithRemote(), 'git clone https://github.com/curso/proyecto.git')
-  assert.equal(world.folder, 'proyecto')
+test('clone makes a folder named after the repository, and leaves you outside', () => {
+  const cloned = play(worldWithRemote(), 'git clone https://github.com/curso/recetas.git')
 
-  // A URL whose repository is named differently renames the folder with it.
-  const other = createWorld({ remoteUrl: 'https://github.com/quien/mi-repo.git' })
-  const remote = createRepo({ head: { type: 'branch', name: 'main' } })
-  remote.branches.main = writeCommit(other, remote, {
-    parents: [],
-    message: 'inicial',
-    tree: { 'README.md': 'x' },
-  })
-  other.remote = remote
+  assert.equal(cloned.folder, 'proyecto', 'clone must not move you')
+  assert.equal(cloned.repo, null, 'you are not in the repository yet')
+  assert.deepEqual(Object.keys(cloned.subdirs), ['recetas'])
+  assert.match(run(worldWithRemote(), 'git clone https://github.com/curso/recetas.git').output.lines[0], /recetas/)
 
-  const cloned = play(other, 'git clone https://github.com/quien/mi-repo.git')
-  assert.equal(cloned.folder, 'mi-repo')
-  assert.match(run(other, 'git clone https://github.com/quien/mi-repo.git').output.lines[0], /mi-repo/)
+  // Which is why a git command still says there is no repository here...
+  const refused = run(cloned, 'git status')
+  assert.equal(refused.output.error, true)
+  assert.equal(refused.output.hintKey, 'hint.notARepo')
+
+  // ...and why clone itself says nothing about it: finding that out is the
+  // lesson, and the hints are there for whoever gets stuck.
+  const step = run(worldWithRemote(), 'git clone https://github.com/curso/recetas.git')
+  assert.equal(step.output.error, false)
+  assert.equal(step.output.hintKey, null)
+})
+
+test('cd walks into the clone, and back out of it', () => {
+  const cloned = play(worldWithRemote(), 'git clone https://github.com/curso/recetas.git')
+
+  // `ls` shows the folder with a slash, which is how you learn its name.
+  assert.match(run(cloned, 'ls').output.lines[0], /recetas\//)
+  assert.deepEqual(run(cloned, 'pwd').output.lines, ['/proyecto'])
+
+  const inside = play(cloned, 'cd recetas')
+  assert.ok(inside.repo, 'cd should carry the repository of the folder')
+  assert.deepEqual(run(inside, 'pwd').output.lines, ['/proyecto/recetas'])
+  assert.deepEqual(Object.keys(inside.subdirs), [])
+
+  const back = play(inside, 'cd ..')
+  assert.equal(back.folder, 'proyecto')
+  assert.equal(back.repo, null)
+  assert.deepEqual(Object.keys(back.subdirs), ['recetas'], 'the folder is still there')
+})
+
+test('cd says so when the folder is not there', () => {
+  const cloned = play(worldWithRemote(), 'git clone https://github.com/curso/recetas.git')
+
+  assert.equal(fails(cloned, 'cd recetitas').hintKey, 'hint.cdNoSuchDirectory')
+  assert.equal(fails(cloned, 'cd').hintKey, 'hint.cdNeedsName')
+
+  const withFile = play(cloned, 'touch notas.txt')
+  assert.equal(fails(withFile, 'cd notas.txt').hintKey, 'hint.cdNotADirectory')
+
+  // At the top there is nowhere further up, so it stays put rather than erroring.
+  assert.equal(run(cloned, 'cd ..').output.error, false)
 })
 
 test('every git command answers --help', () => {

@@ -50,6 +50,14 @@ repo = {
 
 Three decisions keep this simple:
 
+The folder model is thin but not a lie. `subdirs` holds the folders sitting
+next to you — in practice the one `git clone` just made — and `parent` is where
+`cd ..` goes back to. `git clone` creates the folder and leaves you outside it,
+exactly as it does for real, so a git command there still answers "not a git
+repository" until you `cd` in. Getting that wrong was hiding the step everybody
+forgets. One level of nesting is all a clone ever creates, so that is all this
+models.
+
 - **A commit stores a whole snapshot**, not a diff. `tree` is the complete set
   of files as of that commit. Checkout, merge and diff all become plain object
   comparisons, and the student's mental model ("a commit is a photo") matches

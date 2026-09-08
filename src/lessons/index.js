@@ -17,6 +17,7 @@ import {
   createRepo,
   createWorld,
   currentBranch,
+  folderFromUrl,
   headCommitId,
   writeCommit,
 } from '../engine/model.js'
@@ -232,7 +233,8 @@ const DEFINITIONS = [
     id: 'clone',
     commands: ['git clone'],
     setup: () => {
-      const world = createWorld()
+      // Standing in a folder where projects go, not inside one.
+      const world = createWorld({ folder: 'proyectos' })
       remoteRepo(world, [
         ['primeras recetas', { 'recetas.md': RECIPE }],
         ['agrego ñoquis', { 'recetas.md': RECIPE_V2 }],
@@ -311,7 +313,7 @@ const DEFINITIONS = [
     id: 'final',
     commands: ['git clone', 'git checkout -b', 'git add', 'git commit -m', 'git merge', 'git push'],
     setup: () => {
-      const world = createWorld()
+      const world = createWorld({ folder: 'proyectos' })
       remoteRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
       return world
     },
@@ -332,7 +334,10 @@ const DEFINITIONS = [
   },
 ]
 
-/** Reproduces what `git clone` does, for lessons that start after the clone. */
+/**
+ * Reproduces `git clone` followed by `cd`, for the lessons that start with the
+ * student already working inside the clone.
+ */
 function cloneInto(world, remote) {
   const repo = createRepo({ head: { type: 'branch', name: 'main' } })
   repo.commits = structuredClone(remote.commits)
@@ -345,6 +350,7 @@ function cloneInto(world, remote) {
   repo.index = { ...tree }
   world.files = { ...tree }
   world.repo = repo
+  world.folder = folderFromUrl(COURSE_REPO_URL)
   return repo
 }
 

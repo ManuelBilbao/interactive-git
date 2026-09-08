@@ -32,7 +32,7 @@ const HELP = {
 
   clone: () => ({
     usage: msg('usage: git clone <url>'),
-    summary: msg('Copy a repository from a server, with all of its history.'),
+    summary: msg('Copy a repository from a server into a new folder, with all of its history.'),
     options: [],
   }),
 

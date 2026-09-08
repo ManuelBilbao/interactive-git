@@ -10,14 +10,11 @@ import { gitBranch, gitCheckout, gitMerge } from './branching.js'
 import { gitCommit, gitLog } from './history.js'
 import { gitPull, gitPush } from './remote.js'
 import { gitClone, gitInit } from './repoSetup.js'
-import { cat, echo, ls, pwd, rm, touch } from './shell.js'
+import { cat, cd, echo, ls, pwd, rm, touch } from './shell.js'
 import { gitAdd, gitRestore, gitStatus } from './staging.js'
 
 /** Git subcommands that work without an existing repository. */
 const WITHOUT_REPO = new Set(['init', 'clone'])
-
-/** The subcommands that can leave a merge half-finished. */
-const MERGING = new Set(['merge', 'pull'])
 
 const GIT_COMMANDS = {
   init: gitInit,
@@ -34,7 +31,7 @@ const GIT_COMMANDS = {
   pull: gitPull,
 }
 
-const SHELL_COMMANDS = { ls, cat, touch, rm, echo, pwd }
+const SHELL_COMMANDS = { ls, cd, cat, touch, rm, echo, pwd }
 
 /** Edit distance, used to answer "did you mean...?". */
 function distance(a, b) {
@@ -114,14 +111,19 @@ function runGit(world, args) {
     )
   }
 
-  const lines = command(world, rest)
+  return result(command(world, rest), takeNotice(world))
+}
 
-  // A merge that ends in conflicts is not a failure, but it leaves the student
-  // mid-operation with something to do and no error to read about it.
-  if (world.repo?.merge && MERGING.has(subcommand)) {
-    return result(lines, { hintKey: 'hint.mergeConflict' })
-  }
-  return result(lines)
+/**
+ * A command that succeeded but still has something to say leaves a note on the
+ * world; this reads it and clears it. Used where the output is not an error and
+ * yet the student is left with something to do: a merge that ended in
+ * conflicts, a clone that made a folder they have not walked into.
+ */
+function takeNotice(world) {
+  const notice = world.notice
+  delete world.notice
+  return notice ? { hintKey: notice.key, hintParams: notice.params ?? {} } : {}
 }
 
 /**

@@ -55,7 +55,8 @@
     "delete": "Borrar",
     "contentPlaceholder": "Escribí el contenido del archivo",
     "legend": "Editar acá es como editar con un editor de texto: git no se entera hasta `git add`.",
-    "duplicate": "Ya existe un archivo con ese nombre."
+    "duplicate": "Ya existe un archivo con ese nombre.",
+    "folder": "carpeta"
   },
   "state": {
     "untracked": "sin trackear",
@@ -120,10 +121,13 @@
     "unknownCommand": "`{name}` no es un comando. Escribí `help` para ver la lista completa.",
     "unknownCommandDidYouMean": "`{name}` no es un comando. ¿Quisiste escribir `{suggestion}`?",
     "gitHelp": "Comandos de git que podés usar acá:\n\ngit init      convierte la carpeta en un repositorio\ngit clone     trae un repositorio del servidor\ngit status    muestra qué cambió y qué está en el stage\ngit add       pone cambios en el stage\ngit restore   deshace cambios (con --staged, saca del stage)\ngit commit    guarda lo que está en el stage\ngit log       muestra la historia\ngit branch    lista o crea ramas (-a incluye las del servidor)\ngit checkout  te mueve de rama (-b crea una nueva)\ngit merge     trae el trabajo de otra rama\ngit push      sube tus commits al servidor\ngit pull      baja los commits del servidor\n\nCon `git <comando> --help` ves qué hace cada uno y qué opciones acepta acá.",
-    "shellHelp": "Comandos de git: git init, git clone, git status, git add, git restore, git commit, git log, git branch, git checkout, git merge, git push, git pull.\nEscribí `git` solo para ver la lista, o `git <comando> --help` para ver uno en detalle.\n\nComandos de la terminal: ls, cat, touch, rm, echo, pwd, clear.\n\nTambién podés crear y editar archivos desde el panel Archivos, sin usar la terminal.",
+    "shellHelp": "Comandos de git: git init, git clone, git status, git add, git restore, git commit, git log, git branch, git checkout, git merge, git push, git pull.\nEscribí `git` solo para ver la lista, o `git <comando> --help` para ver uno en detalle.\n\nComandos de la terminal: ls, cd, cat, touch, rm, echo, pwd, clear.\n\nTambién podés crear y editar archivos desde el panel Archivos, sin usar la terminal.",
     "statusUnknownOption": "`git status` no lleva esa opción. Escribilo a secas: la sección `Changes to be committed`, en verde, es justamente lo que ya está en el stage.",
     "reducedHelp": "Esta ayuda es reducida: lista solo lo que funciona en este simulador. Git tiene muchas más opciones, y la ayuda de verdad la vas a ver corriendo `git {command} --help` en una terminal.",
-    "mergeConflict": "El merge quedó a medio hacer. Los archivos en conflicto tienen marcas `<<<<<<<`, `=======` y `>>>>>>>`: editalos para dejar la versión que quieras, y después `git add <archivo>` y `git commit` para cerrarlo."
+    "mergeConflict": "El merge quedó a medio hacer. Los archivos en conflicto tienen marcas `<<<<<<<`, `=======` y `>>>>>>>`: editalos para dejar la versión que quieras, y después `git add <archivo>` y `git commit` para cerrarlo.",
+    "cdNeedsName": "A `cd` hay que decirle a dónde ir: `cd <carpeta>`.",
+    "cdNoSuchDirectory": "No hay ninguna carpeta `{name}` acá. Mirá qué hay con `ls`: las carpetas terminan en `/`.",
+    "cdNotADirectory": "`{name}` es un archivo, no una carpeta."
   },
   "lessons": {
     "init": {
@@ -279,13 +283,15 @@
       "title": "Clonar un repositorio que ya existe",
       "intro": [
         "Hasta acá todo pasó en tu computadora. Ahora aparece un segundo repositorio: el que vive en el servidor. Git lo llama **origin**.",
-        "`git clone <url>` se baja todo: los commits, las ramas y la historia completa. Y te deja la copia lista para trabajar.",
-        "Vamos a clonar el repositorio de este mismo sitio, que es de verdad y podés abrir en otra pestaña:\n```\n{repoUrl}\n```"
+        "`git clone <url>` se baja todo: los commits, las ramas y la historia completa. La deja en una carpeta nueva, con el nombre del repositorio.",
+        "Vamos a clonar el repositorio de este mismo sitio, que es de verdad y podés abrir en otra pestaña:\n```\n{repoUrl}\n```",
+        "Ojo con esto, que es lo que más se olvida: `clone` crea la carpeta pero **no te mete adentro**. Eso lo hacés vos con `cd`."
       ],
-      "goal": "Cloná el repositorio del curso.",
+      "goal": "Cloná el repositorio del curso y entrá en la carpeta que se creó.",
       "hints": [
         "El comando lleva la URL del repositorio, que está en la explicación de arriba.",
-        "```\ngit clone {repoUrl}\n```\nCuando termine, mirá los dos paneles de Historia: tenés la misma cadena de commits de los dos lados."
+        "Después de clonar, `ls` te muestra la carpeta nueva. Todavía estás afuera: fijate que `git status` te dice que esto no es un repositorio.",
+        "```\ngit clone {repoUrl}\ncd interactive-git\n```\nAhora sí, mirá los dos paneles de Historia: tenés la misma cadena de commits de los dos lados."
       ]
     },
     "push": {
@@ -353,10 +359,10 @@
       ],
       "goal": "Cloná el repositorio, creá la rama `bebidas` con un commit que agregue `bebidas.md`, mergeala a `main` y hacé push.",
       "hints": [
-        "Arrancá trayendo el repositorio del servidor a tu computadora.",
+        "Arrancá trayendo el repositorio del servidor, y entrando en la carpeta que crea.",
         "Hacé el trabajo en una rama aparte: creala y pasate a ella en un paso, y commiteá `bebidas.md` ahí.",
         "Volvé a `main` y traé lo que hiciste con un merge. Al final, subilo.",
-        "Creá `bebidas.md` desde el panel Archivos cuando estés en la rama. Los comandos son:\n```\ngit clone {repoUrl}\ngit checkout -b bebidas\ngit add .\ngit commit -m \"agrego bebidas\"\ngit checkout main\ngit merge bebidas\ngit push\n```"
+        "Creá `bebidas.md` desde el panel Archivos cuando estés en la rama. Los comandos son:\n```\ngit clone {repoUrl}\ncd interactive-git\ngit checkout -b bebidas\ngit add .\ngit commit -m \"agrego bebidas\"\ngit checkout main\ngit merge bebidas\ngit push\n```"
       ]
     }
   },
@@ -440,6 +446,9 @@
     "Cloning into '{folder}'...": "Clonando en '{folder}'...",
     "remote: Counting objects: 100% ({count}/{count}), done.": "remote: Contando objetos: 100% ({count}/{count}), listo.",
     "Receiving objects: 100% ({count}/{count}), done.": "Recibiendo objetos: 100% ({count}/{count}), listo.",
+    "usage: cd <directory>": "uso: cd <carpeta>",
+    "cd: {name}: Not a directory": "cd: {name}: No es un directorio",
+    "cd: {name}: No such file or directory": "cd: {name}: No existe el archivo o el directorio",
     "usage: cat <file>": "uso: cat <archivo>",
     "cat: {name}: No such file or directory": "cat: {name}: No existe el archivo o el directorio",
     "usage: touch <file>": "uso: touch <archivo>",
@@ -480,7 +489,7 @@
     "usage: git init": "uso: git init",
     "Turn the folder you are in into a git repository.": "Convierte la carpeta en la que estás en un repositorio de git.",
     "usage: git clone <url>": "uso: git clone <url>",
-    "Copy a repository from a server, with all of its history.": "Trae una copia de un repositorio del servidor, con toda su historia.",
+    "Copy a repository from a server into a new folder, with all of its history.": "Trae una copia de un repositorio del servidor a una carpeta nueva, con toda su historia.",
     "usage: git status": "uso: git status",
     "Show what is staged, what is not, and which files git is not tracking.": "Muestra qué está en el stage, qué no, y qué archivos git no está trackeando.",
     "usage: git add [-A | --all] <pathspec>...": "uso: git add [-A | --all] <ruta>...",

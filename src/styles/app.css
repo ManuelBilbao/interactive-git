@@ -982,6 +982,10 @@ button.reset {
   justify-content: space-between;
 }
 
+.file.folder .file-name {
+  color: var(--ink-2);
+}
+
 .file-name {
   font-family: var(--mono);
   font-size: 12.5px;

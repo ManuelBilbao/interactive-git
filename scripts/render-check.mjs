@@ -78,6 +78,10 @@ const cases = [
   ['detached HEAD', () => play(lesson('branch').setup(), ['git checkout C1'])],
   ['cloned repository with a remote', () => lesson('push').setup()],
   [
+    'cloned, but not walked into yet',
+    () => play(lesson('clone').setup(), ['git clone https://github.com/ManuelBilbao/interactive-git.git']),
+  ],
+  [
     'conflict in progress',
     () => {
       const world = play(lesson('checkoutB').setup(), [

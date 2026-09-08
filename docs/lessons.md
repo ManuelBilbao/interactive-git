@@ -25,6 +25,12 @@ El curso está armado en cinco bloques:
 
 Hay dos decisiones de fondo detrás de ese orden.
 
+**`clone` no te mete adentro.** Crea la carpeta y te deja afuera, igual que en
+git de verdad, así que hace falta un `cd`. Es de las cosas que más se olvidan, y
+el simulador no la regala: después de clonar, `git status` sigue diciendo que ahí
+no hay repositorio, `ls` muestra la carpeta nueva, y de ahí se sale con `cd`. La
+lección 10 lo pide explícitamente en el objetivo.
+
 **El remoto no va primero.** Casi todos los tutoriales meten `git clone` en el
 primer minuto, y el resultado es que se aprende a copiar comandos antes de
 entender qué es un commit. Acá el servidor recién aparece cuando el ciclo
@@ -50,7 +56,7 @@ las dos cosas al mismo tiempo.
 | 7 | `branch` | `git branch` | Crear una rama sin moverse de `main`. |
 | 8 | `checkout` | `git checkout` | Pasarse a otra rama y ver que cambian los archivos. |
 | 9 | `checkoutB` | `git checkout -b` | Crear una rama, saltar a ella y commitear ahí. |
-| 10 | `clone` | `git clone` | Traer un repositorio del servidor. |
+| 10 | `clone` | `git clone` | Traer un repositorio del servidor y entrar en la carpeta. |
 | 11 | `push` | `git push` | Subir un commit propio. |
 | 12 | `pull` | `git pull` | Bajar el commit que subió otra persona. |
 | 13 | `merge` | `git merge` | Un merge que es un fast-forward. |
