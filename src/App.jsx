@@ -5,6 +5,7 @@ import GraphView from './components/GraphView.jsx'
 import LessonPanel from './components/LessonPanel.jsx'
 import Terminal from './components/Terminal.jsx'
 import { run } from './engine/commands/index.js'
+import { currentBranch } from './engine/model.js'
 import { useI18n } from './i18n/index.jsx'
 import { LESSONS } from './lessons/index.js'
 import { lessonFromUrl, loadProgress, saveProgress, writeLessonToUrl } from './storage.js'
@@ -136,11 +137,20 @@ export default function App() {
         </div>
         <div className="header-actions">
           <div className="progress">
-            <span className="progress-track">
-              <span
-                className="progress-fill"
-                style={{ width: `${(completed.size / LESSONS.length) * 100}%` }}
-              />
+            {/* One tick per lesson, so the shape of the course is visible. */}
+            <span className="progress-ticks" aria-hidden="true">
+              {LESSONS.map((item, position) => (
+                <span
+                  key={item.id}
+                  className={
+                    completed.has(item.id)
+                      ? 'tick done'
+                      : position === index
+                        ? 'tick current'
+                        : 'tick'
+                  }
+                />
+              ))}
             </span>
             <span>{t('nav.progress', { done: completed.size, total: LESSONS.length })}</span>
           </div>
@@ -176,6 +186,8 @@ export default function App() {
 
         <Terminal
           entries={entries}
+          folder={world.folder}
+          branch={world.repo ? currentBranch(world.repo) : null}
           onSubmit={handleCommand}
           onClear={() => setEntries([])}
         />

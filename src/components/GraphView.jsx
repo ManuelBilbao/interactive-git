@@ -6,7 +6,7 @@ function RefChips({ refs }) {
   return refs.map((ref) => (
     <g key={ref.name} transform={`translate(${ref.x}, ${ref.y})`}>
       <rect className={`ref ref-${ref.kind}`} width={ref.width} height={CHIP_HEIGHT} rx={4} />
-      <text className={`ref-text ref-text-${ref.kind}`} x={8} y={15}>
+      <text className={`ref-text ref-text-${ref.kind}`} x={7} y={14.5}>
         {ref.name}
       </text>
     </g>

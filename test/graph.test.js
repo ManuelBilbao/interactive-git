@@ -114,3 +114,16 @@ test('an empty repository lays out without blowing up', () => {
   const layout = layoutGraph(lesson('status').setup().repo)
   assert.deepEqual(layout.nodes, [])
 })
+
+test('a ref chip clears the circle it belongs to', () => {
+  for (const repo of everyRepo()) {
+    for (const node of layoutGraph(repo).nodes) {
+      for (const ref of node.refs) {
+        assert.ok(
+          ref.y > node.y + 17,
+          `the ${ref.name} chip on ${node.id} overlaps the commit circle`,
+        )
+      }
+    }
+  }
+})

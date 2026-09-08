@@ -200,6 +200,33 @@ commit with two parents.
 Conflicts are not part of any lesson goal, but they are fully implemented, so a
 student who wanders into one can get out the same way they would in real life.
 
+## Look and feel
+
+`src/styles/app.css` is the whole design, in one file with no framework. Five
+decisions carry it, and they are worth keeping if you extend the interface:
+
+- **Three surfaces, deliberately different.** Paper white for the lesson you
+  read, near-black for the terminal you work in, white panels for the reference
+  views. The terminal is the one region with no card around it — the dark
+  surface sits straight on the page, which is what separates working from
+  reading. Uniform cards everywhere was what made an earlier pass look like a
+  bootstrapped admin panel.
+- **Hairlines, not shadows.** Panels are a 1px warm line and a 4px radius.
+  Callouts — the goal, a hint, the note — are a 2px rule down the left rather
+  than a tinted box.
+- **Monospace is the chrome.** Panel titles, buttons, badges, commit ids, file
+  names, the lesson counter. The proportional face is kept for prose. It reads
+  as a developer tool, and it puts the interface in the same voice as the
+  commands being taught.
+- **One accent.** git's orange marks what is live: the current lesson, the goal,
+  the hint, the merge commit. Primary buttons are ink-black instead, so orange,
+  green and red stay free to mean something — live, staged, not staged.
+- **Progress is one tick per lesson**, not a percentage bar, so the shape of the
+  course is visible at a glance.
+
+The terminal's title doubles as a shell prompt — `proyecto ⎇ main` — which
+keeps the current branch on screen even when the graph is scrolled away.
+
 ## Drawing the graph
 
 `components/graphLayout.js` turns a repo into coordinates.

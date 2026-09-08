@@ -7,7 +7,9 @@
 //
 // Each commit carries two labels. The message sits on the commit's own line,
 // right after the circle, which is the order `git log --oneline` prints them
-// in. The refs pointing at it go on the line below, tucked under the circle.
+// in. The refs pointing at it go on the lines below, indented to line up with
+// the message: everything about one commit forms a single block, clear of the
+// line that joins the commits, and never floating halfway to its neighbour.
 //
 // That split is also the narrowest arrangement: the message and the chips each
 // take a line of their own instead of competing for one, and the chips stack
@@ -27,24 +29,25 @@ const MIN_ROW_HEIGHT = 62
 const PADDING = 18
 const CHIP_OFFSET = NODE_RADIUS + 12
 const MESSAGE_BASELINE = 4
-const CHIP_TOP = 12
+// Far enough below the centre to clear the circle itself, not just its centre.
+const CHIP_TOP = NODE_RADIUS + 5
 const CHIP_STEP = CHIP_HEIGHT + 4
 // 18 characters shows every message the course writes in full except the two
 // `Merge branch ...` ones, which git generates and which the tooltip carries.
 const MESSAGE_MAX_CHARS = 18
 
 // Rough advance widths. They only have to be close enough to reserve space.
-const CHIP_CHAR_WIDTH = 7
+const CHIP_CHAR_WIDTH = 6.4
 const MESSAGE_CHAR_WIDTH = 5.95
 
 // The gaps leave room for the radius of the node in the next row or column,
 // so a label can never touch the circle beside or below it.
 const COLUMN_GAP = NODE_RADIUS + 18
-const ROW_GAP = NODE_RADIUS + 10
+const ROW_GAP = NODE_RADIUS + 4
 
 /** Width of a ref chip, kept here so the layout and the view agree on it. */
 export function chipWidth(name) {
-  return name.length * CHIP_CHAR_WIDTH + 16
+  return name.length * CHIP_CHAR_WIDTH + 14
 }
 
 /** Commit messages are shown in full in the tooltip, so here they can be cut. */
@@ -109,9 +112,7 @@ function extent(refs, messageWidth) {
     right: Math.max(
       NODE_RADIUS,
       CHIP_OFFSET + messageWidth,
-      // Chips start under the circle's left edge, so only the part that runs
-      // past the node counts towards the column width.
-      widest - NODE_RADIUS,
+      refs.length > 0 ? CHIP_OFFSET + widest : 0,
     ),
     down:
       refs.length > 0
@@ -163,10 +164,10 @@ export function layoutGraph(repo) {
 
   const nodes = commits.map((commit) => {
     const { x, y } = position(commit.id)
-    // Chips stack downwards on the lines below the commit.
+    // Chips stack downwards, lined up with the message above them.
     const placed = refs.get(commit.id).map((ref, position) => ({
       ...ref,
-      x: x - NODE_RADIUS,
+      x: x + CHIP_OFFSET,
       y: y + CHIP_TOP + position * CHIP_STEP,
       width: chipWidth(ref.name),
     }))

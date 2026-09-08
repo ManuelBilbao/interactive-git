@@ -27,7 +27,7 @@ function AnsiLine({ text }) {
   })
 }
 
-export default function Terminal({ entries, onSubmit, onClear }) {
+export default function Terminal({ entries, folder, branch, onSubmit, onClear }) {
   const { t, tList } = useI18n()
   const [draft, setDraft] = useState('')
   const [recalled, setRecalled] = useState(null)
@@ -66,11 +66,22 @@ export default function Terminal({ entries, onSubmit, onClear }) {
     <section className="panel terminal-panel">
       <h2 className="panel-title">
         {t('terminal.title')}
-        {entries.length > 0 && (
-          <button type="button" className="tiny ghost" onClick={onClear}>
-            {t('terminal.clear')}
-          </button>
-        )}
+        <span className="terminal-meta">
+          <span className="terminal-where">
+            {folder}
+            {branch && (
+              <>
+                {' '}
+                <b>⎇ {branch}</b>
+              </>
+            )}
+          </span>
+          {entries.length > 0 && (
+            <button type="button" className="tiny ghost" onClick={onClear}>
+              {t('terminal.clear')}
+            </button>
+          )}
+        </span>
       </h2>
       <div className="terminal" onClick={() => inputRef.current?.focus()} role="presentation">
         <div className="terminal-welcome">

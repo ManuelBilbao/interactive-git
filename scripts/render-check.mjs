@@ -104,6 +104,8 @@ for (const [name, build] of cases) {
       wrap(h(FilesPanel, { world, onEdit() {}, onCreate() {}, onDelete() {} })),
       wrap(
         h(Terminal, {
+          folder: 'proyecto',
+          branch: 'main',
           entries: [
             { key: 1, type: 'command', text: 'git status' },
             { key: 2, type: 'error', text: 'fatal: not a git repository' },
