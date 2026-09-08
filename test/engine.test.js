@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
+import { stripAnsi } from '../src/ansi.js'
 import { run } from '../src/engine/commands/index.js'
 import { createRepo, createWorld, headCommitId, writeCommit } from '../src/engine/model.js'
 import { computeStatus } from '../src/engine/status.js'
@@ -261,7 +262,7 @@ test('pull brings the server commits and merges them', () => {
 
 test('branch -a lists remote-tracking branches', () => {
   const world = play(worldWithRemote(), 'git clone https://github.com/curso/proyecto.git')
-  const listed = run(world, 'git branch -a').output.lines
+  const listed = run(world, 'git branch -a').output.lines.map(stripAnsi)
   assert.deepEqual(listed, ['* main', '  remotes/origin/main'])
 })
 

@@ -1,6 +1,7 @@
 // `git branch`, `git checkout` and `git merge`: everything about moving and
 // joining lines of work.
 
+import { green, red } from '../../ansi.js'
 import { gitError } from '../errors.js'
 import {
   ancestors,
@@ -27,9 +28,13 @@ export function gitBranch(world, args) {
   if (names.length === 0) {
     const lines = Object.keys(repo.branches)
       .sort()
-      .map((name) => (name === currentBranch(repo) ? `* ${name}` : `  ${name}`))
+      .map((name) => (name === currentBranch(repo) ? green(`* ${name}`) : `  ${name}`))
     if (showAll) {
-      lines.push(...Object.keys(repo.remoteTracking).sort().map((name) => `  remotes/${name}`))
+      lines.push(
+        ...Object.keys(repo.remoteTracking)
+          .sort()
+          .map((name) => red(`  remotes/${name}`)),
+      )
     }
     if (lines.length === 0) return []
     return lines

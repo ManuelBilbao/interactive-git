@@ -454,6 +454,35 @@ h3 {
   color: var(--terminal-error);
 }
 
+/* Colours git asks for through ANSI codes, mapped onto the dark terminal. */
+.ansi-red {
+  color: #ff8a80;
+}
+
+.ansi-green {
+  color: #7ee787;
+}
+
+.ansi-yellow {
+  color: #e3b341;
+}
+
+.ansi-blue {
+  color: #79c0ff;
+}
+
+.ansi-magenta {
+  color: #d2a8ff;
+}
+
+.ansi-cyan {
+  color: #56d4dd;
+}
+
+.ansi-bold {
+  font-weight: 700;
+}
+
 .terminal-input {
   display: flex;
   gap: 8px;

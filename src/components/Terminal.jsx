@@ -1,8 +1,31 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 
+import { parseAnsi } from '../ansi.js'
 import { useI18n } from '../i18n/index.jsx'
 import HintCard from './HintCard.jsx'
 import RichText from './RichText.jsx'
+
+/** Renders one line of command output, honouring the colours git asked for. */
+function AnsiLine({ text }) {
+  const segments = parseAnsi(text)
+  // A non-breaking space keeps git's blank separator lines visible.
+  if (segments.length === 0) return '\u00a0'
+
+  return segments.map((segment, position) => {
+    const classes = [segment.color && `ansi-${segment.color}`, segment.bold && 'ansi-bold']
+      .filter(Boolean)
+      .join(' ')
+    // Segments have no identity of their own, so position is the only key.
+    const key = `${position}-${segment.text}`
+    return classes === '' ? (
+      <Fragment key={key}>{segment.text}</Fragment>
+    ) : (
+      <span key={key} className={classes}>
+        {segment.text}
+      </span>
+    )
+  })
+}
 
 export default function Terminal({ entries, hint, onSubmit }) {
   const { t, tList } = useI18n()
@@ -50,8 +73,7 @@ export default function Terminal({ entries, hint, onSubmit }) {
         </div>
         {entries.map((entry) => (
           <pre key={entry.key} className={`terminal-line terminal-${entry.type}`}>
-            {/* A non-breaking space keeps git's blank separator lines visible. */}
-            {entry.type === 'command' ? `$ ${entry.text}` : entry.text || '\u00a0'}
+            {entry.type === 'command' ? `$ ${entry.text}` : <AnsiLine text={entry.text} />}
           </pre>
         ))}
         <form className="terminal-input" onSubmit={submit}>

@@ -1,5 +1,6 @@
 // The staging area: `git status`, `git add` and `git restore`.
 
+import { green, red } from '../../ansi.js'
 import { gitError } from '../errors.js'
 import { ancestors, currentBranch, headCommitId, headTree } from '../model.js'
 import { computeStatus, formatEntry } from '../status.js'
@@ -62,7 +63,7 @@ export function gitStatus(world, args) {
   if (status.staged.length > 0) {
     lines.push('', 'Changes to be committed:')
     lines.push('  (use "git restore --staged <file>..." to unstage)')
-    lines.push(...status.staged.map(formatEntry))
+    lines.push(...status.staged.map((entry) => green(formatEntry(entry))))
   }
 
   if (onlyStaged) {
@@ -76,20 +77,20 @@ export function gitStatus(world, args) {
   if (status.conflicted.length > 0) {
     lines.push('', 'Unmerged paths:')
     lines.push('  (use "git add <file>..." to mark resolution)')
-    lines.push(...status.conflicted.map((name) => `\tboth modified:   ${name}`))
+    lines.push(...status.conflicted.map((name) => red(`\tboth modified:   ${name}`)))
   }
 
   if (status.notStaged.length > 0) {
     lines.push('', 'Changes not staged for commit:')
     lines.push('  (use "git add <file>..." to update what will be committed)')
     lines.push('  (use "git restore <file>..." to discard changes in working directory)')
-    lines.push(...status.notStaged.map(formatEntry))
+    lines.push(...status.notStaged.map((entry) => red(formatEntry(entry))))
   }
 
   if (status.untracked.length > 0) {
     lines.push('', 'Untracked files:')
     lines.push('  (use "git add <file>..." to include in what will be committed)')
-    lines.push(...status.untracked.map((name) => `\t${name}`))
+    lines.push(...status.untracked.map((name) => red(`\t${name}`)))
   }
 
   lines.push('')

@@ -102,6 +102,27 @@ will never see again. `test/i18n.test.js` walks the engine source for
 `'hint.*'` literals and fails when one has no translation, or when a
 translation is no longer used.
 
+## Colour
+
+Real git colours its output, and the colours carry meaning: in `git status`,
+green is "already staged", red is "not staged yet". Teaching the difference
+between the two is most of what lessons 3 to 6 are about, so the simulator emits
+the colour the same way git does — as ANSI escape codes inside the output
+string.
+
+`src/ansi.js` has both halves: `paint()` and its shorthands for the engine,
+`parseAnsi()` for the terminal component, which turns the codes back into
+spans, and `stripAnsi()` for tests that want the bare text.
+
+Keeping the codes inside plain strings means the engine's contract does not
+change: a command still returns `string[]`, and most assertions still read
+naturally. Where a test needs an exact match, it strips first.
+
+Colour is emitted in the three places git emits it: `git status` (staged green,
+unstaged and untracked red), `git branch` (current branch green, the server's
+branches red) and `git log` (commit ids yellow, `HEAD` cyan, branches green,
+remote branches red). Section headers stay uncoloured, as in real git.
+
 ## The working directory
 
 `engine/workdir.js` holds the checks git performs before it overwrites your

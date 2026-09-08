@@ -1,5 +1,6 @@
 // `git commit` and `git log`: writing history and reading it back.
 
+import { paint, yellow } from '../../ansi.js'
 import { gitError } from '../errors.js'
 import {
   currentBranch,
@@ -81,16 +82,19 @@ export function gitCommit(world, args) {
 
 /** Every ref that points at a commit, rendered as git's `(HEAD -> main)`. */
 function decorations(repo, commitId) {
+  const head = paint('HEAD', 'bold', 'cyan')
   const refs = []
   for (const [name, id] of Object.entries(repo.branches)) {
     if (id !== commitId) continue
-    refs.push(currentBranch(repo) === name ? `HEAD -> ${name}` : name)
+    const branch = paint(name, 'bold', 'green')
+    refs.push(currentBranch(repo) === name ? `${head} -> ${branch}` : branch)
   }
   for (const [name, id] of Object.entries(repo.remoteTracking)) {
-    if (id === commitId) refs.push(name)
+    if (id === commitId) refs.push(paint(name, 'bold', 'red'))
   }
-  if (repo.head.type === 'detached' && repo.head.commit === commitId) refs.unshift('HEAD')
-  return refs.length > 0 ? ` (${refs.join(', ')})` : ''
+  if (repo.head.type === 'detached' && repo.head.commit === commitId) refs.unshift(head)
+  if (refs.length === 0) return ''
+  return `${yellow(' (')}${refs.join(yellow(', '))}${yellow(')')}`
 }
 
 export function gitLog(world, args) {
@@ -107,9 +111,9 @@ export function gitLog(world, args) {
   const lines = []
   for (const commit of commits) {
     if (oneline) {
-      lines.push(`${commit.id}${decorations(repo, commit.id)} ${commit.message}`)
+      lines.push(`${yellow(commit.id)}${decorations(repo, commit.id)} ${commit.message}`)
     } else {
-      lines.push(`commit ${commit.id}${decorations(repo, commit.id)}`)
+      lines.push(`${yellow(`commit ${commit.id}`)}${decorations(repo, commit.id)}`)
       if (commit.parents.length > 1) lines.push(`Merge: ${commit.parents.join(' ')}`)
       lines.push('', `    ${commit.message}`, '')
     }

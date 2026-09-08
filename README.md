@@ -46,6 +46,7 @@ hacer con el panel **Archivos**, que hace las veces de editor de texto.
 
 ```
 src/
+  ansi.js            colores: el motor los emite, la terminal los pinta
   engine/            el simulador de git (no sabe nada de React)
     model.js         el "mundo": archivos, repositorio local, remoto
     status.js        la comparación entre commit, stage y carpeta
