@@ -47,31 +47,30 @@ function upstreamHeadline(repo) {
 
 export function gitStatus(world, args) {
   const repo = world.repo
-  const status = computeStatus(world)
-  const onlyStaged = args.includes('--staged')
-  const lines = []
+  const unknown = args.find((arg) => arg.startsWith('-'))
+  if (unknown) {
+    throw gitError(
+      [
+        `error: unknown option \`${unknown.replace(/^-+/, '')}'`,
+        'usage: git status [--] <pathspec>...',
+      ].join('\n'),
+      'hint.statusUnknownOption',
+      { name: unknown },
+    )
+  }
 
-  if (!onlyStaged) {
-    lines.push(branchHeadline(repo))
-    const upstream = upstreamHeadline(repo)
-    if (upstream) lines.push(upstream)
-    if (!headCommitId(repo) && repo.head.type === 'branch') {
-      lines.push('', 'No commits yet')
-    }
+  const status = computeStatus(world)
+  const lines = [branchHeadline(repo)]
+  const upstream = upstreamHeadline(repo)
+  if (upstream) lines.push(upstream)
+  if (!headCommitId(repo) && repo.head.type === 'branch') {
+    lines.push('', 'No commits yet')
   }
 
   if (status.staged.length > 0) {
     lines.push('', 'Changes to be committed:')
     lines.push('  (use "git restore --staged <file>..." to unstage)')
     lines.push(...status.staged.map((entry) => green(formatEntry(entry))))
-  }
-
-  if (onlyStaged) {
-    if (status.staged.length === 0) {
-      lines.push('No changes staged for commit.')
-      lines.push('  (use "git add <file>..." to stage changes)')
-    }
-    return lines
   }
 
   if (status.conflicted.length > 0) {

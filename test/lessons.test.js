@@ -15,7 +15,7 @@ const SOLUTIONS = {
   cycle: [
     'echo "Milanesas" >> recetas.md',
     'git add recetas.md',
-    'git status --staged',
+    'git status',
     'git commit -m "agrego milanesas"',
   ],
   restore: ['git restore --staged recetas.md', 'git restore recetas.md'],

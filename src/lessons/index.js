@@ -101,7 +101,7 @@ export const LESSONS = [
   },
   {
     id: 'cycle',
-    commands: ['git status --staged', 'git add', 'git commit -m'],
+    commands: ['git status', 'git add', 'git commit -m'],
     setup: () => {
       const world = createWorld()
       localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
@@ -110,7 +110,7 @@ export const LESSONS = [
     check: (world, history) =>
       Object.keys(world.repo.commits).length >= 2 &&
       isClean(world) &&
-      ran(history, /^git\s+status\s+--staged\s*$/),
+      ran(history, /^git\s+status\s*$/),
   },
   {
     id: 'restore',

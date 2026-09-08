@@ -222,9 +222,6 @@ on demand.
 
 These are deliberate, and worth knowing before extending the project:
 
-- **`git status --staged` is not a real git flag.** It was requested for the
-  course as a way to look at the staging area on its own; real git's closest
-  equivalent is `git diff --staged`. The `cycle` lesson says so in a note.
 - There is one folder and no subdirectories; file names are flat strings.
 - Merging compares whole file contents, not lines, so any two different versions
   of a file conflict. Good enough to teach what a conflict *is*.

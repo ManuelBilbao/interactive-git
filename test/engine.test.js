@@ -49,8 +49,10 @@ test('status reports untracked, staged and modified files', () => {
   world = play(world, 'git commit -m "a"', 'echo "cambio" > a.txt')
   assert.deepEqual(computeStatus(world).notStaged, [{ name: 'a.txt', change: 'modified' }])
 
-  const staged = run(world, 'git status --staged').output.lines.join('\n')
-  assert.match(staged, /No changes staged for commit/)
+  // `--staged` is not a real `git status` flag, so it is refused like git does.
+  const refused = fails(world, 'git status --staged')
+  assert.match(refused.lines[0], /unknown option/)
+  assert.equal(refused.hintKey, 'hint.statusUnknownOption')
 })
 
 test('restore unstages and discards changes', () => {

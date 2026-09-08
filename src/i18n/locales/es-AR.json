@@ -114,7 +114,8 @@
     "unknownCommand": "`{name}` no es un comando. Escribí `help` para ver la lista completa.",
     "unknownCommandDidYouMean": "`{name}` no es un comando. ¿Quisiste escribir `{suggestion}`?",
     "gitHelp": "Comandos de git que podés usar acá:\n\ngit init      convierte la carpeta en un repositorio\ngit clone     trae un repositorio del servidor\ngit status    muestra qué cambió y qué está en el stage\ngit add       pone cambios en el stage\ngit restore   deshace cambios (con --staged, saca del stage)\ngit commit    guarda lo que está en el stage\ngit log       muestra la historia\ngit branch    lista o crea ramas (-a incluye las del servidor)\ngit checkout  te mueve de rama (-b crea una nueva)\ngit merge     trae el trabajo de otra rama\ngit push      sube tus commits al servidor\ngit pull      baja los commits del servidor",
-    "shellHelp": "Comandos de git: git init, git clone, git status, git add, git restore, git commit, git log, git branch, git checkout, git merge, git push, git pull.\nEscribí `git` solo para ver qué hace cada uno.\n\nComandos de la terminal: ls, cat, touch, rm, echo, pwd, clear.\n\nTambién podés crear y editar archivos desde el panel Archivos, sin usar la terminal."
+    "shellHelp": "Comandos de git: git init, git clone, git status, git add, git restore, git commit, git log, git branch, git checkout, git merge, git push, git pull.\nEscribí `git` solo para ver qué hace cada uno.\n\nComandos de la terminal: ls, cat, touch, rm, echo, pwd, clear.\n\nTambién podés crear y editar archivos desde el panel Archivos, sin usar la terminal.",
+    "statusUnknownOption": "`git status` no lleva esa opción. Escribilo a secas: la sección `Changes to be committed`, en verde, es justamente lo que ya está en el stage."
   },
   "lessons": {
     "init": {
@@ -175,16 +176,15 @@
       "intro": [
         "Ya tenés un commit. De acá en adelante el trabajo es siempre el mismo ciclo: **editás → `git add` → `git commit`**.",
         "Editá `recetas.md` desde el panel Archivos, o con `echo \"Milanesas\" >> recetas.md` en la terminal.",
-        "`git status --staged` te muestra solo lo que ya está en el stage, sin el resto del ruido."
+        "En el medio mirá `git status`, que ahora tiene colores: el archivo aparece en **rojo** mientras el cambio está solo en tu carpeta, y en **verde** una vez que lo pusiste en el stage. Ese cambio de color es todo el ciclo resumido."
       ],
-      "goal": "Modificá `recetas.md`, mirá el stage con `git status --staged` y guardá un segundo commit.",
+      "goal": "Modificá `recetas.md`, mirá con `git status` cómo pasa de rojo a verde, y guardá un segundo commit.",
       "hints": [
         "Primero cambiá el archivo: usá el botón Editar del panel Archivos.",
-        "`git add recetas.md`",
-        "Antes de guardar, mirá qué quedó adentro: `git status --staged`",
+        "Mirá `git status`: `recetas.md` aparece en rojo, bajo `Changes not staged for commit`.",
+        "Ponelo en el stage con `git add recetas.md` y volvé a mirar `git status`: ahora está en verde.",
         "`git commit -m \"agrego milanesas\"`"
-      ],
-      "note": "`git status --staged` es una ayuda de este simulador para mirar solo el stage. En git de verdad la forma más parecida de ver lo mismo es `git diff --staged`."
+      ]
     },
     "restore": {
       "title": "Deshacer sin miedo",

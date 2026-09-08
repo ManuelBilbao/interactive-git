@@ -204,6 +204,22 @@ try {
   await wait(150)
   await type('git status')
   await check('an edit from the files panel shows as modified', (await terminal()).includes('modified:'), terminal)
+
+  // Colour carries the meaning lessons 3 to 6 are built on, so check it lands
+  // in the DOM and not just in the output string.
+  const painted = (colour) =>
+    evaluate(
+      `return [...document.querySelectorAll('.ansi-${colour}')].some(
+         (node) => node.textContent.includes('recetas.md'))`,
+    )
+  await check('an unstaged change is red', await painted('red'))
+  await type('git add recetas.md')
+  await type('git status')
+  await check('a staged change is green', await painted('green'))
+
+  await type('git status --staged')
+  await check('`git status --staged` is refused', (await terminal()).includes('unknown option'), terminal)
+  await check('and the hint points at the green section', (await hint()).includes('stage'), hint)
 } finally {
   socket.close()
   await cleanUp()

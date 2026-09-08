@@ -32,7 +32,7 @@ funciona tal cual en GitHub Pages o en cualquier carpeta de un servidor.
 
 Diecisiete lecciones, en orden, sobre estos comandos:
 
-`git init`, `git clone`, `git status [--staged]`, `git add`,
+`git init`, `git clone`, `git status`, `git add`,
 `git restore [--staged]`, `git commit -m`, `git branch [-a]`,
 `git checkout [-b]`, `git merge`, `git push [-u]`, `git pull`.
 

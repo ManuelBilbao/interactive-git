@@ -31,7 +31,7 @@ recién aparece cuando el ciclo *editar → add → commit* ya está incorporado
 | 2 | `status` | `git status` | Correr `git status` y ver un archivo *untracked*. |
 | 3 | `add` | `git add` | Poner dos archivos en el stage. |
 | 4 | `commit` | `git commit -m` | Hacer el primer commit. |
-| 5 | `cycle` | `git status --staged`, `git add`, `git commit -m` | Modificar un archivo y guardarlo en un segundo commit. |
+| 5 | `cycle` | `git status`, `git add`, `git commit -m` | Modificar un archivo y verlo pasar de rojo a verde antes de commitear. |
 | 6 | `restore` | `git restore`, `git restore --staged` | Dejar todo limpio sin hacer ningún commit. |
 | 7 | `branch` | `git branch` | Crear una rama sin moverse de `main`. |
 | 8 | `checkout` | `git checkout` | Pasarse a otra rama y ver que cambian los archivos. |
@@ -50,6 +50,11 @@ recién aparece cuando el ciclo *editar → add → commit* ya está incorporado
 **El stage antes que el commit (3 y 4).** El stage es lo que más cuesta y es lo
 que más se saltea. Separarlo en dos lecciones obliga a mirar `git status` en el
 medio, con los archivos ya en `Changes to be committed` pero todavía sin commit.
+
+**Los colores hacen el trabajo pesado (5).** `git status` pinta de rojo lo que
+todavía está solo en tu carpeta y de verde lo que ya está en el stage, igual que
+git de verdad. La lección 5 se apoya en eso: el ciclo entero se ve como un
+archivo que pasa de rojo a verde y después desaparece de la lista.
 
 **Deshacer temprano (6).** Si alguien no sabe cómo volver atrás, no experimenta.
 La lección arranca con el repositorio ya ensuciado —una línea a medio escribir en
@@ -97,16 +102,15 @@ Aparte de eso, cada lección tiene pistas propias, que se piden de a una con el
 botón **Pedir una pista** y van de lo general a lo concreto: la última siempre
 dice el comando exacto. Nadie se queda trabado, pero hay que decidir pedir ayuda.
 
-## Nota sobre `git status --staged`
+## Por qué no está `git status --staged`
 
-`--staged` **no existe** en `git status` de verdad. Está en el simulador porque
-se pidió para el curso, como una forma de mirar solo el stage sin el ruido del
-resto. El equivalente más cercano en git real es `git diff --staged`, que muestra
-el contenido de esos cambios en vez de la lista de archivos.
-
-La lección 5 lo aclara en una nota, así que nadie se lleva la idea equivocada. Si
-preferís sacarlo, es un cambio chico: el flag se maneja en `gitStatus`
-(`src/engine/commands/staging.js`), y la lección 5 lo pide en su `check`.
+Porque no existe en git. Se probó como atajo para mirar solo el stage y se sacó:
+enseñar un flag inventado confunde más de lo que ayuda, y los colores de
+`git status` ya muestran esa diferencia sin agregar nada. Si alguien lo escribe,
+el simulador responde con el mismo `error: unknown option` que git, y la tarjeta
+de ayuda lo manda a leer la sección verde. En git real, lo más parecido es
+`git diff --staged`, que muestra el contenido de los cambios en vez de la lista
+de archivos.
 
 ## Ideas para el aula
 
