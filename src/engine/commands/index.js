@@ -111,10 +111,11 @@ export function run(world, line) {
     if (shellCommand) return { world: next, output: result(shellCommand(next, args)) }
 
     const suggestion = closest(name, [...Object.keys(SHELL_COMMANDS), 'git', 'clear', 'help'])
-    throw gitError(`bash: ${name}: command not found`, 'hint.unknownCommand', {
-      name,
-      suggestion,
-    })
+    throw gitError(
+      `bash: ${name}: command not found`,
+      suggestion ? 'hint.unknownCommandDidYouMean' : 'hint.unknownCommand',
+      { name, suggestion },
+    )
   } catch (error) {
     if (error instanceof GitError) {
       return {

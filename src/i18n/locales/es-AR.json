@@ -1,0 +1,354 @@
+{
+  "app": {
+    "title": "Git interactivo",
+    "subtitle": "Aprendé los comandos básicos de git escribiéndolos",
+    "language": "Idioma"
+  },
+  "nav": {
+    "lessons": "Lecciones",
+    "lesson": "Lección {number} de {total}",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "reset": "Reiniciar lección",
+    "resetProgress": "Borrar todo el progreso",
+    "progress": "{done} de {total} completadas",
+    "open": "Ver lecciones",
+    "close": "Cerrar"
+  },
+  "lesson": {
+    "goal": "Objetivo",
+    "commands": "Comandos de esta lección",
+    "hint": "Pedir una pista",
+    "hintTitle": "Pista {number}",
+    "noMoreHints": "No quedan más pistas. Probá reiniciar la lección y volver a empezar.",
+    "note": "Nota",
+    "solved": "¡Objetivo cumplido!",
+    "next": "Siguiente lección",
+    "finished": "Terminaste el curso",
+    "finishedBody": "Ya conocés los comandos con los que se trabaja todos los días. Reiniciá cualquier lección cuando quieras volver a practicar."
+  },
+  "terminal": {
+    "title": "Terminal",
+    "placeholder": "Escribí un comando y apretá Enter",
+    "welcome": [
+      "Escribí los comandos acá, igual que en una terminal de verdad.",
+      "`help` te muestra todo lo que podés usar."
+    ],
+    "hintTitle": "Qué pasó",
+    "clear": "Limpiar"
+  },
+  "files": {
+    "title": "Archivos",
+    "empty": "La carpeta está vacía.",
+    "new": "Nuevo archivo",
+    "namePlaceholder": "nombre.md",
+    "create": "Crear",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "save": "Guardar",
+    "delete": "Borrar",
+    "contentPlaceholder": "Escribí el contenido del archivo",
+    "legend": "Los cambios que hagas acá son iguales a editar el archivo con un editor de texto: git no se entera hasta que hagas `git add`.",
+    "duplicate": "Ya existe un archivo con ese nombre."
+  },
+  "state": {
+    "untracked": "sin trackear",
+    "staged": "en el stage",
+    "modified": "modificado",
+    "deleted": "borrado",
+    "conflict": "en conflicto",
+    "committed": "guardado"
+  },
+  "graph": {
+    "title": "Historia",
+    "local": "Tu repositorio",
+    "remote": "origin (el servidor)",
+    "noRepo": "Todavía no hay repositorio. Creá uno con `git init` o traé uno con `git clone`.",
+    "noCommits": "Todavía no hay commits.",
+    "noRemote": "No hay ningún servidor en esta lección.",
+    "merging": "Merge a medio terminar: resolvé los conflictos, hacé `git add` y después `git commit`."
+  },
+  "hint": {
+    "notARepo": "Esta carpeta todavía no es un repositorio de git. Creá uno con `git init`, o traé uno que ya exista con `git clone <url>`.",
+    "unclosedQuote": "Te quedó una comilla abierta. Fijate que cada comilla tenga su par.",
+    "cloneNeedsUrl": "A `git clone` hay que decirle de dónde clonar: `git clone <url>`.",
+    "cloneOverExisting": "Acá ya hay un repositorio. `git clone` se usa cuando todavía no tenés nada.",
+    "cloneUnknownUrl": "No existe ningún repositorio en {url}. Revisá que la URL esté escrita igual que en el enunciado.",
+    "addNeedsPath": "`git add` necesita saber qué archivo poner en el stage: `git add recetas.md`, o `git add .` para todos los cambios.",
+    "pathspecNotFound": "No hay ningún archivo llamado `{name}` en la carpeta. Mirá los nombres exactos con `ls` o en el panel Archivos.",
+    "restoreNeedsPath": "`git restore` necesita el nombre del archivo: `git restore <archivo>`, o `git restore --staged <archivo>` para sacarlo del stage.",
+    "restoreUntracked": "`{name}` nunca entró al stage ni a un commit, así que git no tiene ninguna versión anterior para devolverte.",
+    "commitWithConflicts": "Hay archivos en conflicto. Editalos, borrá las marcas `<<<<<<<`, `=======` y `>>>>>>>`, y marcalos como resueltos con `git add <archivo>`.",
+    "commitNeedsMessage": "Todo commit lleva un mensaje que explica qué cambiaste: `git commit -m \"lo que hiciste\"`.",
+    "commitEmptyMessage": "Después de `-m` va el mensaje, entre comillas.",
+    "commitNothingStaged": "No hay nada en el stage, así que no hay nada para guardar. Poné los cambios con `git add <archivo>` y volvé a intentar.",
+    "logWithoutCommits": "Todavía no hiciste ningún commit, así que no hay historia para mostrar.",
+    "branchExists": "Ya existe una rama llamada `{name}`. Elegí otro nombre, o pasate a esa con `git checkout {name}`.",
+    "branchWithoutCommits": "Una rama es una etiqueta que apunta a un commit, y todavía no hay ninguno. Hacé el primer commit y después creá la rama.",
+    "branchDeleteNeedsName": "Decile qué rama borrar: `git branch -d <nombre>`.",
+    "branchNotFound": "No existe ninguna rama `{name}`. Listá las que hay con `git branch`.",
+    "branchDeleteCurrent": "No podés borrar la rama en la que estás parado. Pasate a otra con `git checkout main` y recién ahí borrala.",
+    "branchNotMerged": "`{name}` tiene commits que no están en ninguna otra rama: si la borrás, se pierden. Mergeala primero, o forzá con `git branch -D {name}` si de verdad no la querés.",
+    "checkoutNeedsTarget": "`git checkout` necesita a dónde ir: una rama, un commit, o `-b <nombre>` para crear una rama nueva y saltar a ella.",
+    "checkoutUnknownRef": "No hay ninguna rama ni commit que se llame `{name}`. Mirá las ramas con `git branch` y los commits con `git log --oneline`.",
+    "dirtyTree": "Tenés cambios sin guardar en archivos que este `{operation}` necesita pisar. Guardalos con un commit, o descartalos con `git restore <archivo>`.",
+    "untrackedClobber": "Hay archivos en tu carpeta que git no está siguiendo y que este `{operation}` pisaría. Movelos o borralos antes de seguir.",
+    "mergeInProgress": "Quedó un merge a medio terminar. Resolvé los conflictos, hacé `git add` de esos archivos y cerralo con `git commit`.",
+    "mergeNeedsBranch": "Decile a `git merge` qué rama traer: `git merge <rama>`.",
+    "mergeUnknownBranch": "No existe la rama `{name}`. Listá las que tenés con `git branch -a`.",
+    "mergeWithoutCommits": "Todavía no hay ningún commit en esta rama, así que no hay dónde traer el trabajo.",
+    "unrelatedHistories": "Estas dos historias no tienen ningún commit en común, así que git no sabe por dónde empezar a combinarlas.",
+    "noRemote": "Este repositorio no tiene ningún servidor asociado. En el curso el remoto aparece cuando hacés `git clone`.",
+    "pushDetached": "Estás parado en un commit suelto, no en una rama, así que no hay ninguna rama para subir. Volvé con `git checkout main`.",
+    "pushNothingToPush": "No existe una rama local `{name}` para subir. Listá las que tenés con `git branch`.",
+    "pushRejected": "En el servidor hay commits que vos no tenés. Traelos con `git pull` y después volvé a hacer `git push`.",
+    "pullNoUpstream": "La rama `{name}` todavía no está asociada a ninguna rama del servidor. Subila una primera vez con `git push -u origin {name}`.",
+    "pullUnknownBranch": "El servidor no tiene ninguna rama `{name}`.",
+    "catNeedsFile": "`cat` muestra el contenido de un archivo: `cat recetas.md`.",
+    "touchNeedsFile": "`touch` crea un archivo vacío: `touch notas.md`.",
+    "rmNeedsFile": "`rm` borra un archivo: `rm notas.md`.",
+    "noSuchFile": "No hay ningún archivo llamado `{name}`. Listá lo que hay con `ls`.",
+    "redirectNeedsFile": "Después de `>` va el nombre del archivo: `echo \"hola\" > notas.md`.",
+    "unknownGitCommand": "`{name}` no es un comando de git. Escribí `git` solo para ver los que podés usar acá.",
+    "unknownGitCommandDidYouMean": "`{name}` no existe. ¿Quisiste escribir `git {suggestion}`?",
+    "unknownCommand": "`{name}` no es un comando. Escribí `help` para ver la lista completa.",
+    "unknownCommandDidYouMean": "`{name}` no es un comando. ¿Quisiste escribir `{suggestion}`?",
+    "gitHelp": "Comandos de git que podés usar acá:\n\ngit init      convierte la carpeta en un repositorio\ngit clone     trae un repositorio del servidor\ngit status    muestra qué cambió y qué está en el stage\ngit add       pone cambios en el stage\ngit restore   deshace cambios (con --staged, saca del stage)\ngit commit    guarda lo que está en el stage\ngit log       muestra la historia\ngit branch    lista o crea ramas (-a incluye las del servidor)\ngit checkout  te mueve de rama (-b crea una nueva)\ngit merge     trae el trabajo de otra rama\ngit push      sube tus commits al servidor\ngit pull      baja los commits del servidor",
+    "shellHelp": "Comandos de git: git init, git clone, git status, git add, git restore, git commit, git log, git branch, git checkout, git merge, git push, git pull.\nEscribí `git` solo para ver qué hace cada uno.\n\nComandos de la terminal: ls, cat, touch, rm, echo, pwd, clear.\n\nTambién podés crear y editar archivos desde el panel Archivos, sin usar la terminal."
+  },
+  "lessons": {
+    "init": {
+      "title": "Crear un repositorio",
+      "intro": [
+        "Tenés una carpeta con un archivo adentro. Es una carpeta común y silvestre: git todavía no sabe que existe.",
+        "`git init` la convierte en un **repositorio**. Lo que hace es crear una carpeta oculta `.git`, donde git va a guardar toda la historia del proyecto.",
+        "Ojo con esto: `git init` no guarda ningún archivo. Solo prepara el terreno."
+      ],
+      "goal": "Convertí la carpeta en un repositorio de git.",
+      "hints": [
+        "El comando es literalmente `git init`, sin nada más.",
+        "Escribilo en la terminal y apretá Enter."
+      ]
+    },
+    "status": {
+      "title": "Ver en qué anda el repositorio",
+      "intro": [
+        "`git status` es el comando que más vas a usar en tu vida. Te dice en qué rama estás parado, qué cambios están listos para el próximo commit y cuáles no.",
+        "Un archivo que git nunca vio se llama **untracked** (sin trackear). Aparece en una sección aparte, porque git no lo va a guardar hasta que vos se lo pidas.",
+        "Cada vez que no sepas qué está pasando, `git status`. Siempre."
+      ],
+      "goal": "Corré `git status` y mirá cómo aparece `recetas.md`.",
+      "hints": [
+        "Escribí `git status` tal cual.",
+        "Fijate en la sección `Untracked files`: ahí está `recetas.md`."
+      ]
+    },
+    "add": {
+      "title": "Poner cambios en el stage",
+      "intro": [
+        "Entre tu carpeta y la historia del proyecto hay un lugar intermedio: el **stage**. Ahí vas armando el próximo commit, archivo por archivo.",
+        "`git add <archivo>` copia el estado actual de ese archivo al stage. `git add .` agrega todo lo que haya cambiado en la carpeta.",
+        "El stage existe para que puedas elegir qué entra en cada commit y qué queda para el siguiente."
+      ],
+      "goal": "Poné `recetas.md` y `compras.md` en el stage.",
+      "hints": [
+        "Podés hacerlo en dos pasos: `git add recetas.md` y después `git add compras.md`.",
+        "O de una sola vez: `git add .`",
+        "Revisá con `git status`: los dos tienen que aparecer bajo `Changes to be committed`."
+      ]
+    },
+    "commit": {
+      "title": "Guardar el primer commit",
+      "intro": [
+        "Un **commit** es una foto de todo lo que está en el stage, con un mensaje que explica qué cambiaste.",
+        "Los commits son la unidad de la historia: cada uno apunta al anterior, y esa cadena es lo que ves en el panel Historia.",
+        "El mensaje va entre comillas, después de `-m`."
+      ],
+      "goal": "Hacé el primer commit del proyecto. Los archivos ya están en el stage.",
+      "hints": [
+        "`git commit -m \"primer commit\"`",
+        "El mensaje puede decir cualquier cosa, pero conviene que describa el cambio."
+      ]
+    },
+    "cycle": {
+      "title": "El ciclo de todos los días",
+      "intro": [
+        "Ya tenés un commit. De acá en adelante el trabajo es siempre el mismo ciclo: **editás → `git add` → `git commit`**.",
+        "Editá `recetas.md` desde el panel Archivos, o con `echo \"Milanesas\" >> recetas.md` en la terminal.",
+        "`git status --staged` te muestra solo lo que ya está en el stage, sin el resto del ruido."
+      ],
+      "goal": "Modificá `recetas.md`, mirá el stage con `git status --staged` y guardá un segundo commit.",
+      "hints": [
+        "Primero cambiá el archivo: usá el botón Editar del panel Archivos.",
+        "`git add recetas.md`",
+        "Antes de guardar, mirá qué quedó adentro: `git status --staged`",
+        "`git commit -m \"agrego milanesas\"`"
+      ],
+      "note": "`git status --staged` es una ayuda de este simulador para mirar solo el stage. En git de verdad la forma más parecida de ver lo mismo es `git diff --staged`."
+    },
+    "restore": {
+      "title": "Deshacer sin miedo",
+      "intro": [
+        "Alguien dejó basura en `recetas.md`, y además ya había puesto una línea a medio escribir en el stage. Nada de eso está en un commit, así que se puede deshacer.",
+        "`git restore --staged <archivo>` lo saca del stage, pero **no toca** lo que tenés escrito en la carpeta.",
+        "`git restore <archivo>` sí pisa el archivo con la versión que hay en el stage. Eso borra lo que hayas escrito y no hay forma de recuperarlo."
+      ],
+      "goal": "Dejá el repositorio limpio otra vez, sin hacer ningún commit.",
+      "hints": [
+        "Primero sacalo del stage: `git restore --staged recetas.md`",
+        "Después descartá los cambios del archivo: `git restore recetas.md`",
+        "`git status` tiene que terminar diciendo `nothing to commit, working tree clean`."
+      ]
+    },
+    "branch": {
+      "title": "Ramas: trabajar en paralelo",
+      "intro": [
+        "Un **branch** (rama) es una etiqueta que apunta a un commit. Nada más que eso. Por eso crear una es instantáneo y no cuesta nada.",
+        "`git branch <nombre>` crea la etiqueta donde estás parado, pero no te mueve: seguís en `main`.",
+        "`git branch` sin nada lista las ramas, y el asterisco marca en cuál estás."
+      ],
+      "goal": "Creá una rama llamada `postres`, sin moverte de `main`.",
+      "hints": [
+        "`git branch postres`",
+        "Comprobá con `git branch`: tenés que ver `* main` y `postres` debajo."
+      ]
+    },
+    "checkout": {
+      "title": "Moverte entre ramas",
+      "intro": [
+        "`git checkout <rama>` te para en otra rama: mueve el puntero `HEAD` y **cambia los archivos de tu carpeta** para que coincidan con esa rama.",
+        "Este repositorio tiene una rama `postres` con un archivo que `main` no tiene.",
+        "Pasate y mirá el panel Archivos: los archivos aparecen y desaparecen solos."
+      ],
+      "goal": "Pasate a la rama `postres`.",
+      "hints": [
+        "`git checkout postres`",
+        "Después del checkout, fijate cómo apareció `postres.md` en la carpeta."
+      ]
+    },
+    "checkoutB": {
+      "title": "Crear una rama y saltar en un solo paso",
+      "intro": [
+        "`git checkout -b <nombre>` hace dos cosas juntas: crea la rama y te para en ella. Es lo que vas a usar casi siempre.",
+        "La idea es no tocar `main` mientras trabajás: hacés tus commits en una rama aparte y después los traés.",
+        "Creá la rama `bebidas`, agregá un archivo `bebidas.md` y hacé un commit ahí. Vas a ver que `main` se queda donde estaba."
+      ],
+      "goal": "Creá la rama `bebidas`, pasate a ella y hacé un commit que agregue `bebidas.md`.",
+      "hints": [
+        "`git checkout -b bebidas`",
+        "Creá el archivo con el botón Nuevo archivo, o con `echo \"Limonada\" > bebidas.md`.",
+        "Cerrá con `git add bebidas.md` y `git commit -m \"agrego bebidas\"`."
+      ]
+    },
+    "merge": {
+      "title": "Merge: traer el trabajo de otra rama",
+      "intro": [
+        "`git merge <rama>` trae los commits de esa rama a la rama donde estás parado ahora.",
+        "Acá `main` no se movió desde que salió `postres`, así que git no necesita inventar nada: adelanta la etiqueta `main` hasta donde está `postres` y listo.",
+        "Eso se llama **fast-forward**, y es el merge más simple que existe."
+      ],
+      "goal": "Estando en `main`, traé el trabajo de la rama `postres`.",
+      "hints": [
+        "Chequeá dónde estás parado con `git status`.",
+        "`git merge postres`"
+      ]
+    },
+    "mergeDiverged": {
+      "title": "Merge con la historia dividida",
+      "intro": [
+        "Ahora las dos ramas avanzaron por su cuenta: `main` tiene la lista de compras y `postres` tiene el flan.",
+        "Git ya no puede adelantar una etiqueta, porque cada rama tiene algo que la otra no. Entonces crea un **commit de merge**: un commit con dos padres, que junta las dos historias.",
+        "Cuando termines, mirá el grafo: vas a ver el commit nuevo con dos flechas saliendo hacia atrás."
+      ],
+      "goal": "Estando en `main`, hacé el merge de `postres`.",
+      "hints": [
+        "`git merge postres`",
+        "Si `git status` no dice `On branch main`, primero `git checkout main`."
+      ]
+    },
+    "clone": {
+      "title": "Clonar un repositorio que ya existe",
+      "intro": [
+        "Hasta acá todo pasó en tu computadora. Ahora aparece un segundo repositorio: el que vive en el servidor. Git lo llama **origin**.",
+        "`git clone <url>` se baja todo: los commits, las ramas y la historia completa. Y te deja la copia lista para trabajar.",
+        "El repositorio del curso está en `https://github.com/curso/recetas.git`."
+      ],
+      "goal": "Cloná el repositorio del curso.",
+      "hints": [
+        "`git clone https://github.com/curso/recetas.git`",
+        "Cuando termine, mirá los dos paneles de Historia: tenés la misma cadena de commits de los dos lados."
+      ]
+    },
+    "push": {
+      "title": "Push: subir tus commits",
+      "intro": [
+        "Un commit vive solo en tu computadora hasta que lo subas. `git push` manda los commits de tu rama al servidor y mueve la rama de allá.",
+        "La etiqueta `origin/main` es la memoria de git: marca dónde estaba `main` en el servidor la última vez que se hablaron.",
+        "Si el push nunca sale, tu trabajo no existe para nadie más que para vos."
+      ],
+      "goal": "Hacé un commit y subilo al servidor.",
+      "hints": [
+        "Editá `recetas.md` desde el panel Archivos.",
+        "`git add recetas.md` y después `git commit -m \"agrego milanesas\"`.",
+        "`git push`",
+        "Mirá cómo `origin/main` se mueve junto con `main`."
+      ]
+    },
+    "pull": {
+      "title": "Pull: bajar lo que hicieron otros",
+      "intro": [
+        "Mientras vos no mirabas, alguien más subió un commit al servidor. Tu repositorio no se entera solo: git nunca habla con el servidor si vos no se lo pedís.",
+        "`git pull` hace dos cosas: baja lo que hay en el servidor y lo mergea en la rama donde estás parado.",
+        "Conviene hacerlo antes de empezar a trabajar, para arrancar desde lo último."
+      ],
+      "goal": "Traé a tu repositorio el commit que subió tu compañera.",
+      "hints": [
+        "`git pull`",
+        "Cuando termine, abrí `recetas.md` y fijate que aparezca la receta nueva."
+      ]
+    },
+    "pushRejected": {
+      "title": "Cuando el push te lo rechazan",
+      "intro": [
+        "Este es el error más común de todos, y te va a pasar mil veces: vos hiciste un commit, pero en el servidor hay otro commit que vos no tenés.",
+        "Git rechaza el push. No es que esté roto: es que no puede decidir por vos cómo se combinan las dos historias.",
+        "Probá `git push` primero para ver el error entero. No rompe nada."
+      ],
+      "goal": "Conseguí que tu commit llegue al servidor.",
+      "hints": [
+        "Probá `git push` y leé el error: dice `[rejected]` y `fetch first`.",
+        "Traé lo de afuera con `git pull`: baja el commit del servidor y lo mergea con el tuyo.",
+        "Ahora sí: `git push`."
+      ]
+    },
+    "branchAll": {
+      "title": "Ramas locales y ramas del servidor",
+      "intro": [
+        "Las ramas que creás son tuyas: el servidor no se entera de que existen hasta que las subas.",
+        "`git push -u origin <rama>` la sube y además la deja asociada, así la próxima vez alcanza con `git push` a secas.",
+        "`git branch -a` lista todas: las tuyas arriba y las del servidor abajo, con el prefijo `remotes/origin/`."
+      ],
+      "goal": "Subí la rama `postres` al servidor y después listá todas las ramas.",
+      "hints": [
+        "`git push -u origin postres`",
+        "`git branch -a`",
+        "Ahora `postres` aparece dos veces: la tuya y `remotes/origin/postres`."
+      ]
+    },
+    "final": {
+      "title": "Todo junto",
+      "intro": [
+        "Último nivel: el flujo completo, igual que en un proyecto de verdad.",
+        "Cloná el repositorio, hacé el trabajo en una rama aparte, traelo a `main` con un merge y subilo.",
+        "Sin pistas paso a paso esta vez. Si te trabás, `git status` te va a decir dónde estás."
+      ],
+      "goal": "Cloná el repositorio, creá la rama `bebidas` con un commit que agregue `bebidas.md`, mergeala a `main` y hacé push.",
+      "hints": [
+        "Arrancá clonando: `git clone https://github.com/curso/recetas.git`",
+        "`git checkout -b bebidas`, creá el archivo, `git add`, `git commit -m \"...\"`.",
+        "Volvé con `git checkout main` y traé el trabajo con `git merge bebidas`.",
+        "Cerrá con `git push`."
+      ]
+    }
+  }
+}

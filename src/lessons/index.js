@@ -1,0 +1,342 @@
+// The course: an ordered list of levels.
+//
+// A lesson is three things:
+//   - `setup`, which builds the world the student starts from,
+//   - `check`, which decides whether the goal was reached,
+//   - `commands`, the commands it introduces (shown as chips in the sidebar).
+//
+// All of its text lives in the locale files under `lessons.<id>.*`, so a new
+// language never requires touching this file.
+
+import {
+  createRepo,
+  createWorld,
+  currentBranch,
+  headCommitId,
+  writeCommit,
+} from '../engine/model.js'
+import { computeStatus, isClean } from '../engine/status.js'
+
+const REMOTE_URL = 'https://github.com/curso/recetas.git'
+
+/** Adds a commit to a repository and moves the branch that points at it. */
+function seed(world, repo, branch, message, tree) {
+  const parents = repo.branches[branch] ? [repo.branches[branch]] : []
+  const id = writeCommit(world, repo, { parents, message, tree })
+  repo.branches[branch] = id
+  return id
+}
+
+/** A local repository with `main` checked out and the given commits applied. */
+function localRepo(world, commits) {
+  const repo = createRepo({ head: { type: 'branch', name: 'main' } })
+  world.repo = repo
+  for (const [message, tree] of commits) seed(world, repo, 'main', message, tree)
+  const tree = commits.length > 0 ? commits.at(-1)[1] : {}
+  repo.index = { ...tree }
+  world.files = { ...tree }
+  return repo
+}
+
+/** A world whose server already holds a repository, ready to be cloned. */
+function remoteRepo(world, commits) {
+  const repo = createRepo({ head: { type: 'branch', name: 'main' } })
+  world.remote = repo
+  world.remoteUrl = REMOTE_URL
+  for (const [message, tree] of commits) seed(world, repo, 'main', message, tree)
+  return repo
+}
+
+/** True when the student ran a command matching `pattern`. */
+function ran(history, pattern) {
+  return history.some((line) => pattern.test(line))
+}
+
+const RECIPE = '# Recetas\n\nTortilla de papas'
+const RECIPE_V2 = '# Recetas\n\nTortilla de papas\nÑoquis del 29'
+
+export const LESSONS = [
+  {
+    id: 'init',
+    commands: ['git init'],
+    setup: () => createWorld({ files: { 'recetas.md': RECIPE } }),
+    check: (world) => world.repo !== null,
+  },
+  {
+    id: 'status',
+    commands: ['git status'],
+    setup: () => {
+      const world = createWorld({ files: { 'recetas.md': RECIPE } })
+      localRepo(world, [])
+      world.files = { 'recetas.md': RECIPE }
+      return world
+    },
+    check: (_world, history) => ran(history, /^git\s+status\s*$/),
+  },
+  {
+    id: 'add',
+    commands: ['git add'],
+    setup: () => {
+      const world = createWorld()
+      localRepo(world, [])
+      world.files = { 'recetas.md': RECIPE, 'compras.md': 'papas\nhuevos' }
+      return world
+    },
+    check: (world) => {
+      const status = computeStatus(world)
+      return status.untracked.length === 0 && status.staged.length === 2
+    },
+  },
+  {
+    id: 'commit',
+    commands: ['git commit -m'],
+    setup: () => {
+      const world = createWorld()
+      const repo = localRepo(world, [])
+      world.files = { 'recetas.md': RECIPE, 'compras.md': 'papas\nhuevos' }
+      repo.index = { ...world.files }
+      return world
+    },
+    check: (world) => headCommitId(world.repo) !== null && isClean(world),
+  },
+  {
+    id: 'cycle',
+    commands: ['git status --staged', 'git add', 'git commit -m'],
+    setup: () => {
+      const world = createWorld()
+      localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      return world
+    },
+    check: (world, history) =>
+      Object.keys(world.repo.commits).length >= 2 &&
+      isClean(world) &&
+      ran(history, /^git\s+status\s+--staged\s*$/),
+  },
+  {
+    id: 'restore',
+    commands: ['git restore', 'git restore --staged'],
+    setup: () => {
+      const world = createWorld()
+      const repo = localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      // The student arrives with a change already staged and another one not.
+      repo.index = { 'recetas.md': `${RECIPE}\nAsado (sin receta todavía)` }
+      world.files = { 'recetas.md': `${RECIPE}\nAsado (sin receta todavía)\nfsdklfjsd` }
+      return world
+    },
+    check: (world, history) =>
+      isClean(world) &&
+      Object.keys(world.repo.commits).length === 1 &&
+      ran(history, /^git\s+restore\b/),
+  },
+  {
+    id: 'branch',
+    commands: ['git branch'],
+    setup: () => {
+      const world = createWorld()
+      localRepo(world, [
+        ['primeras recetas', { 'recetas.md': RECIPE }],
+        ['agrego ñoquis', { 'recetas.md': RECIPE_V2 }],
+      ])
+      return world
+    },
+    check: (world) =>
+      Object.hasOwn(world.repo.branches, 'postres') && currentBranch(world.repo) === 'main',
+  },
+  {
+    id: 'checkout',
+    commands: ['git checkout'],
+    setup: () => {
+      const world = createWorld()
+      const repo = localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      repo.branches.postres = repo.branches.main
+      seed(world, repo, 'postres', 'flan', {
+        'recetas.md': RECIPE,
+        'postres.md': 'Flan casero',
+      })
+      return world
+    },
+    check: (world) => currentBranch(world.repo) === 'postres',
+  },
+  {
+    id: 'checkoutB',
+    commands: ['git checkout -b'],
+    setup: () => {
+      const world = createWorld()
+      localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      return world
+    },
+    check: (world) => {
+      const repo = world.repo
+      return (
+        currentBranch(repo) === 'bebidas' &&
+        repo.branches.bebidas !== undefined &&
+        repo.branches.bebidas !== repo.branches.main
+      )
+    },
+  },
+  {
+    id: 'merge',
+    commands: ['git merge'],
+    setup: () => {
+      const world = createWorld()
+      const repo = localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      repo.branches.postres = repo.branches.main
+      seed(world, repo, 'postres', 'flan', {
+        'recetas.md': RECIPE,
+        'postres.md': 'Flan casero',
+      })
+      return world
+    },
+    check: (world) =>
+      world.repo.branches.main === world.repo.branches.postres &&
+      currentBranch(world.repo) === 'main',
+  },
+  {
+    id: 'mergeDiverged',
+    commands: ['git merge'],
+    setup: () => {
+      const world = createWorld()
+      const repo = localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      repo.branches.postres = repo.branches.main
+      seed(world, repo, 'postres', 'flan', {
+        'recetas.md': RECIPE,
+        'postres.md': 'Flan casero',
+      })
+      seed(world, repo, 'main', 'lista de compras', {
+        'recetas.md': RECIPE,
+        'compras.md': 'papas\nhuevos',
+      })
+      world.files = { ...repo.commits[repo.branches.main].tree }
+      repo.index = { ...world.files }
+      return world
+    },
+    check: (world) => {
+      const head = world.repo.commits[headCommitId(world.repo)]
+      return Boolean(head) && head.parents.length === 2
+    },
+  },
+  {
+    id: 'clone',
+    commands: ['git clone'],
+    setup: () => {
+      const world = createWorld()
+      remoteRepo(world, [
+        ['primeras recetas', { 'recetas.md': RECIPE }],
+        ['agrego ñoquis', { 'recetas.md': RECIPE_V2 }],
+      ])
+      return world
+    },
+    check: (world) => world.repo !== null && Object.hasOwn(world.files, 'recetas.md'),
+  },
+  {
+    id: 'push',
+    commands: ['git push'],
+    setup: () => {
+      const world = createWorld()
+      const remote = remoteRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      cloneInto(world, remote)
+      return world
+    },
+    check: (world) =>
+      Object.keys(world.remote.commits).length > 1 &&
+      world.remote.branches.main === world.repo.branches.main,
+  },
+  {
+    id: 'pull',
+    commands: ['git pull'],
+    setup: () => {
+      const world = createWorld()
+      const remote = remoteRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      cloneInto(world, remote)
+      // A teammate pushed while the student was away.
+      seed(world, remote, 'main', 'agrego ñoquis', { 'recetas.md': RECIPE_V2 })
+      return world
+    },
+    check: (world) =>
+      world.repo.branches.main === world.remote.branches.main &&
+      world.files['recetas.md'] === RECIPE_V2,
+  },
+  {
+    id: 'pushRejected',
+    commands: ['git pull', 'git push'],
+    setup: () => {
+      const world = createWorld()
+      const remote = remoteRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      cloneInto(world, remote)
+      seed(world, remote, 'main', 'agrego ñoquis', { 'recetas.md': RECIPE_V2 })
+      // ...and the student already committed something of their own.
+      const repo = world.repo
+      seed(world, repo, 'main', 'lista de compras', {
+        'recetas.md': RECIPE,
+        'compras.md': 'papas\nhuevos',
+      })
+      world.files = { ...repo.commits[repo.branches.main].tree }
+      repo.index = { ...world.files }
+      return world
+    },
+    check: (world) => world.remote.branches.main === world.repo.branches.main,
+  },
+  {
+    id: 'branchAll',
+    commands: ['git push -u', 'git branch -a'],
+    setup: () => {
+      const world = createWorld()
+      const remote = remoteRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      cloneInto(world, remote)
+      const repo = world.repo
+      repo.branches.postres = repo.branches.main
+      seed(world, repo, 'postres', 'flan', {
+        'recetas.md': RECIPE,
+        'postres.md': 'Flan casero',
+      })
+      return world
+    },
+    check: (world, history) =>
+      Object.hasOwn(world.remote.branches, 'postres') && ran(history, /^git\s+branch\s+-a\s*$/),
+  },
+  {
+    id: 'final',
+    commands: ['git clone', 'git checkout -b', 'git add', 'git commit -m', 'git merge', 'git push'],
+    setup: () => {
+      const world = createWorld()
+      remoteRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      return world
+    },
+    check: (world) => {
+      const repo = world.repo
+      if (!repo || !world.remote) return false
+      const head = repo.branches.main
+      const bebidas = repo.branches.bebidas
+      return (
+        Boolean(bebidas) &&
+        Object.hasOwn(world.files, 'bebidas.md') &&
+        currentBranch(repo) === 'main' &&
+        world.remote.branches.main === head &&
+        Object.keys(repo.commits).length >= 2 &&
+        isClean(world)
+      )
+    },
+  },
+]
+
+/** Reproduces what `git clone` does, for lessons that start after the clone. */
+function cloneInto(world, remote) {
+  const repo = createRepo({ head: { type: 'branch', name: 'main' } })
+  repo.commits = structuredClone(remote.commits)
+  repo.branches.main = remote.branches.main
+  for (const [name, id] of Object.entries(remote.branches)) {
+    repo.remoteTracking[`origin/${name}`] = id
+  }
+  repo.upstream.main = 'origin/main'
+  const tree = repo.commits[repo.branches.main].tree
+  repo.index = { ...tree }
+  world.files = { ...tree }
+  world.repo = repo
+  return repo
+}
+
+export const LESSON_IDS = LESSONS.map((lesson) => lesson.id)
+
+export function lessonAt(index) {
+  return LESSONS[Math.min(Math.max(index, 0), LESSONS.length - 1)]
+}
