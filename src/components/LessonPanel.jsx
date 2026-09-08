@@ -1,0 +1,125 @@
+import { useI18n } from '../i18n/index.jsx'
+import { LESSONS } from '../lessons/index.js'
+import RichText from './RichText.jsx'
+
+function LessonList({ current, completed, onSelect }) {
+  const { t } = useI18n()
+
+  return (
+    <details className="lesson-list">
+      <summary>
+        {t('nav.lessons')} · {t('nav.progress', { done: completed.size, total: LESSONS.length })}
+      </summary>
+      <ol>
+        {LESSONS.map((lesson, index) => (
+          <li key={lesson.id}>
+            <button
+              type="button"
+              className={index === current ? 'lesson-link current' : 'lesson-link'}
+              onClick={() => onSelect(index)}
+            >
+              <span className="lesson-number">{index + 1}</span>
+              <span>{t(`lessons.${lesson.id}.title`)}</span>
+              {completed.has(lesson.id) && <span className="check">✓</span>}
+            </button>
+          </li>
+        ))}
+      </ol>
+    </details>
+  )
+}
+
+export default function LessonPanel({
+  lesson,
+  index,
+  completed,
+  solved,
+  hintsShown,
+  onHint,
+  onSelect,
+  onReset,
+}) {
+  const { t, tList, has } = useI18n()
+  const key = `lessons.${lesson.id}`
+  const hints = tList(`${key}.hints`)
+  const isLast = index === LESSONS.length - 1
+
+  return (
+    <section className="panel lesson-panel">
+      <LessonList current={index} completed={completed} onSelect={onSelect} />
+
+      <p className="lesson-counter">
+        {t('nav.lesson', { number: index + 1, total: LESSONS.length })}
+      </p>
+      <h2 className="lesson-title">{t(`${key}.title`)}</h2>
+
+      {tList(`${key}.intro`).map((paragraph) => (
+        <RichText key={paragraph} text={paragraph} className="lesson-intro" />
+      ))}
+
+      <div className="lesson-goal">
+        <h3>{t('lesson.goal')}</h3>
+        <RichText text={t(`${key}.goal`)} />
+      </div>
+
+      <div className="lesson-commands">
+        <h3>{t('lesson.commands')}</h3>
+        <ul>
+          {lesson.commands.map((command) => (
+            <li key={command}>
+              <code>{command}</code>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {has(`${key}.note`) && (
+        <div className="lesson-note">
+          <h3>{t('lesson.note')}</h3>
+          <RichText text={t(`${key}.note`)} />
+        </div>
+      )}
+
+      <div className="lesson-hints">
+        {hints.slice(0, hintsShown).map((hint, position) => (
+          <div key={hint} className="hint">
+            <span className="hint-title">{t('lesson.hintTitle', { number: position + 1 })}</span>
+            <RichText text={hint} />
+          </div>
+        ))}
+        {hintsShown < hints.length ? (
+          <button type="button" onClick={onHint}>
+            {t('lesson.hint')}
+          </button>
+        ) : (
+          <p className="legend">{t('lesson.noMoreHints')}</p>
+        )}
+      </div>
+
+      {solved && (
+        <div className="lesson-solved">
+          <h3>{isLast ? t('lesson.finished') : t('lesson.solved')}</h3>
+          {isLast ? (
+            <p>{t('lesson.finishedBody')}</p>
+          ) : (
+            <button type="button" className="primary" onClick={() => onSelect(index + 1)}>
+              {t('lesson.next')} →
+            </button>
+          )}
+        </div>
+      )}
+
+      <div className="lesson-nav">
+        <button type="button" disabled={index === 0} onClick={() => onSelect(index - 1)}>
+          ← {t('nav.previous')}
+        </button>
+        <button type="button" onClick={onReset}>
+          {t('nav.reset')}
+        </button>
+        <button type="button" disabled={isLast} onClick={() => onSelect(index + 1)}>
+          {t('nav.next')} →
+        </button>
+      </div>
+    </section>
+  )
+}
