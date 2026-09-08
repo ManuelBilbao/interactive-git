@@ -31,6 +31,7 @@ await esbuild.build({
       export { default as GraphView } from './src/components/GraphView.jsx'
       export { default as FilesPanel } from './src/components/FilesPanel.jsx'
       export { default as Terminal } from './src/components/Terminal.jsx'
+      export { default as RichText } from './src/components/RichText.jsx'
       export { I18nProvider } from './src/i18n/index.jsx'
       export { run } from './src/engine/commands/index.js'
       export { LESSONS } from './src/lessons/index.js'
@@ -48,7 +49,7 @@ await esbuild.build({
 })
 
 const bundle = await import(`${outdir}/bundle.mjs`)
-const { App, GraphView, FilesPanel, Terminal, I18nProvider, run, LESSONS } = bundle
+const { App, GraphView, FilesPanel, Terminal, RichText, I18nProvider, run, LESSONS } = bundle
 
 const wrap = (element) => renderToString(h(I18nProvider, null, element))
 
@@ -109,6 +110,19 @@ for (const [name, build] of cases) {
     failures += 1
     console.error(`FAIL ${name}: ${error.message}`)
   }
+}
+
+// Lesson prose mixes the two bits of markdown the renderer supports, including
+// code inside a bold run.
+try {
+  const html = renderToString(h(RichText, { text: 'el ciclo: **editás → `git add`**, y listo' }))
+  if (!html.includes('<strong>')) throw new Error('bold was not rendered')
+  if (!html.includes('<code>git add</code>')) throw new Error('code inside bold was not rendered')
+  if (html.includes('`')) throw new Error('a backtick leaked into the output')
+  console.log('ok   rich text with code inside bold')
+} catch (error) {
+  failures += 1
+  console.error(`FAIL rich text: ${error.message}`)
 }
 
 try {
