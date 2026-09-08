@@ -2,7 +2,8 @@
   "app": {
     "title": "Git interactivo",
     "subtitle": "Aprendé los comandos básicos de git escribiéndolos",
-    "language": "Idioma"
+    "language": "Idioma",
+    "translateOutput": "Terminal en castellano"
   },
   "nav": {
     "lessons": "Lecciones",
@@ -141,7 +142,7 @@
       "goal": "Corré `git status` y mirá cómo aparece `recetas.md`.",
       "hints": [
         "Escribí `git status` tal cual.",
-        "Fijate en la sección `Untracked files`: ahí está `recetas.md`."
+        "Fijate en la sección `{gitUntracked}`: ahí está `recetas.md`."
       ]
     },
     "add": {
@@ -155,7 +156,7 @@
       "hints": [
         "Podés hacerlo en dos pasos: `git add recetas.md` y después `git add compras.md`.",
         "O de una sola vez: `git add .`",
-        "Revisá con `git status`: los dos tienen que aparecer bajo `Changes to be committed`."
+        "Revisá con `git status`: los dos tienen que aparecer bajo `{gitToBeCommitted}`."
       ]
     },
     "commit": {
@@ -181,7 +182,7 @@
       "goal": "Modificá `recetas.md`, mirá con `git status` cómo pasa de rojo a verde, y guardá un segundo commit.",
       "hints": [
         "Primero cambiá el archivo: usá el botón Editar del panel Archivos.",
-        "Mirá `git status`: `recetas.md` aparece en rojo, bajo `Changes not staged for commit`.",
+        "Mirá `git status`: `recetas.md` aparece en rojo, bajo `{gitNotStaged}`.",
         "Ponelo en el stage con `git add recetas.md` y volvé a mirar `git status`: ahora está en verde.",
         "`git commit -m \"agrego milanesas\"`"
       ]
@@ -197,7 +198,7 @@
       "hints": [
         "Primero sacalo del stage: `git restore --staged recetas.md`",
         "Después descartá los cambios del archivo: `git restore recetas.md`",
-        "`git status` tiene que terminar diciendo `nothing to commit, working tree clean`."
+        "`git status` tiene que terminar diciendo `{gitClean}`."
       ]
     },
     "branch": {
@@ -316,7 +317,7 @@
       ],
       "goal": "Conseguí que tu commit llegue al servidor.",
       "hints": [
-        "Probá `git push` y leé el error: dice `[rejected]` y `fetch first`.",
+        "Probá `git push` y leé el error entero: dice que el servidor rechazó el push y que primero traigas lo que hay allá.",
         "Traé lo de afuera con `git pull`: baja el commit del servidor y lo mergea con el tuyo.",
         "Ahora sí: `git push`."
       ]
@@ -350,5 +351,133 @@
         "Cerrá con `git push`."
       ]
     }
+  },
+  "git": {
+    "{count} file changed": "{count} archivo cambiado",
+    "{count} files changed": "{count} archivos cambiados",
+    "fatal: a branch named '{name}' already exists": "fatal: ya existe una rama llamada '{name}'",
+    "fatal: not a valid object name: '{name}'": "fatal: no es un nombre de objeto válido: '{name}'",
+    "fatal: branch name required": "fatal: falta el nombre de la rama",
+    "error: branch '{name}' not found.": "error: no se encontró la rama '{name}'.",
+    "error: Cannot delete branch '{name}' checked out at '/{folder}'": "error: No se puede borrar la rama '{name}', está activa en '/{folder}'",
+    "error: The branch '{name}' is not fully merged.": "error: La rama '{name}' no está completamente mergeada.",
+    "If you are sure you want to delete it, run 'git branch -D {name}'.": "Si estás seguro de querer borrarla, corré 'git branch -D {name}'.",
+    "Deleted branch {name} (was {commit}).": "Rama {name} borrada (estaba en {commit}).",
+    "error: you must specify a branch or commit to checkout": "error: tenés que indicar a qué rama o commit ir",
+    "Switched to a new branch '{name}'": "Cambiado a la rama nueva '{name}'",
+    "error: pathspec '{name}' did not match any file(s) known to git": "error: la ruta '{name}' no coincide con ningún archivo conocido por git",
+    "Switched to branch '{name}'": "Cambiado a la rama '{name}'",
+    "Your branch is up to date with '{upstream}'.": "Tu rama está actualizada con '{upstream}'.",
+    "Note: switching to '{name}'.": "Nota: cambiando a '{name}'.",
+    "You are in 'detached HEAD' state. You can look around, make experimental": "Estás en estado 'detached HEAD'. Podés mirar alrededor, hacer cambios",
+    "changes and commit them, and you can discard any commits you make in this": "experimentales y commitearlos, y podés descartar cualquier commit que hagas",
+    "state without impacting any branches by switching back to a branch.": "en este estado sin afectar ninguna rama, volviendo a una rama.",
+    "HEAD is now at {commit} {message}": "HEAD está ahora en {commit} {message}",
+    "fatal: You have not concluded your merge (MERGE_HEAD exists).": "fatal: No terminaste el merge (existe MERGE_HEAD).",
+    "Please, commit your changes before you merge.": "Hacé el commit de tus cambios antes de mergear.",
+    "fatal: No commit specified and merge.defaultToUpstream not set.": "fatal: No indicaste ningún commit y merge.defaultToUpstream no está configurado.",
+    "merge: {name} - not something we can merge": "merge: {name} - no es algo que podamos mergear",
+    "fatal: Non-fast-forward commit does not make sense into an empty head": "fatal: un commit que no es fast-forward no tiene sentido sobre un head vacío",
+    "Already up to date.": "Ya está actualizado.",
+    "Updating {from}..{to}": "Actualizando {from}..{to}",
+    "Fast-forward": "Fast-forward",
+    "fatal: refusing to merge unrelated histories": "fatal: me niego a mergear historias no relacionadas",
+    "Auto-merging {name}": "Merge automático de {name}",
+    "CONFLICT (content): Merge conflict in {name}": "CONFLICTO (contenido): conflicto de merge en {name}",
+    "Automatic merge failed; fix conflicts and then commit the result.": "El merge automático falló; arreglá los conflictos y después hacé el commit del resultado.",
+    "Merge made by the 'ort' strategy.": "Merge hecho con la estrategia 'ort'.",
+    "error: Committing is not possible because you have unmerged files.": "error: No se puede hacer el commit porque tenés archivos sin mergear.",
+    "hint: Fix them up in the work tree, and then use 'git add <file>'": "hint: Arreglalos en el directorio de trabajo y después usá 'git add <archivo>'",
+    "hint: as appropriate to mark resolution and make a commit.": "hint: para marcarlos como resueltos y hacer el commit.",
+    "fatal: Exiting because of an unresolved conflict.": "fatal: Saliendo por un conflicto sin resolver.",
+    "Aborting commit due to empty commit message.": "Abortando el commit porque el mensaje está vacío.",
+    "error: switch `m' requires a value": "error: la opción `m' necesita un valor",
+    "HEAD detached at {commit}": "HEAD desconectado en {commit}",
+    "root-commit": "commit-raíz",
+    "fatal: your current branch '{branch}' does not have any commits yet": "fatal: tu rama actual '{branch}' todavía no tiene ningún commit",
+    "Merge: {parents}": "Merge: {parents}",
+    "git: '{name}' is not a git command. See 'git --help'.": "git: '{name}' no es un comando de git. Mirá 'git --help'.",
+    "The most similar command is": "El comando más parecido es",
+    "fatal: not a git repository (or any of the parent directories): .git": "fatal: no es un repositorio git (ni ninguno de los directorios superiores): .git",
+    "bash: {name}: command not found": "bash: {name}: no se encontró el comando",
+    "fatal: No configured push destination.": "fatal: No hay ningún destino configurado para el push.",
+    "Please specify either a URL or a remote name from which": "Indicá una URL o el nombre de un remoto desde el cual",
+    "new revisions should be fetched.": "traer las revisiones nuevas.",
+    "fatal: You are not currently on a branch.": "fatal: No estás parado en ninguna rama.",
+    "error: src refspec {name} does not match any": "error: la referencia de origen {name} no coincide con ninguna",
+    "error: failed to push some refs to '{url}'": "error: falló el push de algunas referencias a '{url}'",
+    "Everything up-to-date": "Todo actualizado",
+    "To {url}": "A {url}",
+    " ! [rejected]        {branch} -> {branch} (fetch first)": " ! [rechazado]       {branch} -> {branch} (hacé fetch primero)",
+    "hint: Updates were rejected because the remote contains work that you do": "hint: Los cambios fueron rechazados porque el remoto tiene trabajo que vos",
+    "hint: not have locally. You may want to first integrate the remote changes": "hint: no tenés localmente. Conviene que primero integres los cambios del remoto",
+    "hint: (e.g., 'git pull') before pushing again.": "hint: (por ejemplo con 'git pull') antes de volver a hacer push.",
+    "Enumerating objects: {count}, done.": "Enumerando objetos: {count}, listo.",
+    " * [new branch]      {branch} -> {branch}": " * [rama nueva]      {branch} -> {branch}",
+    "branch '{name}' set up to track '{ref}'.": "la rama '{name}' quedó siguiendo a '{ref}'.",
+    "There is no tracking information for the current branch.": "No hay información de seguimiento para la rama actual.",
+    "Please specify which branch you want to merge with.": "Indicá con qué rama querés hacer el merge.",
+    "remote: Enumerating objects: {count}, done.": "remote: Enumerando objetos: {count}, listo.",
+    "From {url}": "Desde {url}",
+    " * [new branch]      {branch} -> {ref}": " * [rama nueva]      {branch} -> {ref}",
+    "fatal: couldn't find remote ref {name}": "fatal: no se encontró la referencia remota {name}",
+    "Reinitialized existing Git repository in /{folder}/.git/": "Reinicializado el repositorio Git existente en /{folder}/.git/",
+    "Initialized empty Git repository in /{folder}/.git/": "Inicializado un repositorio Git vacío en /{folder}/.git/",
+    "hint: Using '{branch}' as the name for the initial branch.": "hint: Usando '{branch}' como nombre de la rama inicial.",
+    "fatal: You must specify a repository to clone.": "fatal: Tenés que indicar qué repositorio clonar.",
+    "fatal: destination path '{folder}' already exists and is not an empty directory.": "fatal: la ruta de destino '{folder}' ya existe y no es un directorio vacío.",
+    "fatal: repository '{url}' does not exist": "fatal: el repositorio '{url}' no existe",
+    "Please make sure you have the correct access rights": "Asegurate de tener los permisos correctos",
+    "and the repository exists.": "y de que el repositorio exista.",
+    "Cloning into '{folder}'...": "Clonando en '{folder}'...",
+    "remote: Counting objects: 100% ({count}/{count}), done.": "remote: Contando objetos: 100% ({count}/{count}), listo.",
+    "Receiving objects: 100% ({count}/{count}), done.": "Recibiendo objetos: 100% ({count}/{count}), listo.",
+    "usage: cat <file>": "uso: cat <archivo>",
+    "cat: {name}: No such file or directory": "cat: {name}: No existe el archivo o el directorio",
+    "usage: touch <file>": "uso: touch <archivo>",
+    "usage: rm <file>": "uso: rm <archivo>",
+    "rm: {name}: No such file or directory": "rm: {name}: No existe el archivo o el directorio",
+    "bash: syntax error near unexpected token `newline'": "bash: error de sintaxis cerca del token inesperado `newline'",
+    "On branch {branch}": "En la rama {branch}",
+    "Your branch is ahead of '{upstream}' by {count} commit.": "Tu rama está adelantada a '{upstream}' por {count} commit.",
+    "Your branch is ahead of '{upstream}' by {count} commits.": "Tu rama está adelantada a '{upstream}' por {count} commits.",
+    "  (use \"git push\" to publish your local commits)": "  (usá \"git push\" para publicar tus commits locales)",
+    "Your branch is behind '{upstream}' by {count} commit, and can be fast-forwarded.": "Tu rama está atrasada respecto de '{upstream}' por {count} commit, y puede avanzar con fast-forward.",
+    "Your branch is behind '{upstream}' by {count} commits, and can be fast-forwarded.": "Tu rama está atrasada respecto de '{upstream}' por {count} commits, y puede avanzar con fast-forward.",
+    "  (use \"git pull\" to update your local branch)": "  (usá \"git pull\" para actualizar tu rama local)",
+    "Your branch and '{upstream}' have diverged,": "Tu rama y '{upstream}' divergieron,",
+    "and have {ahead} and {behind} different commits each, respectively.": "y tienen {ahead} y {behind} commits distintos cada una, respectivamente.",
+    "  (use \"git pull\" to merge the remote branch into yours)": "  (usá \"git pull\" para hacer el merge de la rama remota con la tuya)",
+    "error: unknown option `{name}'": "error: opción desconocida `{name}'",
+    "usage: git status [--] <pathspec>...": "uso: git status [--] <ruta>...",
+    "No commits yet": "Todavía no hay commits",
+    "Changes to be committed:": "Cambios listos para el commit:",
+    "  (use \"git restore --staged <file>...\" to unstage)": "  (usá \"git restore --staged <archivo>...\" para sacarlos del stage)",
+    "Unmerged paths:": "Rutas sin mergear:",
+    "  (use \"git add <file>...\" to mark resolution)": "  (usá \"git add <archivo>...\" para marcarlos como resueltos)",
+    "Changes not staged for commit:": "Cambios que no están en el stage:",
+    "  (use \"git add <file>...\" to update what will be committed)": "  (usá \"git add <archivo>...\" para agregarlos al próximo commit)",
+    "  (use \"git restore <file>...\" to discard changes in working directory)": "  (usá \"git restore <archivo>...\" para descartar los cambios del directorio de trabajo)",
+    "Untracked files:": "Archivos sin trackear:",
+    "  (use \"git add <file>...\" to include in what will be committed)": "  (usá \"git add <archivo>...\" para incluirlos en el próximo commit)",
+    "You have unmerged paths.": "Tenés rutas sin mergear.",
+    "no changes added to commit (use \"git add\" and/or \"git commit -a\")": "no agregaste ningún cambio al commit (usá \"git add\" y/o \"git commit -a\")",
+    "nothing added to commit but untracked files present (use \"git add\" to track)": "no agregaste nada al commit, pero hay archivos sin trackear (usá \"git add\" para trackearlos)",
+    "nothing to commit, working tree clean": "no hay nada para el commit, el directorio de trabajo está limpio",
+    "Nothing specified, nothing added.": "No indicaste nada, no se agregó nada.",
+    "hint: Maybe you wanted to say 'git add .'?": "hint: ¿Quisiste decir 'git add .'?",
+    "fatal: pathspec '{name}' did not match any files": "fatal: la ruta '{name}' no coincide con ningún archivo",
+    "fatal: you must specify path(s) to restore": "fatal: tenés que indicar qué archivo(s) restaurar",
+    "usage: git restore [--staged] <pathspec>...": "uso: git restore [--staged] <ruta>...",
+    "bash: unexpected EOF while looking for matching quote": "bash: fin de archivo inesperado buscando la comilla que cierra",
+    "new file:": "archivo nuevo:",
+    "modified:": "modificado:",
+    "deleted:": "borrado:",
+    "both modified:": "modificado por ambos:",
+    "error: Your local changes to the following files would be overwritten by {operation}:": "error: Tus cambios locales en estos archivos se perderían con el {operation}:",
+    "Please commit your changes or stash them before you {operation}.": "Hacé el commit de tus cambios o guardalos con stash antes del {operation}.",
+    "Aborting": "Abortando",
+    "error: The following untracked working tree files would be overwritten by {operation}:": "error: Estos archivos sin trackear se perderían con el {operation}:",
+    "Please move or remove them before you continue.": "Movelos o borralos antes de seguir."
   }
 }

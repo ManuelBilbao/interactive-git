@@ -1,6 +1,7 @@
 // `git init` and `git clone`: the two ways a repository comes into existence.
 
 import { gitError } from '../errors.js'
+import { msg } from '../messages.js'
 import {
   DEFAULT_BRANCH,
   REMOTE_NAME,
@@ -11,13 +12,13 @@ import {
 
 export function gitInit(world) {
   if (world.repo) {
-    return [`Reinitialized existing Git repository in /${world.folder}/.git/`]
+    return [msg('Reinitialized existing Git repository in /{folder}/.git/', { folder: world.folder })]
   }
   world.repo = createRepo({ head: { type: 'branch', name: DEFAULT_BRANCH } })
   return [
-    `Initialized empty Git repository in /${world.folder}/.git/`,
+    msg('Initialized empty Git repository in /{folder}/.git/', { folder: world.folder }),
     '',
-    `hint: Using '${DEFAULT_BRANCH}' as the name for the initial branch.`,
+    msg("hint: Using '{branch}' as the name for the initial branch.", { branch: DEFAULT_BRANCH }),
   ]
 }
 
@@ -25,23 +26,25 @@ export function gitClone(world, args) {
   const url = args[0]
   if (!url) {
     throw gitError(
-      'fatal: You must specify a repository to clone.',
+      msg('fatal: You must specify a repository to clone.'),
       'hint.cloneNeedsUrl',
     )
   }
   if (world.repo) {
     throw gitError(
-      `fatal: destination path '${world.folder}' already exists and is not an empty directory.`,
+      msg("fatal: destination path '{folder}' already exists and is not an empty directory.", {
+        folder: world.folder,
+      }),
       'hint.cloneOverExisting',
     )
   }
   if (!world.remote || (world.remoteUrl && url !== world.remoteUrl)) {
     throw gitError(
       [
-        `fatal: repository '${url}' does not exist`,
+        msg("fatal: repository '{url}' does not exist", { url }),
         '',
-        'Please make sure you have the correct access rights',
-        'and the repository exists.',
+        msg('Please make sure you have the correct access rights'),
+        msg('and the repository exists.'),
       ].join('\n'),
       'hint.cloneUnknownUrl',
       { url },
@@ -71,11 +74,11 @@ export function gitClone(world, args) {
   world.repo = repo
   world.remoteUrl = url
 
-  const objects = Object.keys(repo.commits).length
+  const count = Object.keys(repo.commits).length
   return [
-    `Cloning into '${world.folder}'...`,
-    `remote: Enumerating objects: ${objects}, done.`,
-    `remote: Counting objects: 100% (${objects}/${objects}), done.`,
-    `Receiving objects: 100% (${objects}/${objects}), done.`,
+    msg("Cloning into '{folder}'...", { folder: world.folder }),
+    msg('remote: Enumerating objects: {count}, done.', { count }),
+    msg('remote: Counting objects: 100% ({count}/{count}), done.', { count }),
+    msg('Receiving objects: 100% ({count}/{count}), done.', { count }),
   ]
 }

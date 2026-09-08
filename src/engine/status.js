@@ -1,6 +1,7 @@
 // Computes the difference between the three places a file can live:
 // the last commit (HEAD), the staging area (index) and the working directory.
 
+import { msg } from './messages.js'
 import { headTree } from './model.js'
 
 const ADDED = 'added'
@@ -66,12 +67,27 @@ export function dirtyFiles(world) {
   return new Set([...staged, ...notStaged].map((entry) => entry.name))
 }
 
+// Written as thunks so that the message extractor, which scans the source for
+// `msg('...')`, can still see the literals behind this lookup table.
 const LABEL = {
-  [ADDED]: 'new file:',
-  [MODIFIED]: 'modified:',
-  [DELETED]: 'deleted:',
+  [ADDED]: () => msg('new file:'),
+  [MODIFIED]: () => msg('modified:'),
+  [DELETED]: () => msg('deleted:'),
+}
+
+const bothModified = () => msg('both modified:')
+
+/** Leaves room for the longest label, so file names line up in any language. */
+function pad(label, width) {
+  return label.padEnd(width + 3, ' ')
 }
 
 export function formatEntry(entry) {
-  return `\t${LABEL[entry.change].padEnd(12, ' ')}${entry.name}`
+  const width = Math.max(...Object.values(LABEL).map((label) => label().length))
+  return `\t${pad(LABEL[entry.change](), width)}${entry.name}`
+}
+
+export function formatConflict(name) {
+  const label = bothModified()
+  return `\t${pad(label, label.length)}${name}`
 }

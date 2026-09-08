@@ -1,18 +1,33 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
+import { setMessages, translateWith } from '../engine/messages.js'
 import { AVAILABLE_LOCALES, DEFAULT_LOCALE, LOCALES } from './locales/index.js'
 
-const STORAGE_KEY = 'git-interactivo:locale'
+const LOCALE_KEY = 'git-interactivo:locale'
+const OUTPUT_KEY = 'git-interactivo:translate-output'
 const I18nContext = createContext(null)
 
-function readStoredLocale() {
+function read(key, fallback) {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored && AVAILABLE_LOCALES.includes(stored)) return stored
+    const stored = localStorage.getItem(key)
+    return stored === null ? fallback : stored
   } catch {
     // Private windows and blocked storage simply fall back to the default.
+    return fallback
   }
-  return DEFAULT_LOCALE
+}
+
+function write(key, value) {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    // Not being able to remember the choice is not worth an error.
+  }
+}
+
+function readStoredLocale() {
+  const stored = read(LOCALE_KEY, null)
+  return stored && AVAILABLE_LOCALES.includes(stored) ? stored : DEFAULT_LOCALE
 }
 
 /** Walks a dotted key such as `lesson.goal` through the messages object. */
@@ -26,28 +41,54 @@ function interpolate(text, params) {
   )
 }
 
+/**
+ * Lines of git output that the lesson texts quote. They are available to every
+ * `t()` call as parameters, so a hint that points at a section of `git status`
+ * keeps pointing at the right words whichever language the terminal is in.
+ */
+function gitQuotes(catalogue) {
+  const quote = (text) => translateWith(catalogue, text).replace(/:$/, '')
+  return {
+    gitUntracked: quote('Untracked files:'),
+    gitToBeCommitted: quote('Changes to be committed:'),
+    gitNotStaged: quote('Changes not staged for commit:'),
+    gitClean: quote('nothing to commit, working tree clean'),
+  }
+}
+
 export function I18nProvider({ children }) {
   const [locale, setLocaleState] = useState(readStoredLocale)
+  const [translateOutput, setTranslateOutputState] = useState(
+    () => read(OUTPUT_KEY, 'true') !== 'false',
+  )
 
   const setLocale = useCallback((next) => {
     setLocaleState(next)
-    try {
-      localStorage.setItem(STORAGE_KEY, next)
-    } catch {
-      // Not being able to remember the choice is not worth an error.
-    }
+    write(LOCALE_KEY, next)
   }, [])
 
-  const value = useMemo(() => {
-    const messages = LOCALES[locale]?.messages ?? LOCALES[DEFAULT_LOCALE].messages
-    const fallback = LOCALES[DEFAULT_LOCALE].messages
+  const setTranslateOutput = useCallback((next) => {
+    setTranslateOutputState(next)
+    write(OUTPUT_KEY, String(next))
+  }, [])
 
+  const messages = LOCALES[locale]?.messages ?? LOCALES[DEFAULT_LOCALE].messages
+  const gitCatalogue = translateOutput ? (messages.git ?? null) : null
+
+  // git picks its language from the environment; this is that environment.
+  useEffect(() => {
+    setMessages(gitCatalogue)
+  }, [gitCatalogue])
+
+  const value = useMemo(() => {
+    const fallback = LOCALES[DEFAULT_LOCALE].messages
     const resolve = (key) => lookup(messages, key) ?? lookup(fallback, key)
+    const quotes = gitQuotes(gitCatalogue)
 
     /** Translates a key. Missing keys surface as the key itself, never blank. */
     const t = (key, params = {}) => {
       const found = resolve(key)
-      if (typeof found === 'string') return interpolate(found, params)
+      if (typeof found === 'string') return interpolate(found, { ...quotes, ...params })
       if (found === undefined) return key
       return found
     }
@@ -56,14 +97,24 @@ export function I18nProvider({ children }) {
     const tList = (key, params = {}) => {
       const found = resolve(key)
       if (!Array.isArray(found)) return []
-      return found.map((item) => interpolate(item, params))
+      return found.map((item) => interpolate(item, { ...quotes, ...params }))
     }
 
     /** True when the key exists, so callers can skip optional sections. */
     const has = (key) => resolve(key) !== undefined
 
-    return { locale, setLocale, t, tList, has, locales: LOCALES, available: AVAILABLE_LOCALES }
-  }, [locale, setLocale])
+    return {
+      locale,
+      setLocale,
+      translateOutput,
+      setTranslateOutput,
+      t,
+      tList,
+      has,
+      locales: LOCALES,
+      available: AVAILABLE_LOCALES,
+    }
+  }, [locale, setLocale, messages, gitCatalogue, translateOutput, setTranslateOutput])
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }

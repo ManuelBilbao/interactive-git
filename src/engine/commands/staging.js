@@ -2,12 +2,15 @@
 
 import { green, red } from '../../ansi.js'
 import { gitError } from '../errors.js'
+import { msg } from '../messages.js'
 import { ancestors, currentBranch, headCommitId, headTree } from '../model.js'
-import { computeStatus, formatEntry } from '../status.js'
+import { computeStatus, formatConflict, formatEntry } from '../status.js'
 
 function branchHeadline(repo) {
-  if (repo.head.type === 'detached') return `HEAD detached at ${repo.head.commit}`
-  return `On branch ${repo.head.name}`
+  if (repo.head.type === 'detached') {
+    return msg('HEAD detached at {commit}', { commit: repo.head.commit })
+  }
+  return msg('On branch {branch}', { branch: repo.head.name })
 }
 
 /** "Your branch is ahead of 'origin/main' by 2 commits." and friends. */
@@ -23,25 +26,36 @@ function upstreamHeadline(repo) {
   const fromRemote = ancestors(repo, remote)
   const ahead = [...fromLocal].filter((id) => !fromRemote.has(id)).length
   const behind = [...fromRemote].filter((id) => !fromLocal.has(id)).length
-  const plural = (n) => (n === 1 ? 'commit' : 'commits')
 
-  if (ahead === 0 && behind === 0) return `Your branch is up to date with '${upstream}'.`
+  if (ahead === 0 && behind === 0) {
+    return msg("Your branch is up to date with '{upstream}'.", { upstream })
+  }
   if (behind === 0) {
     return [
-      `Your branch is ahead of '${upstream}' by ${ahead} ${plural(ahead)}.`,
-      '  (use "git push" to publish your local commits)',
+      ahead === 1
+        ? msg("Your branch is ahead of '{upstream}' by {count} commit.", { upstream, count: ahead })
+        : msg("Your branch is ahead of '{upstream}' by {count} commits.", { upstream, count: ahead }),
+      msg('  (use "git push" to publish your local commits)'),
     ].join('\n')
   }
   if (ahead === 0) {
     return [
-      `Your branch is behind '${upstream}' by ${behind} ${plural(behind)}, and can be fast-forwarded.`,
-      '  (use "git pull" to update your local branch)',
+      behind === 1
+        ? msg(
+            "Your branch is behind '{upstream}' by {count} commit, and can be fast-forwarded.",
+            { upstream, count: behind },
+          )
+        : msg(
+            "Your branch is behind '{upstream}' by {count} commits, and can be fast-forwarded.",
+            { upstream, count: behind },
+          ),
+      msg('  (use "git pull" to update your local branch)'),
     ].join('\n')
   }
   return [
-    `Your branch and '${upstream}' have diverged,`,
-    `and have ${ahead} and ${behind} different ${plural(2)} each, respectively.`,
-    '  (use "git pull" to merge the remote branch into yours)',
+    msg("Your branch and '{upstream}' have diverged,", { upstream }),
+    msg('and have {ahead} and {behind} different commits each, respectively.', { ahead, behind }),
+    msg('  (use "git pull" to merge the remote branch into yours)'),
   ].join('\n')
 }
 
@@ -51,8 +65,8 @@ export function gitStatus(world, args) {
   if (unknown) {
     throw gitError(
       [
-        `error: unknown option \`${unknown.replace(/^-+/, '')}'`,
-        'usage: git status [--] <pathspec>...',
+        msg("error: unknown option `{name}'", { name: unknown.replace(/^-+/, '') }),
+        msg('usage: git status [--] <pathspec>...'),
       ].join('\n'),
       'hint.statusUnknownOption',
       { name: unknown },
@@ -64,45 +78,47 @@ export function gitStatus(world, args) {
   const upstream = upstreamHeadline(repo)
   if (upstream) lines.push(upstream)
   if (!headCommitId(repo) && repo.head.type === 'branch') {
-    lines.push('', 'No commits yet')
+    lines.push('', msg('No commits yet'))
   }
 
   if (status.staged.length > 0) {
-    lines.push('', 'Changes to be committed:')
-    lines.push('  (use "git restore --staged <file>..." to unstage)')
+    lines.push('', msg('Changes to be committed:'))
+    lines.push(msg('  (use "git restore --staged <file>..." to unstage)'))
     lines.push(...status.staged.map((entry) => green(formatEntry(entry))))
   }
 
   if (status.conflicted.length > 0) {
-    lines.push('', 'Unmerged paths:')
-    lines.push('  (use "git add <file>..." to mark resolution)')
-    lines.push(...status.conflicted.map((name) => red(`\tboth modified:   ${name}`)))
+    lines.push('', msg('Unmerged paths:'))
+    lines.push(msg('  (use "git add <file>..." to mark resolution)'))
+    lines.push(...status.conflicted.map((name) => red(formatConflict(name))))
   }
 
   if (status.notStaged.length > 0) {
-    lines.push('', 'Changes not staged for commit:')
-    lines.push('  (use "git add <file>..." to update what will be committed)')
-    lines.push('  (use "git restore <file>..." to discard changes in working directory)')
+    lines.push('', msg('Changes not staged for commit:'))
+    lines.push(msg('  (use "git add <file>..." to update what will be committed)'))
+    lines.push(msg('  (use "git restore <file>..." to discard changes in working directory)'))
     lines.push(...status.notStaged.map((entry) => red(formatEntry(entry))))
   }
 
   if (status.untracked.length > 0) {
-    lines.push('', 'Untracked files:')
-    lines.push('  (use "git add <file>..." to include in what will be committed)')
+    lines.push('', msg('Untracked files:'))
+    lines.push(msg('  (use "git add <file>..." to include in what will be committed)'))
     lines.push(...status.untracked.map((name) => red(`\t${name}`)))
   }
 
   lines.push('')
   if (status.conflicted.length > 0) {
-    lines.push('You have unmerged paths.')
+    lines.push(msg('You have unmerged paths.'))
   } else if (status.staged.length > 0) {
     lines.pop()
   } else if (status.notStaged.length > 0) {
-    lines.push('no changes added to commit (use "git add" and/or "git commit -a")')
+    lines.push(msg('no changes added to commit (use "git add" and/or "git commit -a")'))
   } else if (status.untracked.length > 0) {
-    lines.push('nothing added to commit but untracked files present (use "git add" to track)')
+    lines.push(
+      msg('nothing added to commit but untracked files present (use "git add" to track)'),
+    )
   } else {
-    lines.push('nothing to commit, working tree clean')
+    lines.push(msg('nothing to commit, working tree clean'))
   }
   return lines
 }
@@ -122,7 +138,10 @@ export function gitAdd(world, args) {
 
   if (paths.length === 0 && !flagged) {
     throw gitError(
-      ['Nothing specified, nothing added.', "hint: Maybe you wanted to say 'git add .'?"].join('\n'),
+      [
+        msg('Nothing specified, nothing added.'),
+        msg("hint: Maybe you wanted to say 'git add .'?"),
+      ].join('\n'),
       'hint.addNeedsPath',
     )
   }
@@ -131,7 +150,7 @@ export function gitAdd(world, args) {
   for (const name of targets) {
     if (!Object.hasOwn(world.files, name) && !Object.hasOwn(repo.index, name)) {
       throw gitError(
-        `fatal: pathspec '${name}' did not match any files`,
+        msg("fatal: pathspec '{name}' did not match any files", { name }),
         'hint.pathspecNotFound',
         { name },
       )
@@ -160,9 +179,9 @@ export function gitRestore(world, args) {
   if (paths.length === 0) {
     throw gitError(
       [
-        'fatal: you must specify path(s) to restore',
+        msg('fatal: you must specify path(s) to restore'),
         '',
-        'usage: git restore [--staged] <pathspec>...',
+        msg('usage: git restore [--staged] <pathspec>...'),
       ].join('\n'),
       'hint.restoreNeedsPath',
     )
@@ -176,7 +195,7 @@ export function gitRestore(world, args) {
     } else {
       if (!Object.hasOwn(repo.index, name)) {
         throw gitError(
-          `error: pathspec '${name}' did not match any file(s) known to git`,
+          msg("error: pathspec '{name}' did not match any file(s) known to git", { name }),
           'hint.restoreUntracked',
           { name },
         )

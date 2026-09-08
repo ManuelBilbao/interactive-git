@@ -2,6 +2,7 @@
 
 import { paint, yellow } from '../../ansi.js'
 import { gitError } from '../errors.js'
+import { msg } from '../messages.js'
 import {
   currentBranch,
   headCommitId,
@@ -23,6 +24,13 @@ function countChanges(before, after) {
   return changed
 }
 
+/** " 2 files changed", in whichever language and plural form fits. */
+function changedLine(count) {
+  return count === 1
+    ? ` ${msg('{count} file changed', { count })}`
+    : ` ${msg('{count} files changed', { count })}`
+}
+
 export function gitCommit(world, args) {
   const repo = world.repo
   const status = computeStatus(world)
@@ -30,10 +38,10 @@ export function gitCommit(world, args) {
   if (status.conflicted.length > 0) {
     throw gitError(
       [
-        'error: Committing is not possible because you have unmerged files.',
-        'hint: Fix them up in the work tree, and then use \'git add <file>\'',
-        'hint: as appropriate to mark resolution and make a commit.',
-        'fatal: Exiting because of an unresolved conflict.',
+        msg('error: Committing is not possible because you have unmerged files.'),
+        msg("hint: Fix them up in the work tree, and then use 'git add <file>'"),
+        msg('hint: as appropriate to mark resolution and make a commit.'),
+        msg('fatal: Exiting because of an unresolved conflict.'),
       ].join('\n'),
       'hint.commitWithConflicts',
     )
@@ -41,13 +49,10 @@ export function gitCommit(world, args) {
 
   const message = readOption(args, '-m', '--message')
   if (message === undefined) {
-    throw gitError(
-      ['Aborting commit due to empty commit message.'].join('\n'),
-      'hint.commitNeedsMessage',
-    )
+    throw gitError(msg('Aborting commit due to empty commit message.'), 'hint.commitNeedsMessage')
   }
   if (message === null || message.trim() === '') {
-    throw gitError("error: switch `m' requires a value", 'hint.commitEmptyMessage')
+    throw gitError(msg("error: switch `m' requires a value"), 'hint.commitEmptyMessage')
   }
 
   const parentId = headCommitId(repo)
@@ -70,14 +75,11 @@ export function gitCommit(world, args) {
   else repo.head = { type: 'detached', commit: commitId }
 
   const changed = countChanges(treeOf(repo, parentId), repo.index)
-  const label = branch ?? `HEAD detached at ${commitId}`
-  const rootMark = parents.length === 0 ? ' (root-commit)' : ''
+  const label = branch ?? msg('HEAD detached at {commit}', { commit: commitId })
+  const rootMark = parents.length === 0 ? ` (${msg('root-commit')})` : ''
   repo.merge = null
 
-  return [
-    `[${label}${rootMark} ${commitId}] ${message}`,
-    ` ${changed} ${changed === 1 ? 'file' : 'files'} changed`,
-  ]
+  return [`[${label}${rootMark} ${commitId}] ${message}`, changedLine(changed)]
 }
 
 /** Every ref that points at a commit, rendered as git's `(HEAD -> main)`. */
@@ -102,7 +104,9 @@ export function gitLog(world, args) {
   const head = headCommitId(repo)
   if (!head) {
     throw gitError(
-      `fatal: your current branch '${currentBranch(repo)}' does not have any commits yet`,
+      msg("fatal: your current branch '{branch}' does not have any commits yet", {
+        branch: currentBranch(repo),
+      }),
       'hint.logWithoutCommits',
     )
   }
@@ -114,7 +118,9 @@ export function gitLog(world, args) {
       lines.push(`${yellow(commit.id)}${decorations(repo, commit.id)} ${commit.message}`)
     } else {
       lines.push(`${yellow(`commit ${commit.id}`)}${decorations(repo, commit.id)}`)
-      if (commit.parents.length > 1) lines.push(`Merge: ${commit.parents.join(' ')}`)
+      if (commit.parents.length > 1) {
+        lines.push(msg('Merge: {parents}', { parents: commit.parents.join(' ') }))
+      }
       lines.push('', `    ${commit.message}`, '')
     }
   }

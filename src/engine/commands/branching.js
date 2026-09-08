@@ -3,6 +3,7 @@
 
 import { green, red } from '../../ansi.js'
 import { gitError } from '../errors.js'
+import { msg } from '../messages.js'
 import {
   ancestors,
   currentBranch,
@@ -16,6 +17,13 @@ import {
 } from '../model.js'
 import { computeStatus } from '../status.js'
 import { applyTree, assertSafeToSwitch, changedBetween } from '../workdir.js'
+
+/** " 2 files changed", in whichever language and plural form fits. */
+function changedLine(count) {
+  return count === 1
+    ? ` ${msg('{count} file changed', { count })}`
+    : ` ${msg('{count} files changed', { count })}`
+}
 
 export function gitBranch(world, args) {
   const repo = world.repo
@@ -42,12 +50,16 @@ export function gitBranch(world, args) {
 
   const name = names[0]
   if (Object.hasOwn(repo.branches, name)) {
-    throw gitError(`fatal: a branch named '${name}' already exists`, 'hint.branchExists', { name })
+    throw gitError(
+      msg("fatal: a branch named '{name}' already exists", { name }),
+      'hint.branchExists',
+      { name },
+    )
   }
   const target = headCommitId(repo)
   if (!target) {
     throw gitError(
-      `fatal: not a valid object name: '${currentBranch(repo)}'`,
+      msg("fatal: not a valid object name: '{name}'", { name: currentBranch(repo) }),
       'hint.branchWithoutCommits',
     )
   }
@@ -57,15 +69,18 @@ export function gitBranch(world, args) {
 
 function deleteBranch(world, name, force) {
   const repo = world.repo
-  if (!name) throw gitError('fatal: branch name required', 'hint.branchDeleteNeedsName')
+  if (!name) throw gitError(msg('fatal: branch name required'), 'hint.branchDeleteNeedsName')
   if (!Object.hasOwn(repo.branches, name)) {
-    throw gitError(`error: branch '${name}' not found.`, 'hint.branchNotFound', { name })
+    throw gitError(msg("error: branch '{name}' not found.", { name }), 'hint.branchNotFound', {
+      name,
+    })
   }
   if (currentBranch(repo) === name) {
     throw gitError(
-      [
-        `error: Cannot delete branch '${name}' checked out at '/${world.folder}'`,
-      ].join('\n'),
+      msg("error: Cannot delete branch '{name}' checked out at '/{folder}'", {
+        name,
+        folder: world.folder,
+      }),
       'hint.branchDeleteCurrent',
       { name },
     )
@@ -73,8 +88,8 @@ function deleteBranch(world, name, force) {
   if (!force && !isAncestor(repo, repo.branches[name], headCommitId(repo))) {
     throw gitError(
       [
-        `error: The branch '${name}' is not fully merged.`,
-        `If you are sure you want to delete it, run 'git branch -D ${name}'.`,
+        msg("error: The branch '{name}' is not fully merged.", { name }),
+        msg("If you are sure you want to delete it, run 'git branch -D {name}'.", { name }),
       ].join('\n'),
       'hint.branchNotMerged',
       { name },
@@ -83,7 +98,7 @@ function deleteBranch(world, name, force) {
   const commitId = repo.branches[name]
   delete repo.branches[name]
   delete repo.upstream[name]
-  return [`Deleted branch ${name} (was ${commitId}).`]
+  return [msg('Deleted branch {name} (was {commit}).', { name, commit: commitId })]
 }
 
 export function gitCheckout(world, args) {
@@ -94,7 +109,7 @@ export function gitCheckout(world, args) {
 
   if (!target) {
     throw gitError(
-      'error: you must specify a branch or commit to checkout',
+      msg('error: you must specify a branch or commit to checkout'),
       'hint.checkoutNeedsTarget',
     )
   }
@@ -102,7 +117,7 @@ export function gitCheckout(world, args) {
   if (create) {
     if (Object.hasOwn(repo.branches, target)) {
       throw gitError(
-        `fatal: a branch named '${target}' already exists`,
+        msg("fatal: a branch named '{name}' already exists", { name: target }),
         'hint.branchExists',
         { name: target },
       )
@@ -110,19 +125,19 @@ export function gitCheckout(world, args) {
     const head = headCommitId(repo)
     if (!head) {
       throw gitError(
-        `fatal: not a valid object name: '${currentBranch(repo)}'`,
+        msg("fatal: not a valid object name: '{name}'", { name: currentBranch(repo) }),
         'hint.branchWithoutCommits',
       )
     }
     repo.branches[target] = head
     repo.head = { type: 'branch', name: target }
-    return [`Switched to a new branch '${target}'`]
+    return [msg("Switched to a new branch '{name}'", { name: target })]
   }
 
   const commitId = resolveRef(repo, target)
   if (!commitId) {
     throw gitError(
-      `error: pathspec '${target}' did not match any file(s) known to git`,
+      msg("error: pathspec '{name}' did not match any file(s) known to git", { name: target }),
       'hint.checkoutUnknownRef',
       { name: target },
     )
@@ -135,22 +150,25 @@ export function gitCheckout(world, args) {
   if (Object.hasOwn(repo.branches, target)) {
     repo.head = { type: 'branch', name: target }
     const upstream = repo.upstream[target]
-    const lines = [`Switched to branch '${target}'`]
+    const lines = [msg("Switched to branch '{name}'", { name: target })]
     if (upstream && repo.remoteTracking[upstream] === repo.branches[target]) {
-      lines.push(`Your branch is up to date with '${upstream}'.`)
+      lines.push(msg("Your branch is up to date with '{upstream}'.", { upstream }))
     }
     return lines
   }
 
   repo.head = { type: 'detached', commit: commitId }
   return [
-    `Note: switching to '${target}'.`,
+    msg("Note: switching to '{name}'.", { name: target }),
     '',
-    "You are in 'detached HEAD' state. You can look around, make experimental",
-    'changes and commit them, and you can discard any commits you make in this',
-    'state without impacting any branches by switching back to a branch.',
+    msg("You are in 'detached HEAD' state. You can look around, make experimental"),
+    msg('changes and commit them, and you can discard any commits you make in this'),
+    msg('state without impacting any branches by switching back to a branch.'),
     '',
-    `HEAD is now at ${commitId} ${repo.commits[commitId].message}`,
+    msg('HEAD is now at {commit} {message}', {
+      commit: commitId,
+      message: repo.commits[commitId].message,
+    }),
   ]
 }
 
@@ -197,15 +215,15 @@ export function gitMerge(world, args) {
   if (repo.merge) {
     throw gitError(
       [
-        'fatal: You have not concluded your merge (MERGE_HEAD exists).',
-        'Please, commit your changes before you merge.',
+        msg('fatal: You have not concluded your merge (MERGE_HEAD exists).'),
+        msg('Please, commit your changes before you merge.'),
       ].join('\n'),
       'hint.mergeInProgress',
     )
   }
   if (!target) {
     throw gitError(
-      ['fatal: No commit specified and merge.defaultToUpstream not set.'].join('\n'),
+      msg('fatal: No commit specified and merge.defaultToUpstream not set.'),
       'hint.mergeNeedsBranch',
     )
   }
@@ -213,7 +231,7 @@ export function gitMerge(world, args) {
   const theirCommit = resolveRef(repo, target)
   if (!theirCommit) {
     throw gitError(
-      `merge: ${target} - not something we can merge`,
+      msg('merge: {name} - not something we can merge', { name: target }),
       'hint.mergeUnknownBranch',
       { name: target },
     )
@@ -222,12 +240,12 @@ export function gitMerge(world, args) {
   const ourCommit = headCommitId(repo)
   if (!ourCommit) {
     throw gitError(
-      'fatal: Non-fast-forward commit does not make sense into an empty head',
+      msg('fatal: Non-fast-forward commit does not make sense into an empty head'),
       'hint.mergeWithoutCommits',
     )
   }
   if (ourCommit === theirCommit || isAncestor(repo, theirCommit, ourCommit)) {
-    return ['Already up to date.']
+    return [msg('Already up to date.')]
   }
 
   const theirTree = treeOf(repo, theirCommit)
@@ -242,9 +260,9 @@ export function gitMerge(world, args) {
     if (branch) repo.branches[branch] = theirCommit
     else repo.head = { type: 'detached', commit: theirCommit }
     return [
-      `Updating ${ourCommit}..${theirCommit}`,
-      'Fast-forward',
-      ` ${changed} ${changed === 1 ? 'file' : 'files'} changed`,
+      msg('Updating {from}..{to}', { from: ourCommit, to: theirCommit }),
+      msg('Fast-forward'),
+      changedLine(changed),
     ]
   }
 
@@ -252,7 +270,10 @@ export function gitMerge(world, args) {
 
   const base = mergeBase(repo, ourCommit, theirCommit)
   if (!base) {
-    throw gitError('fatal: refusing to merge unrelated histories', 'hint.unrelatedHistories')
+    throw gitError(
+      msg('fatal: refusing to merge unrelated histories'),
+      'hint.unrelatedHistories',
+    )
   }
 
   const { tree, conflicts } = mergeTrees(
@@ -262,7 +283,7 @@ export function gitMerge(world, args) {
     target,
   )
   const touched = changedBetween(headTree(repo), tree)
-  const lines = touched.map((name) => `Auto-merging ${name}`)
+  const lines = touched.map((name) => msg('Auto-merging {name}', { name }))
 
   // Both the working directory and the index receive the merged content;
   // conflicted files carry the markers until the student fixes them.
@@ -280,12 +301,14 @@ export function gitMerge(world, args) {
   if (conflicts.length > 0) {
     repo.merge = { from: target, fromCommit: theirCommit, conflicts }
     lines.push(
-      ...conflicts.map((name) => `CONFLICT (content): Merge conflict in ${name}`),
-      'Automatic merge failed; fix conflicts and then commit the result.',
+      ...conflicts.map((name) => msg('CONFLICT (content): Merge conflict in {name}', { name })),
+      msg('Automatic merge failed; fix conflicts and then commit the result.'),
     )
     return lines
   }
 
+  // The commit message is stored in the repository, so it stays in English
+  // whatever language the output is in — git does not translate it either.
   const message = `Merge branch '${target}'`
   const commitId = writeCommit(world, repo, {
     parents: [ourCommit, theirCommit],
@@ -296,10 +319,7 @@ export function gitMerge(world, args) {
   if (branch) repo.branches[branch] = commitId
   else repo.head = { type: 'detached', commit: commitId }
 
-  lines.push(
-    "Merge made by the 'ort' strategy.",
-    ` ${touched.length} ${touched.length === 1 ? 'file' : 'files'} changed`,
-  )
+  lines.push(msg("Merge made by the 'ort' strategy."), changedLine(touched.length))
   return lines
 }
 

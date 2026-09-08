@@ -2,6 +2,7 @@
 // goes wrong, the key of a friendly explanation the UI shows beside the error.
 
 import { GitError, gitError } from '../errors.js'
+import { msg } from '../messages.js'
 import { tokenize } from '../parser.js'
 import { gitBranch, gitCheckout, gitMerge } from './branching.js'
 import { gitCommit, gitLog } from './history.js'
@@ -73,8 +74,8 @@ function runGit(world, args) {
     const suggestion = closest(subcommand, Object.keys(GIT_COMMANDS))
     throw gitError(
       [
-        `git: '${subcommand}' is not a git command. See 'git --help'.`,
-        ...(suggestion ? ['', 'The most similar command is', `\t${suggestion}`] : []),
+        msg("git: '{name}' is not a git command. See 'git --help'.", { name: subcommand }),
+        ...(suggestion ? ['', msg('The most similar command is'), `\t${suggestion}`] : []),
       ].join('\n'),
       suggestion ? 'hint.unknownGitCommandDidYouMean' : 'hint.unknownGitCommand',
       { name: subcommand, suggestion },
@@ -82,7 +83,7 @@ function runGit(world, args) {
   }
   if (!world.repo && !WITHOUT_REPO.has(subcommand)) {
     throw gitError(
-      'fatal: not a git repository (or any of the parent directories): .git',
+      msg('fatal: not a git repository (or any of the parent directories): .git'),
       'hint.notARepo',
     )
   }
@@ -112,7 +113,7 @@ export function run(world, line) {
 
     const suggestion = closest(name, [...Object.keys(SHELL_COMMANDS), 'git', 'clear', 'help'])
     throw gitError(
-      `bash: ${name}: command not found`,
+      msg('bash: {name}: command not found', { name }),
       suggestion ? 'hint.unknownCommandDidYouMean' : 'hint.unknownCommand',
       { name, suggestion },
     )

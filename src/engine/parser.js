@@ -2,6 +2,7 @@
 // that `git commit -m "mi primer commit"` arrives as four tokens.
 
 import { gitError } from './errors.js'
+import { msg } from './messages.js'
 
 export function tokenize(line) {
   const tokens = []
@@ -46,7 +47,10 @@ export function tokenize(line) {
     started = true
   }
   if (quote) {
-    throw gitError('bash: unexpected EOF while looking for matching quote', 'hint.unclosedQuote')
+    throw gitError(
+      msg('bash: unexpected EOF while looking for matching quote'),
+      'hint.unclosedQuote',
+    )
   }
   push()
   return tokens

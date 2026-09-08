@@ -1,6 +1,7 @@
 // `git push` and `git pull`: talking to the simulated server, `origin`.
 
 import { gitError } from '../errors.js'
+import { msg } from '../messages.js'
 import {
   REMOTE_NAME,
   ancestors,
@@ -14,9 +15,9 @@ function requireRemote(world) {
   if (!world.remote || !world.remoteUrl) {
     throw gitError(
       [
-        'fatal: No configured push destination.',
-        'Please specify either a URL or a remote name from which',
-        'new revisions should be fetched.',
+        msg('fatal: No configured push destination.'),
+        msg('Please specify either a URL or a remote name from which'),
+        msg('new revisions should be fetched.'),
       ].join('\n'),
       'hint.noRemote',
     )
@@ -27,10 +28,7 @@ function requireRemote(world) {
 function requireBranch(world) {
   const branch = currentBranch(world.repo)
   if (!branch) {
-    throw gitError(
-      'fatal: You are not currently on a branch.',
-      'hint.pushDetached',
-    )
+    throw gitError(msg('fatal: You are not currently on a branch.'), 'hint.pushDetached')
   }
   return branch
 }
@@ -61,8 +59,8 @@ export function gitPush(world, args) {
   if (!Object.hasOwn(repo.branches, branch)) {
     throw gitError(
       [
-        `error: src refspec ${branch} does not match any`,
-        `error: failed to push some refs to '${world.remoteUrl}'`,
+        msg('error: src refspec {name} does not match any', { name: branch }),
+        msg("error: failed to push some refs to '{url}'", { url: world.remoteUrl }),
       ].join('\n'),
       'hint.pushNothingToPush',
       { name: branch },
@@ -72,18 +70,18 @@ export function gitPush(world, args) {
   const local = repo.branches[branch]
   const onServer = remote.branches[branch]
 
-  if (onServer === local) return ['Everything up-to-date']
+  if (onServer === local) return [msg('Everything up-to-date')]
 
   // The server only accepts history that already contains what it has.
   if (onServer && !ancestors(repo, local).has(onServer)) {
     throw gitError(
       [
-        `To ${world.remoteUrl}`,
-        ` ! [rejected]        ${branch} -> ${branch} (fetch first)`,
-        `error: failed to push some refs to '${world.remoteUrl}'`,
-        'hint: Updates were rejected because the remote contains work that you do',
-        'hint: not have locally. You may want to first integrate the remote changes',
-        "hint: (e.g., 'git pull') before pushing again.",
+        msg('To {url}', { url: world.remoteUrl }),
+        msg(' ! [rejected]        {branch} -> {branch} (fetch first)', { branch }),
+        msg("error: failed to push some refs to '{url}'", { url: world.remoteUrl }),
+        msg('hint: Updates were rejected because the remote contains work that you do'),
+        msg('hint: not have locally. You may want to first integrate the remote changes'),
+        msg("hint: (e.g., 'git pull') before pushing again."),
       ].join('\n'),
       'hint.pushRejected',
     )
@@ -97,14 +95,19 @@ export function gitPush(world, args) {
   }
 
   const lines = [
-    `Enumerating objects: ${ancestors(repo, local).size}, done.`,
-    `To ${world.remoteUrl}`,
+    msg('Enumerating objects: {count}, done.', { count: ancestors(repo, local).size }),
+    msg('To {url}', { url: world.remoteUrl }),
     onServer
       ? `   ${onServer}..${local}  ${branch} -> ${branch}`
-      : ` * [new branch]      ${branch} -> ${branch}`,
+      : msg(' * [new branch]      {branch} -> {branch}', { branch }),
   ]
   if (setUpstream) {
-    lines.push(`branch '${branch}' set up to track '${REMOTE_NAME}/${branch}'.`)
+    lines.push(
+      msg("branch '{name}' set up to track '{ref}'.", {
+        name: branch,
+        ref: `${REMOTE_NAME}/${branch}`,
+      }),
+    )
   }
   return lines
 }
@@ -120,8 +123,8 @@ export function gitPull(world, args) {
   if (positional.length === 0 && !repo.upstream[branch]) {
     throw gitError(
       [
-        'There is no tracking information for the current branch.',
-        'Please specify which branch you want to merge with.',
+        msg('There is no tracking information for the current branch.'),
+        msg('Please specify which branch you want to merge with.'),
         '',
         `    git pull ${REMOTE_NAME} <branch>`,
       ].join('\n'),
@@ -134,21 +137,22 @@ export function gitPull(world, args) {
   const lines = []
   if (updates.length > 0) {
     lines.push(
-      `remote: Enumerating objects: ${updates.length}, done.`,
-      `From ${world.remoteUrl}`,
+      msg('remote: Enumerating objects: {count}, done.', { count: updates.length }),
+      msg('From {url}', { url: world.remoteUrl }),
       ...updates.map((update) =>
         update.before
           ? `   ${update.before}..${update.after}  ${update.name} -> ${update.ref}`
-          : ` * [new branch]      ${update.name} -> ${update.ref}`,
+          : msg(' * [new branch]      {branch} -> {ref}', {
+              branch: update.name,
+              ref: update.ref,
+            }),
       ),
     )
   }
 
   if (!Object.hasOwn(repo.remoteTracking, ref)) {
     throw gitError(
-      [
-        `fatal: couldn't find remote ref ${remoteBranch}`,
-      ].join('\n'),
+      msg("fatal: couldn't find remote ref {name}", { name: remoteBranch }),
       'hint.pullUnknownBranch',
       { name: remoteBranch },
     )
@@ -156,10 +160,10 @@ export function gitPull(world, args) {
 
   const before = repo.branches[branch]
   const merged = gitMerge(world, [ref])
-  if (merged.length === 1 && merged[0] === 'Already up to date.' && lines.length === 0) {
-    return ['Already up to date.']
-  }
-  // `git pull` names the merge after the remote branch it integrated.
+  const alreadyUpToDate = merged.length === 1 && merged[0] === msg('Already up to date.')
+  if (alreadyUpToDate && lines.length === 0) return merged
+  // `git pull` names the merge after the remote branch it integrated. The
+  // message is stored in the repository, so it stays in English.
   const head = repo.branches[branch]
   if (head && head !== before && repo.commits[head]?.parents.length > 1) {
     repo.commits[head].message = `Merge branch '${remoteBranch}' of ${world.remoteUrl}`

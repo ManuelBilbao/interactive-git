@@ -2,6 +2,7 @@
 // safety checks real git performs before it overwrites your work.
 
 import { gitError } from './errors.js'
+import { msg } from './messages.js'
 import { headTree } from './model.js'
 import { computeStatus } from './status.js'
 
@@ -27,10 +28,13 @@ export function assertSafeToSwitch(world, targetTree, operation) {
   if (endangered.length > 0) {
     throw gitError(
       [
-        `error: Your local changes to the following files would be overwritten by ${operation}:`,
+        msg(
+          'error: Your local changes to the following files would be overwritten by {operation}:',
+          { operation },
+        ),
         ...[...new Set(endangered)].sort().map((name) => `\t${name}`),
-        `Please commit your changes or stash them before you ${operation}.`,
-        'Aborting',
+        msg('Please commit your changes or stash them before you {operation}.', { operation }),
+        msg('Aborting'),
       ].join('\n'),
       'hint.dirtyTree',
       { operation },
@@ -41,10 +45,13 @@ export function assertSafeToSwitch(world, targetTree, operation) {
   if (clobbered.length > 0) {
     throw gitError(
       [
-        `error: The following untracked working tree files would be overwritten by ${operation}:`,
+        msg(
+          'error: The following untracked working tree files would be overwritten by {operation}:',
+          { operation },
+        ),
         ...clobbered.map((name) => `\t${name}`),
-        'Please move or remove them before you continue.',
-        'Aborting',
+        msg('Please move or remove them before you continue.'),
+        msg('Aborting'),
       ].join('\n'),
       'hint.untrackedClobber',
       { operation },

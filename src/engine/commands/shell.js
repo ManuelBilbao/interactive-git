@@ -2,6 +2,7 @@
 // leaving the terminal. Files can also be edited from the side panel.
 
 import { gitError } from '../errors.js'
+import { msg } from '../messages.js'
 
 export function ls(world) {
   const names = Object.keys(world.files).sort()
@@ -14,16 +15,20 @@ export function pwd(world) {
 
 export function cat(world, args) {
   const name = args[0]
-  if (!name) throw gitError('usage: cat <file>', 'hint.catNeedsFile')
+  if (!name) throw gitError(msg('usage: cat <file>'), 'hint.catNeedsFile')
   if (!Object.hasOwn(world.files, name)) {
-    throw gitError(`cat: ${name}: No such file or directory`, 'hint.noSuchFile', { name })
+    throw gitError(
+      msg('cat: {name}: No such file or directory', { name }),
+      'hint.noSuchFile',
+      { name },
+    )
   }
   const content = world.files[name]
   return content === '' ? [] : content.split('\n')
 }
 
 export function touch(world, args) {
-  if (args.length === 0) throw gitError('usage: touch <file>', 'hint.touchNeedsFile')
+  if (args.length === 0) throw gitError(msg('usage: touch <file>'), 'hint.touchNeedsFile')
   for (const name of args) {
     if (!Object.hasOwn(world.files, name)) world.files[name] = ''
   }
@@ -32,10 +37,14 @@ export function touch(world, args) {
 
 export function rm(world, args) {
   const names = args.filter((arg) => !arg.startsWith('-'))
-  if (names.length === 0) throw gitError('usage: rm <file>', 'hint.rmNeedsFile')
+  if (names.length === 0) throw gitError(msg('usage: rm <file>'), 'hint.rmNeedsFile')
   for (const name of names) {
     if (!Object.hasOwn(world.files, name)) {
-      throw gitError(`rm: ${name}: No such file or directory`, 'hint.noSuchFile', { name })
+      throw gitError(
+        msg('rm: {name}: No such file or directory', { name }),
+        'hint.noSuchFile',
+        { name },
+      )
     }
     delete world.files[name]
   }
@@ -49,7 +58,10 @@ export function echo(world, args) {
 
   const name = args[redirectIndex + 1]
   if (!name) {
-    throw gitError('bash: syntax error near unexpected token `newline\'', 'hint.redirectNeedsFile')
+    throw gitError(
+      msg('bash: syntax error near unexpected token `newline\''),
+      'hint.redirectNeedsFile',
+    )
   }
   if (args[redirectIndex] === '>>') {
     const previous = world.files[name]
