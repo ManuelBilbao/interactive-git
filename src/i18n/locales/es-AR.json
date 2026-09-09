@@ -124,7 +124,6 @@
     "shellHelp": "Comandos de git: git init, git clone, git status, git add, git restore, git commit, git log, git branch, git checkout, git merge, git push, git pull.\nEscribí `git` solo para ver la lista, o `git <comando> --help` para ver uno en detalle.\n\nComandos de la terminal: ls, cd, cat, touch, rm, echo, pwd, clear.\n\nTambién podés crear y editar archivos desde el panel Archivos, sin usar la terminal.",
     "statusUnknownOption": "`git status` no lleva esa opción. Escribilo a secas: la sección `Changes to be committed`, en verde, es lo que ya está en el stage. Y si querés ver *qué* cambió ahí, `git diff --staged`.",
     "reducedHelp": "Esta ayuda es reducida: lista solo lo que funciona en este simulador. Git tiene muchas más opciones, y la ayuda de verdad la vas a ver corriendo `git {command} --help` en una terminal.",
-    "mergeConflict": "El merge quedó a medio hacer. Los archivos en conflicto tienen marcas `<<<<<<<`, `=======` y `>>>>>>>`: editalos para dejar la versión que quieras, y después `git add <archivo>` y `git commit` para cerrarlo.",
     "cdNeedsName": "A `cd` hay que decirle a dónde ir: `cd <carpeta>`.",
     "cdNoSuchDirectory": "No hay ninguna carpeta `{name}` acá. Mirá qué hay con `ls`: las carpetas terminan en `/`.",
     "cdNotADirectory": "`{name}` es un archivo, no una carpeta.",

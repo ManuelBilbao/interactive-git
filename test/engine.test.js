@@ -428,7 +428,7 @@ test('every hint is labelled with the kind of note it is', () => {
   assert.equal(kindOf('git init'), null, 'nothing to say, no note')
 })
 
-test('a conflicted merge warns, without being an error', () => {
+test('a conflicted merge is not an error, and says so on its own', () => {
   const world = play(
     createWorld(),
     'git init',
@@ -447,10 +447,14 @@ test('a conflicted merge warns, without being an error', () => {
   const step = run(world, 'git merge otra')
 
   assert.equal(step.output.error, false, 'a conflict is not a failed command')
-  assert.equal(step.output.hintKey, 'hint.mergeConflict')
-  assert.equal(step.output.hintKind, 'warn')
+  assert.ok(
+    step.output.lines.some((line) => line.includes('CONFLICT')),
+    'git says it itself, in its own output',
+  )
+  // No note beside it: git's output already names the file and what to do, and
+  // a whole lesson is built on reading it.
+  assert.equal(step.output.hintKey, null)
 
-  // And it stops warning once the conflict is dealt with.
   const fixed = play(step.world, 'echo "resuelto" > a.txt', 'git add a.txt')
   assert.equal(run(fixed, 'git status').output.hintKey, null)
 })

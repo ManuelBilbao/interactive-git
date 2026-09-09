@@ -359,7 +359,10 @@ try {
     (await terminal()).includes('CONFLICTO'),
     terminal,
   )
-  await check('and warns instead of erroring', (await hint()).includes('conflicto'), hint)
+  await check(
+    'and puts no note beside it',
+    (await evaluate("return document.querySelectorAll('.hint-card').length")) === 0,
+  )
   await check(
     'the file carries the markers',
     await evaluate(`return document.body.innerText.includes('<<<<<<< HEAD')`),

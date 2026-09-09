@@ -109,15 +109,17 @@ what *this course* says about it: which command to reach for next, and why. One
 is a fact about git, the other is teaching.
 
 Each hint carries the kind of note it is, so the card can say which: **Error**
-for something git refused, **Ojo** for something half-done, **Info** for plain
-information, **Tip** for a suggestion, each in the terminal's own colour.
-`src/engine/hints.js` holds that mapping in one table — an unlisted hint is an
-error when the command failed and information when it did not, which is right
-often enough that only six of them need naming.
+for something git refused, **Info** for plain information, **Tip** for a
+suggestion, each in the terminal's own colour. `src/engine/hints.js` holds that
+mapping in one table — an unlisted hint is an error when the command failed and
+information when it did not, which is right often enough that only five of them
+need naming.
 
-The one that earns "Ojo" is worth pointing out: a merge ending in conflicts is
-**not** a failed command, so nothing was flagging it. It leaves the student
-mid-operation with work to do, and now says so.
+There is a fourth kind, **Ojo**, for something left half-done. Nothing produces
+one today: a conflicted merge used to, and it was the only one. Its own output
+already names the file and says what to do, and lesson 18 is built on reading
+exactly that, so a card repeating it was in the way. The kind stays because it
+costs one line in the table to use again.
 
 `test/i18n.test.js` walks the engine source for `'hint.*'` literals and fails
 when one has no translation, or when a translation is no longer used.

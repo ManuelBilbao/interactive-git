@@ -172,10 +172,8 @@ Cuando un comando falla pasan dos cosas al mismo tiempo:
 - abajo aparece una tarjeta que lo explica en castellano y dice cómo seguir.
 
 La tarjeta dice de qué tipo de nota se trata: **Error** cuando git se negó a
-hacer algo, **Ojo** cuando algo quedó a medio hacer (un merge con conflictos, por
-ejemplo, que no es un error pero deja trabajo pendiente), **Info** cuando es
-información —la ayuda de un comando— y **Tip** cuando es una sugerencia, como
-cuando escribieron mal el nombre de un comando.
+hacer algo, **Info** cuando es información —la ayuda de un comando— y **Tip**
+cuando es una sugerencia, como cuando escribieron mal el nombre de un comando.
 
 Los errores están escritos para que valga la pena leerlos. Un `git comit` sugiere
 `git commit`; un commit sin nada en el stage muestra el `git status` completo; un
@@ -225,6 +223,6 @@ de archivos.
   camino, deshacerlo y que lo hagan ellos.
 - La lección 17 es un buen lugar para frenar y dibujar el grafo en el pizarrón
   antes de correr el merge.
-- Para mostrar un conflicto: en la lección 11, editar el mismo archivo en las dos
-  ramas y mergear. Los conflictos están implementados aunque ninguna lección los
-  exija, y se resuelven como en la vida real, con `git add` y `git commit`.
+- El conflicto de la lección 18 se puede armar en cualquier otra: editar el mismo
+  archivo en dos ramas y mergear. Ahí no hay tarjeta que ayude, a propósito: lo
+  que hay para leer es lo que imprime git.

@@ -12,7 +12,6 @@ const KINDS = {
   'hint.reducedHelp': 'info',
   'hint.unknownGitCommandDidYouMean': 'tip',
   'hint.unknownCommandDidYouMean': 'tip',
-  'hint.mergeConflict': 'warn',
 }
 
 export const HINT_KINDS = ['error', 'warn', 'info', 'tip']
