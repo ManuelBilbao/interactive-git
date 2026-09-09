@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { startLessonTimer, trackLessonCompleted } from './analytics.js'
 import FilesPanel from './components/FilesPanel.jsx'
 import GraphView from './components/GraphView.jsx'
 import LessonPanel from './components/LessonPanel.jsx'
@@ -40,7 +41,7 @@ const stored = loadProgress()
 const initialLesson = lessonFromUrl(LESSONS.length) ?? Math.min(stored.lesson, LESSONS.length - 1)
 
 export default function App() {
-  const { t, locale, setLocale, locales, available } = useI18n()
+  const { t, tList, locale, setLocale, locales, available } = useI18n()
 
   const [index, setIndex] = useState(initialLesson)
   const [world, setWorld] = useState(() => LESSONS[initialLesson].setup())
@@ -58,11 +59,21 @@ export default function App() {
   }
 
   const lesson = LESSONS[index]
+  // How many hints this lesson has, so a completion can report "2 of 4": the
+  // count alone says nothing, since two hints is halfway through one lesson and
+  // the revealed solution in another.
+  const hintsAvailable = tList(`lessons.${lesson.id}.hints`).length
 
   useEffect(() => {
     saveProgress({ completed: [...completed], lesson: index })
     writeLessonToUrl(index)
   }, [completed, index])
+
+  // The first lesson starts its clock on arrival; every later one starts it in
+  // `startLesson`, which also covers starting the same lesson over.
+  useEffect(() => {
+    startLessonTimer()
+  }, [])
 
   const makeEntry = (type, text) => {
     entryId.current += 1
@@ -88,8 +99,9 @@ export default function App() {
       if (!reached) return
       setSolved(true)
       setCompleted((previous) => new Set(previous).add(lesson.id))
+      trackLessonCompleted(lesson.id, index, { hints: hintsShown, hintsAvailable })
     },
-    [lesson],
+    [hintsAvailable, hintsShown, index, lesson],
   )
 
   const startLesson = useCallback((nextIndex) => {
@@ -100,6 +112,7 @@ export default function App() {
     setHistory([])
     setSolved(false)
     setHintsShown(0)
+    startLessonTimer()
   }, [])
 
   const handleCommand = (line) => {

@@ -375,6 +375,91 @@ after every command and after every edit made in the files panel; App wraps it
 in a try/catch so a lesson that trips over an unexpected state cannot take the
 page down.
 
+## Analytics
+
+Four numbers, for the person teaching the course: how many people use the site,
+how many of them get through each lesson, how many hints they needed first, and
+how long it took them. `src/analytics.js` is all of it.
+
+GoatCounter receives them. It sets no cookies and stores nothing that identifies
+a person, so there is no consent banner to write and nothing to put in front of
+the site before a student can use it.
+
+**A GoatCounter event is a path and nothing else.** There is no numeric property
+to put a duration or a count in, and that single constraint shapes everything
+here: the value has to travel inside the path.
+
+```
+leccion/03-add            one per person who finished lesson 3
+pistas/03-add/2-de-4      ...having opened 2 of its 4 hints
+tiempo/03-add/4-2-5m      ...in between two and five minutes
+```
+
+The page view is the fourth number and takes a different route entirely:
+GoatCounter's own script sends it on load, and the counting of unique visitors
+happens on the other side. Nothing in this repository counts people.
+
+Three consequences of encoding values in paths:
+
+- **Hints are reported with their total**, `2-de-4`, not as a bare `2`. Lessons
+  have between two and four hints and the last one is the solution, so two hints
+  is halfway through one lesson and the whole answer in another. `4-de-4` always
+  means the solution was revealed. `App.jsx` reads the length from the locale
+  file and passes it down; the module never sees the prose.
+- **Durations are bucketed**, and the buckets are numbered — `4-2-5m`, not
+  `2-5m` — because the label is all GoatCounter stores. Unnumbered, a dashboard
+  sorted by path lists `1-2m`, `10-20m`, `2-5m` and reads as nonsense.
+- **Lessons are numbered too**, `03-add`, so a CSV export sorts into the order
+  the course is taught. The id stays in the path so a row is still recognisable
+  if the course is ever reordered.
+
+### The clock
+
+`startLessonTimer` runs from `startLesson` in `App.jsx`, and from a mount effect
+for the lesson the site opens on. It stops at the first completion.
+
+It is **not** a wall clock. `visibilitychange` pauses it while the tab is in the
+background, because otherwise "how long does lesson 3 take?" is answered by the
+lunch break of whoever left the tab open, and that is the one question the metric
+exists to answer.
+
+### Counting people, not events
+
+The word in the metric is *users*, so a repeat has to be dropped rather than
+counted and divided out later. The completion path is the gate: it is kept in
+`localStorage`, so a student who replays a lesson, reopens the site next week or
+hits **Reiniciar progreso** is counted once. Resetting the progress deliberately
+does not clear it — they did reach it.
+
+That one gate covers the hints and the duration as well. A second run through a
+lesson is a different question, and averaging it in would make every lesson look
+easier than it is.
+
+### Failure is silent
+
+Two more details fall out of this being a single-page site on a CDN:
+
+- **The page view is counted for the bare path.** `?leccion=N` is a deep link
+  into the same page, and left alone GoatCounter would file each one separately,
+  so the dashboard would open on twenty-two rows instead of one site.
+- **Events are queued until the script loads.** A lesson can be finished before
+  an `async` script from a CDN has landed. A path is written to `localStorage`
+  only once it has actually been handed over, so an event lost to a blocked
+  script is sent again on the next visit rather than silently marked as counted.
+
+An ad blocker, a school firewall, a private window: `state` goes to `off`, the
+queue is dropped and the student never learns that analytics exists. Nothing here
+is worth an error.
+
+`SITE`, at the top of the file, is the whole configuration — the subdomain of the
+GoatCounter site. Empty means no script and no requests at all, which is what a
+fork wants; `npm run dev` is covered anyway, because GoatCounter's script refuses
+to count on localhost.
+
+What is **not** sent is as deliberate as what is. No command the student typed,
+no file they wrote, no error they hit, no wall-clock timestamp. Those would all
+be interesting, and none of them was asked for.
+
 ## Testing
 
 Five layers, all of them cheap:
@@ -385,10 +470,11 @@ Five layers, all of them cheap:
 | `test/lessons.test.js` | every lesson is solvable, via a known-good solution |
 | `test/i18n.test.js` | no hint or lesson text is missing or orphaned |
 | `test/graph.test.js` | the drawing has no overlaps and fits its bounds |
+| `test/analytics.test.js` | one counter per lesson, the buckets, and nobody counted twice |
 | `scripts/render-check.mjs` | components render for empty, merged, detached, conflicted and remote worlds |
 | `scripts/browser-check.mjs` | the real page in headless Chrome, driven by keystrokes |
 
-`npm test` runs the first five. The browser check needs a dev server and is run
+`npm test` runs the first six. The browser check needs a dev server and is run
 on demand.
 
 ## Known simplifications

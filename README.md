@@ -84,6 +84,67 @@ falta de verdad: `git clone` crea la carpeta pero deja al usuario afuera, como e
 git de verdad. Lo mismo se puede
 hacer con el panel **Archivos**, que hace las veces de editor de texto.
 
+## Métricas
+
+El sitio mide cuatro cosas, y nada más: **cuánta gente lo usa**, **cuánta
+termina cada lección**, **cuántas pistas abrió antes de terminarla** y **cuánto
+le llevó**. Las recibe [GoatCounter](https://www.goatcounter.com/), que no usa
+cookies ni guarda nada que identifique a una persona, así que no hace falta
+ningún cartel de consentimiento.
+
+No se manda nada de lo que la persona escribe: ni los comandos, ni los archivos,
+ni los errores. El evento es el id de la lección, un número de pistas y un rango
+de tiempo.
+
+El panel está en <https://manuelbilbao.goatcounter.com>. **Total unique
+visitors** es la primera métrica; las otras tres están en **Events**, con un
+prefijo cada una:
+
+```
+leccion/03-add                 119     ← cuánta gente terminó la lección 3
+pistas/03-add/0-de-4            71     ← de esa gente, cuántos no abrieron ninguna
+pistas/03-add/4-de-4            12     ← y cuántos llegaron a mostrar la solución
+tiempo/03-add/2-30s-1m          44     ← cuánto les llevó
+tiempo/03-add/4-2-5m            18
+```
+
+Un evento de GoatCounter es una ruta y nada más —no hay dónde poner un número—,
+así que el valor viaja en la ruta. De ahí las dos decisiones que se notan al
+mirar el panel:
+
+- Las pistas se informan como `2-de-4`, con el total, porque el número solo no
+  dice nada: dos pistas es la mitad en una lección que tiene cuatro y es la
+  solución en una que tiene dos. `4-de-4` es siempre "mostró la solución".
+- El tiempo cae en un rango (`1-hasta-30s`, `2-30s-1m`, `3-1-2m`, `4-2-5m`,
+  `5-5-10m`, `6-10-20m`, `7-mas-20m`). Van numerados para que ordenen bien: sin
+  el número el panel los lista `1-2m`, `10-20m`, `2-5m`.
+
+El reloj **no cuenta el tiempo con la pestaña en segundo plano**, así que alguien
+que deja el sitio abierto y se va a almorzar no ensucia el promedio. Empieza de
+cero en cada lección y en cada **Reiniciar**.
+
+Cada persona cuenta una sola vez por lección, aunque la repita, vuelva otro día o
+toque **Reiniciar progreso**. Eso vale también para las pistas y el tiempo: una
+segunda vuelta ya contesta otra pregunta, y promediarla haría quedar a todas las
+lecciones más fáciles de lo que son.
+
+Para bajar los números y hacer cuentas de verdad está el export a CSV del panel,
+o su API. Las lecciones van numeradas (`03-add`) para que el CSV quede ordenado
+en el orden en que se dan.
+
+### Configuración
+
+Todo vive en `SITE`, arriba de todo en `src/analytics.js`:
+
+```js
+const SITE = 'manuelbilbao'
+```
+
+Vacío apaga las métricas por completo —no se carga ningún script ni se hace
+ningún pedido—, que es lo que quiere un fork del repositorio. En `npm run dev`
+tampoco cuenta nada, incluso con `SITE` puesto: el script de GoatCounter se niega
+a contar en localhost.
+
 ## Estructura
 
 ```
@@ -99,6 +160,7 @@ src/
     diff.js          comparar dos snapshots, con formato de `git diff`
     merge.js         juntar dos versiones de un archivo, línea por línea
     commands/        un archivo por familia de comandos
+  analytics.js       las métricas del curso, vía GoatCounter
   lessons/index.js   las lecciones: setup y condición de victoria
   i18n/              proveedor de traducciones y locales
     locales/es-AR.json
@@ -113,7 +175,7 @@ test/                tests del simulador, de las lecciones y del grafo
 ## Tests
 
 ```bash
-npm test             # simulador + lecciones + i18n + grafo + render
+npm test             # simulador + lecciones + i18n + grafo + métricas + render
 npm run check:render # sólo el render de los componentes
 npm run check:browser  # end to end en Chrome (requiere `npm run dev` corriendo)
 ```
