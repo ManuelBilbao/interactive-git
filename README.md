@@ -97,6 +97,7 @@ src/
     parser.js        de una línea de texto a tokens
     errors.js        GitError: mensaje de git + clave de la pista traducida
     diff.js          comparar dos snapshots, con formato de `git diff`
+    merge.js         juntar dos versiones de un archivo, línea por línea
     commands/        un archivo por familia de comandos
   lessons/index.js   las lecciones: setup y condición de victoria
   i18n/              proveedor de traducciones y locales

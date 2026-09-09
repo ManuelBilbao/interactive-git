@@ -263,11 +263,27 @@ ids here are `C1` and `C2`, so a line of fake hashes would teach nothing.
 3. otherwise → find the merge base (the deepest common ancestor) and merge the
    three trees file by file
 
-`mergeTrees` decides per file: if both sides agree, take it; if one side matches
-the base, take the other; otherwise it is a conflict, and the file gets the
-familiar `<<<<<<<` / `=======` / `>>>>>>>` markers. `repo.merge` then holds the
-unresolved paths until `git add` clears them and `git commit` writes the merge
-commit with two parents.
+`mergeTrees` decides per file: if both sides agree, take it; if one side still
+matches the base, take the other. When both of them changed it, the file goes to
+`engine/merge.js`, which merges it line by line.
+
+That is diff3, and it reuses the comparison `git diff` is built on. Both sides
+are lined up against the ancestor with `diffLines`, which says where each
+ancestor line ended up on each side, or that it is gone. Walking the three
+together, a line all of them agree on needs no decision; the pieces between
+those agreements are what a merge is actually about. A piece where only one side
+moved takes that side, and one where both sides made the same edit takes it
+once. Only when both changed it *differently* do the `<<<<<<<` / `=======` /
+`>>>>>>>` markers appear, and they wrap that piece alone — the rest of the file
+comes out merged.
+
+This is what makes a conflict mean something: two people editing far apart in
+one file merge cleanly, so the markers only ever show up where they genuinely
+disagreed. `repo.merge` then holds the unresolved paths until `git add` clears
+them and `git commit` writes the merge commit with two parents.
+
+A file one side deleted while the other edited it is the exception, and stays
+whole-file: there are no lines to line up against a file that is not there.
 
 Conflicts are not part of any lesson goal, but they are fully implemented, so a
 student who wanders into one can get out the same way they would in real life.
@@ -381,8 +397,6 @@ These are deliberate, and worth knowing before extending the project:
 
 - File names are flat strings, and the only subdirectory is the one `git clone`
   creates; `cd` moves one level at a time, in or back out.
-- Merging compares whole file contents, not lines, so any two different versions
-  of a file conflict. Good enough to teach what a conflict *is*.
 - `git log` supports `--oneline` and nothing else. No `stash`, `rebase`,
   `reset`, `remote add`, `fetch` on its own, or tags.
 - A remote exists only when a lesson seeds one; there is no `git remote add`.

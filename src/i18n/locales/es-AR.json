@@ -293,8 +293,7 @@
         "Empezá por el merge y leé lo que dice. Un conflicto no es un error: es git preguntándote cuál de las dos versiones vale. `git status` te muestra cuál es el archivo en conflicto.",
         "Editá `recetas.md` en el panel Archivos: borrá las tres líneas de marcas y dejá las dos recetas. Después ponelo en el stage, que es la forma de decirle a git que ese archivo ya está resuelto.",
         "```\ngit merge postres\ngit add recetas.md\ngit commit -m \"junto postres con main\"\n```\nEntre el merge y el `git add` va la edición del archivo. Si no querés salir de la terminal, `echo \"Milanesas\" > recetas.md` y `>>` para las que siguen reescriben el archivo entero."
-      ],
-      "note": "Acá las marcas abarcan el archivo entero, porque el simulador compara archivos completos. En git de verdad abarcan solo las líneas en disputa y el resto del archivo queda intacto."
+      ]
     },
     "clone": {
       "title": "Clonar un repositorio que ya existe",

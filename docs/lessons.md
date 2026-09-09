@@ -223,6 +223,8 @@ de archivos.
   camino, deshacerlo y que lo hagan ellos.
 - La lección 17 es un buen lugar para frenar y dibujar el grafo en el pizarrón
   antes de correr el merge.
-- El conflicto de la lección 18 se puede armar en cualquier otra: editar el mismo
-  archivo en dos ramas y mergear. Ahí no hay tarjeta que ayude, a propósito: lo
-  que hay para leer es lo que imprime git.
+- El conflicto de la lección 18 se puede armar en cualquier otra, pero hace falta
+  que las dos ramas toquen **las mismas líneas**: el merge es por líneas, así que
+  editar el mismo archivo en dos lugares distintos sale limpio. Eso también sirve
+  para mostrarlo. Ahí no hay tarjeta que ayude, a propósito: lo que hay para leer
+  es lo que imprime git.

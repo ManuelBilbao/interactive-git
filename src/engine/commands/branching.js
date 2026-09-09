@@ -3,6 +3,7 @@
 
 import { green, red } from '../../ansi.js'
 import { gitError } from '../errors.js'
+import { threeWayMerge } from '../merge.js'
 import { msg } from '../messages.js'
 import {
   ancestors,
@@ -172,8 +173,7 @@ export function gitCheckout(world, args) {
   ]
 }
 
-const CONFLICT_TOP = '<<<<<<< HEAD'
-const CONFLICT_MIDDLE = '======='
+const OUR_LABEL = 'HEAD'
 
 /** Three-way merge of file trees. Returns the merged tree plus conflicts. */
 export function mergeTrees(base, ours, theirs, theirLabel) {
@@ -193,15 +193,29 @@ export function mergeTrees(base, ours, theirs, theirLabel) {
     if (o === t) result = o
     else if (o === b) result = t
     else if (t === b) result = o
-    else {
+    else if (o === undefined || t === undefined) {
+      // One side deleted the file while the other was editing it. There is no
+      // line to compare against a file that is not there, so the whole thing
+      // goes to the student.
       conflicts.push(name)
       result = [
-        CONFLICT_TOP,
+        `<<<<<<< ${OUR_LABEL}`,
         o ?? '',
-        CONFLICT_MIDDLE,
+        '=======',
         t ?? '',
         `>>>>>>> ${theirLabel}`,
       ].join('\n')
+    } else {
+      // Both sides edited it: only the pieces they disagree on are a conflict.
+      const merged = threeWayMerge(
+        b === undefined ? [] : b.split('\n'),
+        o.split('\n'),
+        t.split('\n'),
+        OUR_LABEL,
+        theirLabel,
+      )
+      if (merged.conflicted) conflicts.push(name)
+      result = merged.lines.join('\n')
     }
     if (result !== undefined) tree[name] = result
   }

@@ -428,6 +428,70 @@ test('every hint is labelled with the kind of note it is', () => {
   assert.equal(kindOf('git init'), null, 'nothing to say, no note')
 })
 
+/**
+ * A repository where `main` and `otra` each edited `lista.md`, from one base.
+ *
+ * The edits are written into the world rather than typed: `echo` appends one
+ * line at a time, and what these tests need is a file long enough to have a
+ * far end.
+ */
+function twoBranches(ourEdit, theirEdit) {
+  const base = { 'lista.md': 'una\ndos\ntres\ncuatro\ncinco' }
+  let world = play(
+    createWorld({ files: base }),
+    'git init',
+    'git add .',
+    'git commit -m "base"',
+    'git checkout -b otra',
+  )
+  world.files = { 'lista.md': theirEdit }
+  world = play(world, 'git add .', 'git commit -m "otra"', 'git checkout main')
+  world.files = { 'lista.md': ourEdit }
+  return play(world, 'git add .', 'git commit -m "main"')
+}
+
+test('two people editing far apart in one file do not conflict', () => {
+  // This is the point of merging by lines: a conflict has to mean the two
+  // sides actually disagreed, not merely that they touched the same file.
+  const world = twoBranches(
+    'UNA\ndos\ntres\ncuatro\ncinco',
+    'una\ndos\ntres\ncuatro\nCINCO',
+  )
+  const step = run(world, 'git merge otra')
+
+  assert.equal(step.output.error, false)
+  assert.equal(step.world.repo.merge, null, 'the merge finished on its own')
+  assert.equal(step.world.files['lista.md'], 'UNA\ndos\ntres\ncuatro\nCINCO')
+})
+
+test('the same edit on both sides is not a disagreement', () => {
+  const edited = 'una\ndos\nTRES\ncuatro\ncinco'
+  const step = run(twoBranches(edited, edited), 'git merge otra')
+
+  assert.equal(step.world.repo.merge, null)
+  assert.equal(step.world.files['lista.md'], edited, 'the shared edit lands once')
+})
+
+test('markers wrap the lines in dispute, not the whole file', () => {
+  const step = run(
+    twoBranches('una\ndos\nnuestra\ncuatro\ncinco', 'una\ndos\nla otra\ncuatro\ncinco'),
+    'git merge otra',
+  )
+
+  assert.deepEqual(step.world.files['lista.md'].split('\n'), [
+    'una',
+    'dos',
+    '<<<<<<< HEAD',
+    'nuestra',
+    '=======',
+    'la otra',
+    '>>>>>>> otra',
+    'cuatro',
+    'cinco',
+  ])
+  assert.deepEqual(step.world.repo.merge.conflicts, ['lista.md'])
+})
+
 test('a conflicted merge is not an error, and says so on its own', () => {
   const world = play(
     createWorld(),
