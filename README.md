@@ -65,7 +65,7 @@ configuración de SPA ni un `404.html`.
 
 ## Qué enseña
 
-Veintiuna lecciones, en orden, sobre estos comandos:
+Veintidós lecciones, en orden, sobre estos comandos:
 
 `git init`, `git clone`, `git status`, `git add`,
 `git restore [--staged]`, `git commit -m`, `git diff [--staged]`,

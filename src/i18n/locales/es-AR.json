@@ -282,6 +282,21 @@
         "Estando en `main`, `git merge postres`. Si `git status` no dice `En la rama main`, primero `git checkout main`."
       ]
     },
+    "mergeConflict": {
+      "title": "Resolver un conflicto",
+      "intro": [
+        "Los merges de recién salieron solos porque cada rama tocó cosas distintas. Cuando las dos tocan **lo mismo**, git no elige por vos: te pasa la decisión.",
+        "Acá `main` agregó `Milanesas` y `postres` agregó `Flan casero`, en el mismo lugar del mismo archivo. Al mergear, git deja las dos versiones adentro de `recetas.md`, separadas por marcas: arriba del `=======` va lo tuyo (`HEAD`), abajo lo que trae la otra rama.",
+        "Resolver es editar el archivo hasta que diga lo que tiene que decir, marcas incluidas: las tres líneas de `<`, `=` y `>` se borran. Hasta que no hagas el commit, el merge queda a medio hacer, y `git status` te lo va a recordar."
+      ],
+      "goal": "Terminá el merge de `postres` sin perder ninguna de las dos recetas: `Milanesas` y `Flan casero` tienen que quedar las dos.",
+      "hints": [
+        "Empezá por el merge y leé lo que dice. Un conflicto no es un error: es git preguntándote cuál de las dos versiones vale. `git status` te muestra cuál es el archivo en conflicto.",
+        "Editá `recetas.md` en el panel Archivos: borrá las tres líneas de marcas y dejá las dos recetas. Después ponelo en el stage, que es la forma de decirle a git que ese archivo ya está resuelto.",
+        "```\ngit merge postres\ngit add recetas.md\ngit commit -m \"junto postres con main\"\n```\nEntre el merge y el `git add` va la edición del archivo. Si no querés salir de la terminal, `echo \"Milanesas\" > recetas.md` y `>>` para las que siguen reescriben el archivo entero."
+      ],
+      "note": "Acá las marcas abarcan el archivo entero, porque el simulador compara archivos completos. En git de verdad abarcan solo las líneas en disputa y el resto del archivo queda intacto."
+    },
     "clone": {
       "title": "Clonar un repositorio que ya existe",
       "intro": [

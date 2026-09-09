@@ -35,6 +35,15 @@ es que "sin salida" es una respuesta y no una falla, y para eso el simulador pon
 una tarjeta cuando pasa. Como todo el sentido está en el contraste, la condición
 de victoria pide el `git diff` **antes** del `git add` y no solo el de después.
 
+**Los tres merges, en ese orden (16, 17 y 18).** Fast-forward, commit de merge y
+conflicto son tres cosas distintas que la misma palabra tapa. Verlas separadas
+deja claro que el conflicto no es un merge que salió mal: es el único caso en el
+que git no tiene forma de decidir solo. La lección pide expresamente que queden
+**las dos** recetas, porque la salida fácil de un conflicto es borrar lo que
+escribió el otro, y eso también lo hace desaparecer. Nada de esto necesita
+comandos nuevos: el conflicto se resuelve editando el archivo, con `git add`
+como forma de decir "listo, ya lo miré".
+
 **Comparar antes de mergear (15).** `git diff main postres` contesta "qué me
 traería este merge" antes de hacerlo. Y enseña una cosa que se paga cara: con dos
 nombres el orden importa, se lee del primero al segundo, y al revés los `+` y los
@@ -91,10 +100,11 @@ las dos cosas al mismo tiempo.
 | 15 | `diffBranches` | `git diff` | Ver qué trae otra rama antes de mergearla. |
 | 16 | `merge` | `git merge` | Un merge que es un fast-forward. |
 | 17 | `mergeDiverged` | `git merge` | Un merge de verdad, con commit de merge. |
-| 18 | `branchDelete` | `git branch -d` | Borrar una rama mergeada, y ver que git protege la que no lo está. |
-| 19 | `pushRejected` | `git pull`, `git push` | Resolver un push rechazado. |
-| 20 | `branchAll` | `git push -u`, `git branch -a` | Subir una rama y listar todas. |
-| 21 | `final` | todos | El flujo completo, sin pistas paso a paso. |
+| 18 | `mergeConflict` | `git merge`, `git add`, `git commit -m` | Resolver un conflicto a mano y cerrar el merge. |
+| 19 | `branchDelete` | `git branch -d` | Borrar una rama mergeada, y ver que git protege la que no lo está. |
+| 20 | `pushRejected` | `git pull`, `git push` | Resolver un push rechazado. |
+| 21 | `branchAll` | `git push -u`, `git branch -a` | Subir una rama y listar todas. |
+| 22 | `final` | todos | El flujo completo, sin pistas paso a paso. |
 
 ## Por qué está armado así
 

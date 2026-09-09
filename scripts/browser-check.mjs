@@ -350,6 +350,35 @@ try {
   await check('status is translated', spanish.includes('En la rama main'), terminal)
   await check('so are its sections', spanish.includes('Cambios listos para el commit:'), terminal)
 
+  // Resolving a conflict is the one lesson whose real path is the Files panel
+  // and not the terminal, so the terminal-only tests cannot cover it.
+  await openLesson('mergeConflict')
+  await type('git merge postres')
+  await check(
+    'a conflicting merge says so without failing',
+    (await terminal()).includes('CONFLICTO'),
+    terminal,
+  )
+  await check('and warns instead of erroring', (await hint()).includes('conflicto'), hint)
+  await check(
+    'the file carries the markers',
+    await evaluate(`return document.body.innerText.includes('<<<<<<< HEAD')`),
+  )
+
+  await evaluate(`document.querySelectorAll('.file-actions button')[0].click()`)
+  await wait(120)
+  await evaluate(`
+    const area = document.querySelector('.file-editor textarea')
+    const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set
+    setter.call(area, '# Recetas\\n\\nTortilla de papas\\nMilanesas\\nFlan casero')
+    area.dispatchEvent(new Event('input', { bubbles: true }))
+    document.querySelector('.file-editor .primary').click()
+  `)
+  await wait(150)
+  await type('git add recetas.md')
+  await type('git commit -m "junto postres con main"')
+  await check('the resolved merge commits', await solved())
+
   // Layout, last so it does not disturb the lesson above: a code block has to
   // show every line it holds. The lesson panel is a flex column, and a flex
   // child that shrinks below its content clips whatever it cannot fit.

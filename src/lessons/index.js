@@ -283,6 +283,37 @@ const DEFINITIONS = [
     },
   },
   {
+    id: 'mergeConflict',
+    commands: ['git merge', 'git add', 'git commit -m'],
+    setup: () => {
+      const world = createWorld()
+      const repo = localRepo(world, [['primeras recetas', { 'recetas.md': RECIPE }]])
+      repo.branches.postres = repo.branches.main
+
+      // Both branches add a line in the same place of the same file, which is
+      // the one thing a merge cannot decide on its own.
+      seed(world, repo, 'postres', 'flan', { 'recetas.md': `${RECIPE}\nFlan casero` })
+      seed(world, repo, 'main', 'milanesas', { 'recetas.md': `${RECIPE}\nMilanesas` })
+      world.files = { ...repo.commits[repo.branches.main].tree }
+      repo.index = { ...world.files }
+      return world
+    },
+    check: (world) => {
+      const repo = world.repo
+      const head = repo.commits[headCommitId(repo)]
+      if (!head || head.parents.length !== 2) return false
+      // Resolving means keeping both sides. Deleting the other branch's line
+      // also makes the conflict go away, and it is the mistake to catch here.
+      const recipes = head.tree['recetas.md'] ?? ''
+      return (
+        !repo.merge &&
+        !recipes.includes('<<<<<<<') &&
+        recipes.includes('Milanesas') &&
+        recipes.includes('Flan casero')
+      )
+    },
+  },
+  {
     id: 'branchDelete',
     commands: ['git branch -d'],
     setup: () => {
@@ -467,6 +498,7 @@ const ORDER = [
   'diffBranches',
   'merge',
   'mergeDiverged',
+  'mergeConflict',
   'branchDelete',
   // Both at once
   'pushRejected',

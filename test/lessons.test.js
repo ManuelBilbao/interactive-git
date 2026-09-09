@@ -33,6 +33,17 @@ const SOLUTIONS = {
   diffBranches: ['git diff main postres'],
   merge: ['git merge postres'],
   mergeDiverged: ['git merge postres'],
+  mergeConflict: [
+    'git merge postres',
+    // The Files panel is the natural way to do this; the terminal is the one
+    // a test can type.
+    'echo "# Recetas" > recetas.md',
+    'echo "Tortilla de papas" >> recetas.md',
+    'echo "Milanesas" >> recetas.md',
+    'echo "Flan casero" >> recetas.md',
+    'git add recetas.md',
+    'git commit -m "junto postres con main"',
+  ],
   branchDelete: ['git branch -d postres'],
   clone: [`git clone ${REPO}`, 'cd interactive-git'],
   push: [
@@ -105,6 +116,31 @@ test('the diff lesson needs the look before the `git add`, not only after', () =
 
   assert.equal(solve(['git add recetas.md', 'git diff', 'git diff --staged']), false)
   assert.equal(solve(SOLUTIONS.diff), true)
+})
+
+test('resolving the conflict by dropping one side is not resolving it', () => {
+  // Deleting the other branch's line also makes the markers go away, and it is
+  // the mistake the lesson is there to catch.
+  const lesson = LESSONS.find((item) => item.id === 'mergeConflict')
+  let world = lesson.setup()
+  const history = []
+  for (const line of [
+    'git merge postres',
+    'echo "# Recetas" > recetas.md',
+    'echo "Tortilla de papas" >> recetas.md',
+    'echo "Milanesas" >> recetas.md',
+    'git add recetas.md',
+    'git commit -m "me quedo con lo mio"',
+  ]) {
+    const step = run(world, line)
+    assert.equal(step.output.error, false, `"${line}" failed`)
+    world = step.world
+    history.push(line)
+  }
+
+  const head = world.repo.commits[world.repo.branches.main]
+  assert.equal(head.parents.length, 2, 'the merge itself did go through')
+  assert.equal(lesson.check(world, history), false, 'but the goal must not count it')
 })
 
 test('the push lesson rejects a push that skipped the pull', () => {
